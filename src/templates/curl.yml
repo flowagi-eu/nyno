@@ -1,0 +1,8 @@
+curl:
+  flags:
+    s: null
+    H:
+      - "Accept: application/json"
+  args:
+    - "https://jsonplaceholder.typicode.com/todos/1"
+

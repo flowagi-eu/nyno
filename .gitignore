@@ -1,0 +1,5 @@
+.ascend
+node_modules
+dist
+bun.lock
+src/tcp/routes
