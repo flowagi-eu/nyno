@@ -5,6 +5,11 @@
 ### Video Demo
 [Watch Video](https://empowerd.dev/h/e99f6d53ae7bbfba55e76fc69f940b61f6e9abf802e01c8e8334f6cf60b1c484/screencast-from-2025-10-13-14-49-10.mp4)
 
+<p align="center">
+  <img src="nyno-logo2.png" alt="Nyno logo" width="200">
+</p>
+
+
 ### Install
 
 Note: Nyno depends on Best.js which needs to be installed to run Nyno.
