@@ -1,4 +1,4 @@
-### Nyno (“Nine-oh”) is a open-source Linux workflow builder & executor without limits. Proudly build with [best.js](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative that uses Vite!
+### Nyno (“Nine-oh”) is an open-source Linux workflow builder & executor without limits. Proudly build with [best.js](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative that uses Vite!
 
 ![Describe Image Here](/h/8d49d6961db4db78cec4ef61f897806f94dd34e2ff881d235f2886181f0233fc/screenshot-from-2025-10-13-13-50-39.webp)
 
