@@ -3,7 +3,7 @@
 ![Describe Image Here](/h/8d49d6961db4db78cec4ef61f897806f94dd34e2ff881d235f2886181f0233fc/screenshot-from-2025-10-13-13-50-39.webp)
 
 ### Video Demo
-[Watch Video](/h/e99f6d53ae7bbfba55e76fc69f940b61f6e9abf802e01c8e8334f6cf60b1c484/screencast-from-2025-10-13-14-49-10.mp4)
+[Watch Video](https://empowerd.dev/h/e99f6d53ae7bbfba55e76fc69f940b61f6e9abf802e01c8e8334f6cf60b1c484/screencast-from-2025-10-13-14-49-10.mp4)
 
 ### Install
 
