@@ -8,38 +8,19 @@ import App from '../App.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Parse .env manually ---
-const envFilePath = path.resolve('./envs/.nyno_log_db.env');
-const envContent = fs.readFileSync(envFilePath, 'utf-8');
-const envVars = {};
-envContent.split(/\r?\n/).forEach(line => {
-  line = line.trim();
-  if (!line || line.startsWith('#')) return;
-  const [key, ...rest] = line.split('=');
-  envVars[key] = rest.join('=').trim();
-});
 
-// Extract DB variables
-const {
-  NYNO_DB_NAME: dbName,
-  NYNO_DB_USER: dbUser,
-  NYNO_DB_PASS: dbPass,
-  NYNO_DB_HOST: dbHost = 'localhost',
-  NYNO_DB_PORT: dbPort = '5432'
-} = envVars;
-
-// --- Connect to Postgres and store in App singleton ---
-const dbClient = new Client({
-  user: dbUser,
-  host: dbHost,
-  password: dbPass,
-  port: parseInt(dbPort),
-  database: dbName
-});
-
-await dbClient.connect();
-App.set('db', dbClient);
-console.log('Postgres client stored in App singleton');
+const extensionsDir = './extensions';
+if (!fs.existsSync(extensionsDir)){
+    fs.mkdirSync(extensionsDir);
+}
+const envsDir = './envs';
+if (!fs.existsSync(envsDir)){
+    fs.mkdirSync(envsDir);
+}
+const outputDir = './output';
+if (!fs.existsSync(outputDir)){
+    fs.mkdirSync(outputDir);
+}
 
 // --- Load extensions ---
 async function loadExtensions() {
