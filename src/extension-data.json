@@ -1,0 +1,5 @@
+{
+  "nyno-log": {
+    "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n"
+  }
+}

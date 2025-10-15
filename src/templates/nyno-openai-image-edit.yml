@@ -1,0 +1,6 @@
+nyno-openai-image-edit:
+	args:
+	- "${apiKey}
+	- "${imagePath}
+	- "${prompt}
+

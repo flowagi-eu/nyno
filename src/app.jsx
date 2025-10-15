@@ -1,5 +1,5 @@
 // src/pages/flow.jsx
-
+import extensions from "@/extension-data.json";
 import { YamlFormToggle } from "@/components/YamlFormToggle";
 
 // --- Template imports (as plain text)
@@ -7,7 +7,6 @@ import echo from "@/templates/echo.yml?raw";
 import echoWithVar from "@/templates/echo-with-var.yml?raw";
 import curl from "@/templates/curl.yml?raw";
 import aiImageEditor from "@/templates/ai-image-editor.yml?raw";
-
 
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
@@ -48,6 +47,15 @@ const templates = {
   "AI Image Edtiro": aiImageEditor,
 };
 
+
+// --- Get existing extensions
+console.log('existing extensions found in app.jsx',extensions);
+
+for (const [folder, { yaml }] of Object.entries(extensions)) {
+  if (!yaml) continue; // skip empty entries
+  const command = folder.toLowerCase().replace(/\s+/g, "-");
+  templates[folder] = yaml; // set yaml in templates
+}
 
   // --- Undo history
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
