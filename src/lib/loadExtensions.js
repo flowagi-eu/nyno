@@ -21,6 +21,11 @@ const outputDir = './output';
 if (!fs.existsSync(outputDir)){
     fs.mkdirSync(outputDir);
 }
+const routesDir = './src/tcp/routes';
+if (!fs.existsSync(routesDir)){
+    fs.mkdirSync(routesDir);
+}
+
 
 // --- Load extensions ---
 async function loadExtensions() {
