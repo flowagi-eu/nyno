@@ -82,7 +82,7 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"i":0}'
 
 
 # Extensions (commands) with JavaScript
-Extensions have been added to make otherwise impossible high performing tasks possible. One example is high frequency logs that need a persistant TCP connection with Postgres (instead of using Bash commands that would open new TCP connection for each log):
+Beyond any Linux Command you can also use JavaScript Extensions to make otherwise impossible high performing tasks possible. One example is high frequency logs that need a persistant TCP connection with Postgres (instead of using Bash commands that would open new TCP connection for each log):
 
 ```
 // extensions/nyno-log/command.js 
