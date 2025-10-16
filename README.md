@@ -84,7 +84,8 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"i":0}'
 # Extensions (commands) with JavaScript
 Extensions have been added to make otherwise impossible high performing tasks possible. One example is high frequency logs that need a persistant TCP connection with Postgres (instead of using Bash commands that would open new TCP connection for each log):
 
- cat extensions/nyno-log/command.js 
+```
+// extensions/nyno-log/command.js 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -136,11 +137,15 @@ export default async function nyno_log(args, context) {
 
   return { output: 'ok' };
 }
-user@staryoga:~/github/nyno$ cat extensions/nyno-log/template.yml 
+```
+
+For loading template code in the GUI:
+```
+// extensions/nyno-log/template.yml 
 nyno-log:
   args:
     - "${JSON}"
-
+```
 
 
 
