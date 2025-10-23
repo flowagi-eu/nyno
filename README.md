@@ -108,6 +108,80 @@ function hello_php($args, $context) {
 
 ```
 
+Example Workflow output:
+```
+{
+    "route": "\/test_runners",
+    "system": "default",
+    "status": "ok",
+    "execution_time_seconds": 0.012,
+    "execution": [
+        {
+            "input": {
+                "i": "0",
+                "name": "Alice"
+            },
+            "output": "0",
+            "details": {
+                "command": [
+                    "nyno-echo",
+                    "0"
+                ],
+                "context": {
+                    "i": "0",
+                    "name": "Alice"
+                },
+                "node_id": "1",
+                "node_title": "route_\/test_runners",
+                "new_context": {
+                    "i": "0",
+                    "name": "Alice",
+                    "NYNO_ECHO_ARGS": [
+                        "0"
+                    ]
+                }
+            }
+        },
+        {
+            "input": {
+                "i": "0",
+                "name": "Alice",
+                "NYNO_ECHO_ARGS": [
+                    "0"
+                ],
+                "O_1": "0"
+            },
+            "output": "Hello, Alice!",
+            "details": {
+                "command": [
+                    "hello",
+                    "Alice"
+                ],
+                "context": {
+                    "i": "0",
+                    "name": "Alice",
+                    "NYNO_ECHO_ARGS": [
+                        "0"
+                    ],
+                    "O_1": "0"
+                },
+                "node_id": "2",
+                "node_title": "test-js",
+                "new_context": {
+                    "i": "0",
+                    "name": "Alice",
+                    "NYNO_ECHO_ARGS": [
+                        "0"
+                    ],
+                    "O_1": "0",
+                    "custom_js_var": "js"
+                }
+            }
+        }
+    ]
+}
+```
+
 ---
 
 Nyno (“Nine-oh”) is  open-source & Proudly build with [Best.JS](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative.
