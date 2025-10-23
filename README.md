@@ -10,7 +10,8 @@
 
 Nyno is an **open-source multi-language workflow engine** that lets you build, extend, and connect automation in the languages you already know — **Python, PHP, JavaScript**, or even **Bash**.
 
-Each language (except Bash) runs in their own **high-performing worker engines**. Functions and Commands from  each language can be called using the human-readable **YAML text** format.
+runs in its own high-performance worker engine
+Each language (except Bash) runs in its own **high-performance worker engine**. Functions and commands can be called using the human-readable **YAML text** format.
 
 ### Introducing "The Engine" that powers Nyno 2.0
 To achieve most requests/per second we're using multi-process worker engines where feasible. Nyno will spawn 3 light-weight workers for each language and for every CPU core. This means that if you have 4 CPU cores, it will spawn 12 ready-to-run workers to run workflow steps.
