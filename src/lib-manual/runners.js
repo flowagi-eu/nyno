@@ -2,16 +2,39 @@
 import net from "net";
 import { spawn } from "child_process";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const RUNNERS = {
-  php: { host: "localhost", port: 6000, cmd: "php", file: path.resolve(__dirname, "runners/runner.php") },
-  js: { host: "localhost", port: 4001, cmd: "node", file: path.resolve(__dirname, "runners/runner.js") },
-  py: { host: "localhost", port: 5000, cmd: "python3", file: path.resolve(__dirname, "runners/runner.py") },
+  php: { host: "localhost", port: 6000, cmd: "php", file: path.resolve(__dirname, "runners/runner.php"), checkFunction:() => {
+    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    if (!fs.existsSync(extensionsDir)) return false;
+
+    return fs.readdirSync(extensionsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.php')));
+  } },
+  js: { host: "localhost", port: 4001, cmd: "node", file: path.resolve(__dirname, "runners/runner.js"), checkFunction:() => {
+    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    if (!fs.existsSync(extensionsDir)) return false;
+
+    return fs.readdirSync(extensionsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.js')));
+  } },
+  py: { host: "localhost", port: 5000, cmd: "python3", file: path.resolve(__dirname, "runners/runner.py"), checkFunction:() => {
+    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    if (!fs.existsSync(extensionsDir)) return false;
+
+    return fs.readdirSync(extensionsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.py')));
+  } },
 };
+const RUNNERS_DISABLED = {};
 
 const API_KEY = "changeme";
 const connections = {};
@@ -33,7 +56,17 @@ function startRunner(type) {
 
 // --- Start all runners ---
 function startRunners() {
-  for (const type of Object.keys(RUNNERS)) startRunner(type);
+  for (const type of Object.keys(RUNNERS)) {
+    const data = RUNNERS[type];
+    if(data.checkFunction){
+      const check = data.checkFunction();
+      if(!check) { 
+        RUNNERS_DISABLED[type] = 1;
+        continue; // skip if no extensions are found
+      }
+    }
+    startRunner(type);
+  }
 }
 
 // --- Persistent TCP connection ---
@@ -80,7 +113,11 @@ function connectRunner(type) {
 
 // --- Connect all runners ---
 function connectAllRunners() {
-  for (const type of Object.keys(RUNNERS)) connectRunner(type);
+  for (const type of Object.keys(RUNNERS)) {
+    if(!(type in RUNNERS_DISABLED)){
+    connectRunner(type);
+    }
+  }
 }
 
 // --- Run function on a single runner ---
