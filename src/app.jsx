@@ -5,8 +5,6 @@ import { YamlFormToggle } from "@/components/YamlFormToggle";
 // --- Template imports (as plain text)
 import echo from "@/templates/echo.yml?raw";
 import echoWithVar from "@/templates/echo-with-var.yml?raw";
-import curl from "@/templates/curl.yml?raw";
-import aiImageEditor from "@/templates/ai-image-editor.yml?raw";
 
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
@@ -43,8 +41,6 @@ const templates = {
   "": "",
   "Echo": echo,
   "Echo with Var": echoWithVar,
-  "Curl": curl,
-  "AI Image Edtiro": aiImageEditor,
 };
 
 

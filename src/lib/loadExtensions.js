@@ -21,9 +21,13 @@ const outputDir = './output';
 if (!fs.existsSync(outputDir)){
     fs.mkdirSync(outputDir);
 }
-const routesDir = './src/tcp/routes';
-if (!fs.existsSync(routesDir)){
-    fs.mkdirSync(routesDir);
+const workflowsDir = './workflows-enabled';
+if (!fs.existsSync(workflowsDir)){
+    fs.mkdirSync(workflowsDir);
+}
+const workflowsDir2 = './workflows-available';
+if (!fs.existsSync(workflowsDir2)){
+    fs.mkdirSync(workflowsDir2);
 }
 
 
@@ -39,7 +43,8 @@ async function loadExtensions() {
     .map(dirent => dirent.name);
 
   for (const folder of folders) {
-    const commandFile = path.join(extensionsDir, folder, 'command.js');
+    const emojiFile = path.join(extensionsDir, folder, 'emoji.txt');
+        const commandFile = path.join(extensionsDir, folder, 'command.js');
     const yamlFile = path.join(extensionsDir, folder, 'template.yml');
 
     let command = null;
@@ -57,9 +62,13 @@ async function loadExtensions() {
       yamlData = fileContent;
     }
 
-    if (command || yamlData) {
-      extensions[folder] = { command, yaml: yamlData };
+    let emoji = '';
+    if(fs.existsSync(emojiFile)){
+    emoji = fs.readFileSync(emojiFile, 'utf8').trim();
     }
+
+      extensions[folder] = { yaml: yamlData,emoji };
+    
   }
 
   App.set('extensions', extensions);

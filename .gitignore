@@ -6,3 +6,6 @@ src/tcp/routes
 output
 envs
 extensions
+src/extension-data.json
+workflows-enabled
+workflows-available

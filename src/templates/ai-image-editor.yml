@@ -1,4 +1,0 @@
-ai-image-edit-gpt1:
-  - ${image_path}
-  - ${prompt}
-

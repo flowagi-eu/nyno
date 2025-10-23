@@ -1,155 +1,119 @@
-### Nyno (“Nine-oh”) is an open-source Linux workflow builder & executor without limits. Proudly build with [best.js](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative that uses Vite!
 
-![Describe Image Here](/h/8d49d6961db4db78cec4ef61f897806f94dd34e2ff881d235f2886181f0233fc/screenshot-from-2025-10-13-13-50-39.webp)
+![Nyno Workflow Example](/h/26ab99978c0ffd5a6ee4188c928cf0506bfbc767032bdab0295890d2aa5cc1b9/screenshot-from-2025-10-23-20-37-24.webp)
 
-### Video Demo
-[Watch Video](https://empowerd.dev/h/e99f6d53ae7bbfba55e76fc69f940b61f6e9abf802e01c8e8334f6cf60b1c484/screencast-from-2025-10-13-14-49-10.mp4)
+
+
+## Nyno 2.0: The Multi-Language Workflow Engine
+
+### 🧠 Create New Steps in the languages you love.
+### 🔗 Connect everything with plain YAML text.
+
+Nyno is an **open-source multi-language workflow engine** that lets you build, extend, and connect automation in the languages you already know — **Python, PHP, JavaScript**, or even **Bash**.
+
+Each language (except Bash) runs in their own **high-performing worker engines**. Functions and Commands from  each language can be called using the human-readable **YAML text** format.
+
+### Introducing "The Engine" that powers Nyno 2.0
+To achieve most requests/per second we're using multi-process worker engines where feasible. Nyno will spawn 3 light-weight workers for each language and for every CPU core. This means that if you have 4 CPU cores, it will spawn 12 ready-to-run workers to run workflow steps.
+
+| Bash (creates new process everytime) | JavaScript + NodeJS (multi-process workers engine) | Python3 (multi-process workers engine) | PHP8 + Swoole (multi-process workers engine) |
+|----------|----------|----------|----------|
+| ![Bash](/h/8be29d64c5a389f6d65094067c25f1e8375f474fd7e0663608d4a89f5f55e25b/bash-neon-nyno-2.webp) | ![JavaScript + NodeJS ](/h/a87196be5391957f9221e082189852d9bd909b6dfd9a1c8e78c5dc40db1018d8/js-neon-nyno-3.webp) | ![Python3](/h/897a882a192b22b587a9d2373171205d8013e7a959134c2131dbd8e7f588e694/python-neon-nyno-2.webp) | ![PHP8 + Swoole](/h/591111cbf8d92909f37ef0b6587bfe9b9c1da12ae5c8c73719e21b27280be18d/php-neon-nyno-3.webp) |
+
+
+---
+
+## Create New Steps or Use Extensions: Turn Scripts into High-Performing Text Commands
+
+In Nyno, every **Python, JavaScript or PHP** script can become a reusable command that will run in its own high-performing worker engine.
+Just export a function (with args and context) and call it in any workflow using plain YAML text.
+
+Example (JavaScript)
+```
+// extensions/hello/command.js
+export function hello(args, context) {
+  const name = args[0] || "World";
+  return { output: `Hello, ${name}!` };
+}
+```
+
+Example in Workflow (YAML):
+```
+hello:
+    - "${name}"
+```
+
+Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflow-enabled/ and restarting** Nyno):
+```
+tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
+
+```
+
+
+
+
+
+
+
 
 <p align="center">
   <img src="nyno-logo2.png" alt="Nyno logo" width="200">
 </p>
 
 
-### Install
 
-Note: Nyno depends on Best.js which needs to be installed to run Nyno.
+
+
+
+
+
+### Install Locally
+
+Note: Nyno is dependent on Best.js which needs to be installed to run Nyno. If you plan to run PHP-based extensions, you'll also need to install PHP Swoole for high-performing PHP commands.
 
 ```
 # install Best.js
 git clone https://github.com/empowerd-cms/best.js
 cd best.js
-npm install
-npm link
+npm install # or # bun install
+npm link # for "bestjsserver" command
 cd ../
 
 # install Nyno
 git clone https://github.com/empowerd-cms/nyno
 cd nyno
-bun install # or # npm install
-bestjserver
+npm install # or # bun install
+bestjserver # runs Nyno
+
+# optionally Install PHP, build tools and Swoole
+sudo apt update
+sudo apt install php php-cli php-dev php-pear -y
+sudo pecl install swoole
 ```
 
 ![Describe Image Here](/h/a7e87aceeadc0133ca4ef143f52661acaf263717b813d9fd7a8a90eb8be9779e/screenshot-from-2025-10-13-13-49-19.webp)
 
 
-
-
-
-
-## Use Simple YAML Text to Create Workflows with Linux Commands that Determine the Next Node:
-- Nodes contain [simple YAML code](https://github.com/empowerd-cms/run-yaml-tool) to execute Linux commands. 
-- Next Node flow: echo `"0" to execute the most left` node or `"1" to execute the next first node`.
-- Need a new function? Add a new Linux command in `src/templates`.
-- Define custom parameters using `${custom_paramter}` and send them as JSON via TCP (see example below).
-
-
-![Describe Image Here](/h/c732dd6e28f3b3c0350c1de77bd438a172170541ec4a44d66fb7bf61ade89cde/screenshot-from-2025-10-13-14-02-28.webp)
-
-![Describe Image Here](/h/a7a0046bdc8e7fccf6b9e0d0587c906333ea4f6e2795ef58add78b61c8f9b3dd/screenshot-from-2025-10-13-14-02-18.webp)
-
-## Execute Workflows JSON files using TCP + Authentication for Most Speed & Security
-Workflow JSON files in the `src/tcp/routes` will be automatically loaded and available via TCP. `You need to restart the server after adding workflows.`
-
-For most testing/executing ease, we also released [tcpman](https://github.com/empowerd-cms/tcpman):
+### More Examples and Documentation
+Example Python extension:
 ```
-tcpman localhost:6001/test1 'c{"apiKey":"changeme"}' 'q{"i":1}'
+# extensions/hello-py/command.py
+def hello_py(args, context):
+    name = args[0] if args else "World"
+    return {"output": f"Hello, {name} from Python!"}
+
 ```
 
---- 
-
-Nyno TCP docs:
-- Use `c{"apiKey":"changeme"}` to connect
-- Use `q{"i":"0","other_param":"user1","path":"/test1"}` to execute workflow routes and use ${other_param} specified in the YAML Text.
-
-
-
----
-
-#### Example flow result with {"i":1}
+Example PHP extension:
 ```
-tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"i":1}'
-```
-![Describe Image Here](/h/af41f2a6da5722183814b41815b6df613b4de79da642cca133cbe0138763a723/screenshot-from-2025-10-13-14-02-55.webp)
-
-
-#### Example flow result with {"i":0}
-```
-tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"i":0}'
-```
-![Describe Image Here](/h/87c2c66358bdeb2a7b471750d7a8c5971dec5ed3e62e370147490cd6ba06e866/screenshot-from-2025-10-13-14-03-40.webp)
-
----
-
-
-# Extensions (commands) with JavaScript
-Beyond any Linux Command (like [nyno-openai-image-edit](https://github.com/empowerd-cms/nyno-openai-image-edit)) you can also create and use JavaScript Extensions (like [nyno-log](https://github.com/empowerd-cms/nyno-log)) to make otherwise impossible high performing tasks possible. 
-
-One great example is high frequency logs that need a persistant TCP connection with Postgres (instead of using Bash commands that would open new TCP connection for each log):
-
-```
-// extensions/nyno-log/command.js 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { Client } from 'pg';
-
-import App from '../../src/App.js'; // import the singleton
-
-// Assume setup.sh has been run, directly connect using generated .env file
-let pgClient = App.get('db_nyno_log');
-if (!pgClient) {
-	const envFilePath = path.resolve('./envs/.nyno_log_db.env'); // from setup.sh
-	const {
-	  NYNO_DB_NAME: dbName,
-	  NYNO_DB_USER: dbUser,
-	  NYNO_DB_PASS: dbPass,
-	  NYNO_DB_HOST: dbHost = 'localhost',
-	  NYNO_DB_PORT: dbPort = '5432'
-	} = App.loadEnvVars(envFilePath);
-
-	const dbClient = new Client({
-	  user: dbUser,
-	  host: dbHost,
-	  password: dbPass,
-	  port: parseInt(dbPort),
-	  database: dbName
-	});
-
-	await dbClient.connect();
-	App.set('db_nyno_log', dbClient);
-        pgClient = App.get('db_nyno_log');
-	console.log('[+TCP] Postgres client db_nyno_log connected');
-  }
-
-  if(!pgClient) throw new Error('Postgres client failed to initialize');
-
-export default async function nyno_log(args, context) {
-  const logJson = args[0]; // assume JSON string
-  // Insert the JSON log into queue_logs
-  await pgClient.query(
-    'INSERT INTO queue_logs(line) VALUES ($1::jsonb)',
-    [logJson]
-  );
-
-  // Flush log older than 5 seconds
-  await pgClient.query('SELECT flush_queue()');
-
-  // Store output in the context
-  context.NYNO_LOG_OUTPUT = 'ok';
-
-  return { output: 'ok' };
+<?php
+// extensions/hello-php/command.php
+function hello_php($args, $context) {
+    $name = $args[0] ?? "World";
+    return ["output" => "Hello, $name from PHP!"];
 }
+
 ```
 
-For loading template code in the GUI:
-```
-// extensions/nyno-log/template.yml 
-nyno-log:
-  args:
-    - "${JSON}"
-```
+---
 
-
-
-
-#### Proudly build as first project to test [best.js](https://github.com/empowerd-cms/best.js) 
+Nyno (“Nine-oh”) is  open-source & Proudly build with [Best.JS](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative.

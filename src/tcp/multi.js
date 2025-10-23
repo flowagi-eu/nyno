@@ -1,24 +1,42 @@
 import fs from 'fs';
+import { runFunction } from '../lib-manual/runners.js';
 import App from '../App.js';
 import path from 'path';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
+import { spawn,spawnSync } from 'child_process';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function debugLog(...args) {
+	//return false;
   console.log('[DEBUG]', ...args);
 }
 
 /**
  * Run a single YAML node
  */
-export async function runYamlTool(nodeName, yamlContent, context = {}) {
+export async function runYamlTool(node, context = {}) {
+
+  let nodeName = node.func;
+  let yamlContent = node.info ?? '';
+  let node_id = node.id ?? '';
+
+  // if its empty return early
+	if(yamlContent.trim().length==0) return {"output":{"r":"","c":context}};
+
   debugLog(`Running YAML node: ${nodeName}`);
   debugLog('Context before execution:', context);
 
+  let cmdName, cmdSpec, args;
+  if(!yamlContent.includes(':')){
+	// assume its command without args
+	cmdName = yamlContent.trim();
+	args = [];
+	cmdSpec = {};
+  } else {
   try {
     const doc = yaml.load(yamlContent);
     debugLog('Parsed YAML:', doc);
@@ -27,63 +45,78 @@ export async function runYamlTool(nodeName, yamlContent, context = {}) {
       return { error: 'YAML must contain exactly one top-level command.' };
     }
 
-    const cmdName = Object.keys(doc)[0];
-    const cmdSpec = doc[cmdName];
-    const args = [];
+    cmdName = Object.keys(doc)[0];
+    cmdSpec = doc[cmdName];
+    args = [];
 
-	  console.log('context JSON = ',context['JSON']);
+  }
+	catch (err) {
+    debugLog(`Error parsing YAML for node ${nodeName}:`, err.message);
+    return { error: err.message };
+    //return { error: err.message,nodeName,context };
+  }
+  }
+	  //console.log('context JSON = ',context['JSON']);
 
-    const replaceEnv = (value) =>
+console.log('context',context);
+
+const unreplaced = [];
+
+	const replaceEnv = (value) =>
   value.replace(/\$\{(\w+)\}/g, (_, key) => {
+    if(!(key in context)) {
+      unreplaced.push(key);
+      return ''; 
+    }
+
     const val = context[key];
-    if (val === undefined) return '';
-    // If it's an object (including arrays), stringify it
     if (typeof val === 'object' && val !== null) {
       return JSON.stringify(val);
     }
-    return String(val); // convert everything else to string
+    return String(val);
   });
 
 
-    if (cmdSpec.flags) {
-      for (const key in cmdSpec.flags) {
-        const val = cmdSpec.flags[key];
-	      console.log('cmd flag key',key);
-	      console.log('cmd flag val',val);
-        if (Array.isArray(val)) {
-          for (const item of val) {
-            args.push(key.length === 1 ? `-${key}` : `--${key}`);
-            args.push(replaceEnv(String(item)));
-          }
-        } else {
-          args.push(key.length === 1 ? `-${key}` : `--${key}`);
-          if (val != null) args.push(replaceEnv(String(val)));
-        }
-      }
-    }
-
-    if (cmdSpec.args) {
-      for (const item of cmdSpec.args) {
-	      console.log('cmd args item',item);
+if (cmdSpec.flags) {
+  for (const key in cmdSpec.flags) {
+    const val = cmdSpec.flags[key];
+    if (Array.isArray(val)) {
+      for (const item of val) {
+        args.push(key.length === 1 ? `-${key}` : `--${key}`);
         args.push(replaceEnv(String(item)));
       }
+    } else {
+      args.push(key.length === 1 ? `-${key}` : `--${key}`);
+      if (val != null) args.push(replaceEnv(String(val)));
     }
+  }
+}
+
+if (cmdSpec.args) {
+  for (const item of cmdSpec.args) {
+    args.push(replaceEnv(String(item)));
+  }
+}
+
+console.log({unreplaced});
+if (unreplaced.length > 0) {
+  return { error: true,output:{r:'',c:context}, missing: [...new Set(unreplaced)] };
+}
 
     debugLog(`Executing command: ${cmdName} ${args.join(' ')}`);
 
-    // Extensions are checked first for custom command, else default to Linux
-    const extensions = App.get('extensions');
-    if(cmdName in extensions) {
 
-	console.log("Executing extension command", {cmdName, args,context});
-	const output =  await extensions[cmdName].command(args,context);
+    // First check extensions/py/php/js.. 
+	const output = await runFunction(cmdName, args,context);
+	 console.log('runFunction',{output});
+
+	if(!output.fnError) {
 	  return {
           command: [cmdName, ...args],
-          extension:true,
           context,
           output,
 	  };
-    }
+	}
 
     return await new Promise((resolve) => {
       const child = spawn(cmdName, args);
@@ -95,12 +128,13 @@ export async function runYamlTool(nodeName, yamlContent, context = {}) {
 
       child.on('error', (err) => {
         debugLog(`Failed to start command ${cmdName}:`, err.message);
-        resolve({ error: err.message });
+        //resolve({ error: err.message });
+    	resolve({ error: stderr, errMsg: err.message,cmdName,args,output:{r:'',c:context},bash:true, });
       });
 
       child.on('close', (exitCode) => {
         const output = stdout.trim();
-        context[`${cmdName.toUpperCase()}_OUTPUT`] = output;
+        context[`O_${node_id}`] = output;
         debugLog(`Command finished: ${cmdName} exitCode=${exitCode}`);
         debugLog('stdout:', stdout.trim());
         debugLog('stderr:', stderr.trim());
@@ -108,17 +142,14 @@ export async function runYamlTool(nodeName, yamlContent, context = {}) {
 
         resolve({
           command: [cmdName, ...args],
-          context,
-          output,
-          error: stderr.trim(),
+          bash:true,
+          stderr:stderr.trim(),
+          output:{r:output,c:context},
           exitCode,
         });
       });
     });
-  } catch (err) {
-    debugLog(`Error parsing YAML for node ${nodeName}:`, err.message);
-    return { error: err.message };
-  }
+   
 }
 
 /**
@@ -135,24 +166,47 @@ export async function runWorkflow(workflow, startNodeId, context = {}) {
     const node = nodes[current];
     debugLog(`Processing node: ${node.id} (${node.func})`);
 
-    const yamlOutput = await runYamlTool(node.func, node.info ?? '', context);
-    const outputValue =
+    const input = JSON.parse(JSON.stringify(context));
+    
+    const yamlOutput = await runYamlTool(node, context);
+
+     const outputValue =
       typeof yamlOutput.output === 'string' ? yamlOutput.output : JSON.stringify(yamlOutput.output);
+ 
 
-    context[`${node.func.toUpperCase()}_OUTPUT`] = outputValue;
 
+      console.log('yamlOutput',yamlOutput);
+
+      const output = yamlOutput.output.r;
+
+    context = JSON.parse(JSON.stringify(yamlOutput.output.c ?? {})); // sync next context changes
+    context[`O_${node.id}`] = output;
+
+    const details = JSON.parse(JSON.stringify(yamlOutput)); // clone
+
+    details['node_id'] = node.id;
+    details['node_title'] = node.func;
+
+    details['new_context'] = details.output.c;
+    // remove double info
+    delete details['output'];
+
+    //delete yamlOutput['output'];
     log.push({
-      node: node.id,
-      func: node.func,
-      yaml_output: yamlOutput,
-      raw_output: outputValue,
+      input,
+      output,
+      details, 
     });
 
-    debugLog(`Node output: ${outputValue}`);
+       debugLog(`Node output: ${outputValue}`);
+    //console.log(`Node output: ${outputValue}`);
 
+	  const nextMap = JSON.parse(outputValue).r ?? '';
+	  //console.log({nextMap});
     if (node.type === 'multiIf' && node.nextMap) {
-      current = node.nextMap[outputValue] ?? node.nextMap['0'] ?? null;
+      current = node.nextMap[nextMap] ?? node.nextMap['0'] ?? null;
       debugLog(`Next node determined by multiIf: ${current}`);
+      //console.log(`Next node determined by multiIf: ${current}`);
     } else {
       current = node.next ?? null;
       debugLog(`Next node: ${current}`);
@@ -170,7 +224,7 @@ export default function register(router) {
   const tenantRoutes = {}; // { system: Map<route, handler> }
   const defaultRoutes = {};
 
-  const routesDir = path.join(__dirname, 'routes');
+  const routesDir = path.join(__dirname, '../../workflows-enabled');
 
   // --- Load tenant directories ---
   for (const system of fs.readdirSync(routesDir)) {
@@ -211,6 +265,7 @@ export default function register(router) {
         if (!socket.authenticated) return { error: 'Not authenticated' };
 
         const context = { ...data };
+        delete context['path']; // not needed for workflows themselves
         if (system) socket.system = system;
 
         const startTime = Date.now();
@@ -223,7 +278,7 @@ export default function register(router) {
           status: 'ok',
           execution_time_seconds: (endTime - startTime) / 1000,
           execution: result.log,
-          context: result.context,
+          context: result.c,
         };
       },system);
     }

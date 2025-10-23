@@ -1,8 +1,46 @@
 {
-  "nyno-log": {
-    "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n"
+  "curl-post": {
+    "yaml": "curl:\n  flags:\n    s: null\n    X: \"POST\"\n    H:\n      - \"Accept: application/json\"\n      - \"Content-Type: application/json\"\n    d: '{\"title\": \"New Todo\", \"completed\": false, \"userId\": 1}'\n  args:\n    - \"https://jsonplaceholder.typicode.com/todos\"\n",
+    "emoji": ""
   },
-  "nyno-logold": {
-    "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n"
+  "hello": {
+    "yaml": "hello:\n  args:\n    - \"${name}\"\n",
+    "emoji": ""
+  },
+  "hello-php": {
+    "yaml": "hello-php:\n  args:\n    - \"${name}\"\n",
+    "emoji": ""
+  },
+  "hello-py": {
+    "yaml": "hello-py:\n  args:\n    - \"${name}\"\n",
+    "emoji": ""
+  },
+  "nyno-echo": {
+    "yaml": "nyno-echo:\n  args:\n    - \"${i}\"\n",
+    "emoji": ""
+  },
+  "nyno-log": {
+    "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n",
+    "emoji": ""
+  },
+  "nyno-openai-image-edit": {
+    "yaml": "nyno-openai-image-edit:\n\targs:\n\t- \"${apiKey}\n\t- \"${imagePath}\n\t- \"${prompt}\n\n",
+    "emoji": "🤖"
+  },
+  "nyno-openai-image-gen": {
+    "yaml": "nyno-openai-image-gen:\n    args:\n        - \"${apiKey}\"\n        - \"${prompt}\"",
+    "emoji": "🤖"
+  },
+  "nyno-openai-text": {
+    "yaml": "nyno-openai-text:\n    args:\n        - \"${apiKey}\"\n        - \"${prompt}\"\n        - \"${reasoningEffort}\" (optional) // minimal, low, medium, high; defaults to \"low\"\n\n",
+    "emoji": "🤖"
+  },
+  "nyno-serper-search": {
+    "yaml": "nyno-serper-search:\n    args:\n        - \"${apiKey}\"\n        - \"${search}\"\n\n",
+    "emoji": "🔗"
+  },
+  "send-email-sw": {
+    "yaml": "send-email-sw:\n  args:\n    - \"${email_receiver}\"   # $1\n    - \"${subject}\"          # $2\n    - \"${text}\"             # $3\n    - \"${from_name}\"        # $4\n    - \"${from_email}\"       # $5\n    - \"${api_key}\"          # $6\n\n",
+    "emoji": ""
   }
 }

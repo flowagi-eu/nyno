@@ -1,11 +1,18 @@
 
 /* global dark style */
 body {
-  background-color: #121212;
   color: #eee;
   font-family: sans-serif;
   margin: 0;
   padding: 0;
+}
+
+body,
+body .react-flow__node-input,
+body .react-flow__node-default
+{
+    background:#03060b;
+
 }
 
 body .react-flow__node-input,
@@ -15,8 +22,14 @@ body .react-flow__node-default
   transform: translate(0px);
   pointer-events: all;
   visibility: visible;
-  background: #373737;
   color: white;
-  border: 1px solid #777;
+  border: 1px solid #113743;
 }
 
+.react-flow__handle {
+  border: 1px solid #113743!important;
+}
+
+.react-flow__edge-path, .react-flow__connection-path {
+  stroke: #009ad5!important;
+}
