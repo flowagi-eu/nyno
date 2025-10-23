@@ -48,19 +48,13 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 
 ```
 
-
-
-
-
+---
 
 
 
 <p align="center">
-  <img src="nyno-logo2.png" alt="Nyno logo" width="200">
+  <img src="/h/3f391b88ab87a304526f144770a4288fe36c0f98eae79e9979276783f77a4a4f/nyno-neon-logo.webp" alt="Nyno logo" width="200">
 </p>
-
-
-
 
 
 
