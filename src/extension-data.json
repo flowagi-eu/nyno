@@ -1,4 +1,8 @@
 {
+  "code-check-indentation": {
+    "yaml": "code-check-indentation:\n   args:\n       - \"${FILE_PATHS}\"\n",
+    "emoji": ""
+  },
   "curl-post": {
     "yaml": "curl:\n  flags:\n    s: null\n    X: \"POST\"\n    H:\n      - \"Accept: application/json\"\n      - \"Content-Type: application/json\"\n    d: '{\"title\": \"New Todo\", \"completed\": false, \"userId\": 1}'\n  args:\n    - \"https://jsonplaceholder.typicode.com/todos\"\n",
     "emoji": ""

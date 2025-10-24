@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const RUNNERS = {
   php: { host: "localhost", port: 6000, cmd: "php", file: path.resolve(__dirname, "runners/runner.php"), checkFunction:() => {
-    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
     return fs.readdirSync(extensionsDir, { withFileTypes: true })
@@ -18,7 +18,7 @@ const RUNNERS = {
     .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.php')));
   } },
   js: { host: "localhost", port: 4001, cmd: "node", file: path.resolve(__dirname, "runners/runner.js"), checkFunction:() => {
-    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
     return fs.readdirSync(extensionsDir, { withFileTypes: true })
@@ -26,7 +26,7 @@ const RUNNERS = {
     .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.js')));
   } },
   py: { host: "localhost", port: 5000, cmd: "python3", file: path.resolve(__dirname, "runners/runner.py"), checkFunction:() => {
-    const extensionsDir = path.resolve(__dirname, '../../../extensions');
+    const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
     return fs.readdirSync(extensionsDir, { withFileTypes: true })
