@@ -62,19 +62,44 @@ console.log('context',context);
 
 const unreplaced = [];
 
-	const replaceEnv = (value) =>
-  value.replace(/\$\{(\w+)\}/g, (_, key) => {
-    if(!(key in context)) {
+const replaceEnv = (value) => {
+  // Match exactly one variable like "${VAR}"
+  const onlyVarMatch = value.match(/^\$\{(\w+)\}$/);
+  if (onlyVarMatch) {
+    const key = onlyVarMatch[1];
+    if (!(key in context)) {
       unreplaced.push(key);
-      return ''; 
+      return '';
+    }
+    const val = context[key];
+
+    // If val is an object/array, return it directly
+    if (typeof val === 'object' && val !== null) {
+      return val;
+    }
+
+    // Otherwise, return the value as-is
+    return val;
+  }
+
+  // Otherwise, replace variables inside a string
+  return value.replace(/\$\{(\w+)\}/g, (_, key) => {
+    if (!(key in context)) {
+      unreplaced.push(key);
+      return '';
     }
 
     const val = context[key];
+
+    // If object/array, convert to JSON string for safe embedding
     if (typeof val === 'object' && val !== null) {
       return JSON.stringify(val);
     }
+
     return String(val);
   });
+};
+
 
 
 if (cmdSpec.flags) {
@@ -103,7 +128,7 @@ if (unreplaced.length > 0) {
   return { error: true,output:{r:'',c:context}, missing: [...new Set(unreplaced)] };
 }
 
-    debugLog(`Executing command: ${cmdName} ${args.join(' ')}`);
+    debugLog(`Executing command: ${cmdName} with args:`, args);
 
 
     // First check extensions/py/php/js.. 

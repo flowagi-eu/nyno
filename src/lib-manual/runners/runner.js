@@ -81,7 +81,7 @@ async function startWorker() {
           const fn = globalThis.state[payload.functionName];
           console.log('global state',globalThis.state);
           console.log({fn,functionName:payload.functionName});
-          if (typeof fn === undefined) {
+          if (typeof fn !== 'function') {
             socket.write(JSON.stringify({ fnError: "not exist" }) + "\n");
           } else {
             try {

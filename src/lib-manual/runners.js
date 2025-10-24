@@ -144,7 +144,7 @@ function runFunctionSingle(language, functionName, args = [],context={}) {
 export async function runFunction(functionName, args = [],context={}) {
   for (const type of Object.keys(RUNNERS)) {
     try {
-	    console.log({functionName,type,args});
+	    console.log('runFunction',{functionName,type,args});
       const result = await runFunctionSingle(type, functionName, args,context);
 	    console.log('runFunction result',result,{type,functionName});
       if (result.fnError === "not exist") continue;
