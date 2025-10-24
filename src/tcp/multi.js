@@ -11,8 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function debugLog(...args) {
-	//return false;
-  console.log('[DEBUG]', ...args);
+	if(process.env.NODE_ENV!=='production') {
+  		console.log('[DEBUG]', ...args);
+	}
 }
 
 /**
@@ -56,9 +57,7 @@ export async function runYamlTool(node, context = {}) {
     //return { error: err.message,nodeName,context };
   }
   }
-	  //console.log('context JSON = ',context['JSON']);
 
-console.log('context',context);
 
 const unreplaced = [];
 
@@ -123,7 +122,6 @@ if (cmdSpec.args) {
   }
 }
 
-console.log({unreplaced});
 if (unreplaced.length > 0) {
   return { error: true,output:{r:'',c:context}, missing: [...new Set(unreplaced)] };
 }
@@ -133,7 +131,7 @@ if (unreplaced.length > 0) {
 
     // First check extensions/py/php/js.. 
 	const output = await runFunction(cmdName, args,context);
-	 console.log('runFunction',{output});
+	 debugLog('runFunction',{output});
 
 	if(!output.fnError) {
 	  return {
@@ -200,7 +198,7 @@ export async function runWorkflow(workflow, startNodeId, context = {}) {
  
 
 
-      console.log('yamlOutput',yamlOutput);
+      debugLog('yamlOutput',yamlOutput);
 
       const output = yamlOutput.output.r;
 
@@ -224,14 +222,11 @@ export async function runWorkflow(workflow, startNodeId, context = {}) {
     });
 
        debugLog(`Node output: ${outputValue}`);
-    //console.log(`Node output: ${outputValue}`);
 
 	  const nextMap = JSON.parse(outputValue).r ?? '';
-	  //console.log({nextMap});
     if (node.type === 'multiIf' && node.nextMap) {
       current = node.nextMap[nextMap] ?? node.nextMap['0'] ?? null;
       debugLog(`Next node determined by multiIf: ${current}`);
-      //console.log(`Next node determined by multiIf: ${current}`);
     } else {
       current = node.next ?? null;
       debugLog(`Next node: ${current}`);

@@ -77,10 +77,7 @@ async function startWorker() {
           socket.write(JSON.stringify({ status: "ERR", error: "Not authenticated" }) + "\n");
           socket.destroy();
         } else if (type === "r") {
-		    console.log('received payload r',payload);
           const fn = globalThis.state[payload.functionName];
-          console.log('global state',globalThis.state);
-          console.log({fn,functionName:payload.functionName});
           if (typeof fn !== 'function') {
             socket.write(JSON.stringify({ fnError: "not exist" }) + "\n");
           } else {
