@@ -61,13 +61,19 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 
 ### Install Nyno using a Docker/Podman Container
 
-#### 1. Build the Container
+#### 1. Clone the Repo
+```
+git clone https://github.com/empowerd-cms/nyno
+cd nyno
+```
+
+#### 2. Build the Container
 ```
 build-container.sh "podman" # Podman can be slightly faster
 build-container.sh "docker"
 ```
 
-#### 2. Run the Container
+#### 3. Run the Container
 Make sure you to build the container first.
 ```
 run-container-prod.sh "podman" # for maximum performance, GUI at https://localhost:5173
