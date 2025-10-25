@@ -40,9 +40,7 @@ echo "[DEBUG] Postgres is ready!"
 # -- Create Postgres Databaes for nyno-logs extension
 mkdir envs -p
 
-if [ ! -f "envs/.nyno_log_db.env" ]; then
-	sudo bash extensions/nyno-log/setup.sh
-fi
+sudo bash extensions/nyno-log/setup.sh
 
 
 # --- Start Best.js server in proper mode ---
