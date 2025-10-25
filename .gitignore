@@ -14,8 +14,13 @@ workflows-enabled/*
 
 # Except these
 !extensions/nyno-log/
+!extensions/nyno-log/**
 !extensions/nyno-echo/
+!extensions/nyno-echo/**
 !extensions/hello/
+!extensions/hello/**
 !extensions/hello-php/
+!extensions/hello-php/**
 !extensions/hello-js/
+!extensions/hello-js/**
 !workflows-enabled/test-languages.json 
