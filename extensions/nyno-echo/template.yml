@@ -1,0 +1,3 @@
+nyno-echo:
+  args:
+    - "${i}"

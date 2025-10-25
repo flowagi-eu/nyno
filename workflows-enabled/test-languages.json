@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "func": "route_/test_runners",
+      "info": "nyno-echo:\n  args:\n    - \"${i}\"\n",
+      "args": [],
+      "next": "2",
+      "position": {
+        "x": 9,
+        "y": -49
+      },
+      "type": "input"
+    },
+    {
+      "id": "2",
+      "func": "test-js",
+      "info": "hello:\n  args:\n    - \"${name}\"\n",
+      "args": [],
+      "next": null,
+      "position": {
+        "x": -242,
+        "y": 66.5
+      },
+      "type": null
+    },
+    {
+      "id": "3",
+      "func": "test-php",
+      "info": "hello-php:\n  args:\n    - \"${name}\"\n",
+      "args": [],
+      "next": null,
+      "position": {
+        "x": -80,
+        "y": 67
+      },
+      "type": null
+    },
+    {
+      "id": "4",
+      "func": "test-py",
+      "info": "hello-py:\n  args:\n    - \"${name}\"\n",
+      "args": [],
+      "next": null,
+      "position": {
+        "x": 84,
+        "y": 66
+      },
+      "type": null
+    },
+    {
+      "id": "5",
+      "func": "test-bash",
+      "info": "ls",
+      "args": [],
+      "next": null,
+      "position": {
+        "x": 246.28001486681765,
+        "y": 67.77138609480666
+      },
+      "type": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "sourceHandle": null,
+      "target": "2",
+      "targetHandle": null,
+      "id": "reactflow__edge-1-2"
+    },
+    {
+      "source": "1",
+      "sourceHandle": null,
+      "target": "3",
+      "targetHandle": null,
+      "id": "reactflow__edge-1-3"
+    },
+    {
+      "source": "1",
+      "sourceHandle": null,
+      "target": "4",
+      "targetHandle": null,
+      "id": "reactflow__edge-1-4"
+    },
+    {
+      "source": "1",
+      "sourceHandle": null,
+      "target": "5",
+      "targetHandle": null,
+      "id": "reactflow__edge-1-5"
+    }
+  ]
+}

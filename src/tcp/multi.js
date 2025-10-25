@@ -305,6 +305,7 @@ export default function register(router) {
   }
 
   function generateNextMaps(workflow) {
+    debugLog('generateNextMaps',workflow);
     const nodesById = Object.fromEntries(workflow.nodes.map((n) => [n.id, n]));
     const childrenMap = {};
     for (const edge of workflow.edges || []) {

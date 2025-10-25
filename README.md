@@ -59,9 +59,28 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 
 
 
+### Install Nyno using a Docker/Podman Container
+
+#### 1. Build the Container
+```
+build-container.sh "podman" # Podman can be slightly faster
+build-container.sh "docker"
+```
+
+#### 2. Run the Container
+Make sure you to build the container first.
+```
+run-container-prod.sh "podman" # for maximum performance, GUI at https://localhost:5173
+run-container-dev.sh "podman" # for maximum logging/debugging mode, GUI at http://localhost:4173
+#
+# Or use Docker
+#
+run-container-prod.sh "docker" # for maximum performance, GUI at https://localhost:5173
+run-container-dev.sh "docker" # for maximum logging/debugging mode, GUI at http://localhost:4173
+```
 
 
-### Install Locally
+### Install Nyno on Linux Host
 
 Note: Nyno is dependent on Best.js which needs to be installed to run Nyno. If you plan to run PHP-based extensions, you'll also need to install PHP Swoole for high-performing PHP commands.
 

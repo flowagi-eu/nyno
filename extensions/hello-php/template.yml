@@ -1,0 +1,3 @@
+hello-php:
+  args:
+    - "${name}"

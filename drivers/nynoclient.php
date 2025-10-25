@@ -1,4 +1,3 @@
-
 <?php
 
 class NynoClient
@@ -8,31 +7,25 @@ class NynoClient
     private bool $usingSwoole;
     private ?object $client = null;
     private array $credentials = [];
+    private int $maxRetries = 3;        // Max reconnect attempts
+    private float $retryDelay = 0.2;    // Initial retry delay (seconds)
 
-    /**
-     * NynoDriver constructor.
-     * @param string $host Nyno server host
-     * @param int $port Nyno server port
-     * @param bool $usingSwoole Use Swoole client if true, else native PHP sockets
-     */
-    public function __construct(array $credentials, string $host = '127.0.0.1', int $port = 6001,  bool $usingSwoole = false)
+    public function __construct(array $credentials, string $host = '127.0.0.1', int $port = 6001, bool $usingSwoole = false)
     {
-	    $this->credentials = $credentials;
+        $this->credentials = $credentials;
         $this->host = $host;
         $this->port = $port;
         $this->usingSwoole = $usingSwoole;
-	$this->connect();
+        $this->connect();
     }
 
     /**
      * Connect and authenticate with Nyno
-     * Example:
-     *   $nyno->connect(['apiKey' => 'changeme']);
-     * @param array $credentials
      * @throws Exception
      */
     public function connect(): void
     {
+        $this->close(); // close any previous connection
 
         if ($this->usingSwoole) {
             $this->client = new Swoole\Client(SWOOLE_SOCK_TCP);
@@ -44,19 +37,18 @@ class NynoClient
             if ($this->client === false) {
                 throw new Exception("Socket creation failed: " . socket_strerror(socket_last_error()));
             }
-            if (!socket_connect($this->client, $this->host, $this->port)) {
+            if (!@socket_connect($this->client, $this->host, $this->port)) {
                 $err = socket_strerror(socket_last_error($this->client));
                 socket_close($this->client);
                 throw new Exception("Connection failed: $err");
             }
         }
 
-        // Send credentials: c{"apiKey":"changeme"}
+        // Authenticate
         $msg = 'c' . json_encode($this->credentials) . "\n";
         $this->writeRaw($msg);
 
         $response = $this->readResponse();
-	var_dump('response',$response);
         $result = json_decode($response, true);
 
         if (!$result || empty($result['status'])) {
@@ -66,107 +58,117 @@ class NynoClient
     }
 
     /**
-     * Run a Nyno workflow.
-     * Example:
-     *   $nyno->run_workflow('/sync/users', ['userId' => 42, 'action' => 'sync']);
-     * Sends:
-     *   q{"path":"/sync/users","userId":42,"action":"sync"}
-     *
-     * @param string $path
-     * @param array $data
-     * @return array
-     * @throws Exception
+     * Run a Nyno workflow, with auto-retry if disconnected
      */
     public function run_workflow(string $path, array $data = []): array
     {
-        $this->ensureConnected();
+        $attempts = 0;
 
-        // Merge 'path' into the payload
-        $payload = array_merge(['path' => $path], $data);
+        while (true) {
+            try {
+                $this->ensureConnected();
 
-        $msg = 'q' . json_encode($payload) . "\n";
-        $this->writeRaw($msg);
+                $payload = array_merge(['path' => $path], $data);
+                $msg = 'q' . json_encode($payload) . "\n";
+                $this->writeRaw($msg);
 
-        $response = $this->readResponse();
-        $result = json_decode($response, true);
+                $response = $this->readResponse();
+                if ($response === '') {
+                    throw new Exception("Empty response from server");
+                }
 
-        if ($result === null) {
-            throw new Exception("Failed to decode Nyno response JSON: " . $response);
+                $result = json_decode($response, true);
+                if ($result === null) {
+                    throw new Exception("Failed to decode Nyno response JSON: " . $response);
+                }
+
+                return $result;
+            } catch (Exception $e) {
+                // Attempt reconnect on connection failure
+                $attempts++;
+                if ($attempts > $this->maxRetries) {
+                    throw new Exception("Nyno request failed after {$this->maxRetries} retries: " . $e->getMessage());
+                }
+
+                // Log or print reconnect attempt
+                error_log("Nyno connection lost, retrying (#{$attempts})...");
+
+                // Wait (exponential backoff)
+                usleep($this->retryDelay * 1e6);
+                $this->retryDelay *= 2;
+
+                // Try to reconnect
+                try {
+                    $this->connect();
+                } catch (Exception $ce) {
+                    error_log("Reconnect attempt failed: " . $ce->getMessage());
+                }
+            }
         }
-
-        return $result;
     }
 
-    /**
-     * Close the Nyno connection
-     */
     public function close(): void
     {
         if ($this->client) {
             if ($this->usingSwoole) {
-                $this->client->close();
+                @$this->client->close();
             } else {
-                socket_close($this->client);
+                @socket_close($this->client);
             }
             $this->client = null;
         }
     }
 
-    /**
-     * Write raw message to the socket
-     */
     private function writeRaw(string $msg): void
     {
         if ($this->usingSwoole) {
-            $this->client->send($msg);
-        } else {
-            socket_write($this->client, $msg, strlen($msg));
-        }
-    }
-
-    /**
-     * Read a full line response ending with \n
-     */
-    private function readResponse(float $timeout = 2.0): string
-{
-    $response = '';
-    $start = microtime(true);
-
-    while (true) {
-        if ($this->usingSwoole) {
-	    $this->client->set(['timeout' => 0.1]);
-		$chunk = @$this->client->recv(); // no argument
-
-        } else {
-            $chunk = @socket_read($this->client, 2048, PHP_NORMAL_READ);
-        }
-
-        if ($chunk === false || $chunk === '' || $chunk === null) {
-            // temporary unavailable, keep trying until timeout
-            if ((microtime(true) - $start) >= $timeout) {
-                break; // exit loop after total timeout
+            $sent = $this->client->send($msg);
+            if ($sent === false) {
+                throw new Exception("Failed to send data via Swoole socket");
             }
-            usleep(50000); // wait 50ms before retrying
-            continue;
-        }
-
-        $response .= $chunk;
-
-        if (strpos($response, "\n") !== false) {
-            break; // full message received
+        } else {
+            $sent = @socket_write($this->client, $msg, strlen($msg));
+            if ($sent === false) {
+                throw new Exception("Failed to send data via PHP socket: " . socket_strerror(socket_last_error($this->client)));
+            }
         }
     }
 
-    return trim($response);
-}
+    private function readResponse(float $timeout = 2.0): string
+    {
+        $response = '';
+        $start = microtime(true);
 
-    /**
-     * Ensure the client is connected
-     */
+        while (true) {
+            if ($this->usingSwoole) {
+                $this->client->set(['timeout' => 0.1]);
+                $chunk = @$this->client->recv();
+            } else {
+                $chunk = @socket_read($this->client, 2048, PHP_NORMAL_READ);
+            }
+
+            if ($chunk === false || $chunk === '' || $chunk === null) {
+                if ((microtime(true) - $start) >= $timeout) {
+                    break;
+                }
+                usleep(50000);
+                continue;
+            }
+
+            $response .= $chunk;
+            if (strpos($response, "\n") !== false) {
+                break;
+            }
+        }
+
+        return trim($response);
+    }
+
     private function ensureConnected(): void
     {
         if ($this->client === null) {
-            throw new Exception("Nyno connection not established. Call connect() first.");
+            $this->connect();
         }
     }
 }
+

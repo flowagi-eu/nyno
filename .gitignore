@@ -5,7 +5,17 @@ bun.lock
 src/tcp/routes
 output
 envs
-extensions
 src/extension-data.json
-workflows-enabled
 workflows-available
+
+# Ignore everything in the extensions/ directory
+extensions/*
+workflows-enabled/*
+
+# Except these
+!extensions/nyno-log/
+!extensions/nyno-echo/
+!extensions/hello/
+!extensions/hello-php/
+!extensions/hello-js/
+!workflows-enabled/test-languages.json 

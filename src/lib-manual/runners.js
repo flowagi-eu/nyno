@@ -135,7 +135,6 @@ function runFunctionSingle(language, functionName, args = [],context={}) {
     });
 
     client.write('r'+JSON.stringify({functionName,args,context}) + '\n');
-	  //":"${functionName}","args":${JSON.stringify(args)}}\n`);
   });
 }
 
@@ -143,9 +142,7 @@ function runFunctionSingle(language, functionName, args = [],context={}) {
 export async function runFunction(functionName, args = [],context={}) {
   for (const type of Object.keys(RUNNERS)) {
     try {
-	    //console.log('runFunction',{functionName,type,args});
       const result = await runFunctionSingle(type, functionName, args,context);
-	    //console.log('runFunction result',result,{type,functionName});
       if (result.fnError === "not exist") continue;
       return result;
     } catch (err) {
