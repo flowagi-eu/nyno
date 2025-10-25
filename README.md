@@ -63,7 +63,7 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 
 
 
-### Install Nyno using a Docker/Podman Container
+### Install Nyno using Docker/Podman
 
 #### 1. Clone the Repo
 ```
