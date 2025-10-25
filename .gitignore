@@ -26,3 +26,4 @@ workflows-enabled/*
 !extensions/hello-js/
 !extensions/hello-js/**
 !workflows-enabled/test-languages.json 
+!workflows-enabled/test-basic-decision-tree.json

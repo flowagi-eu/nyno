@@ -46,6 +46,10 @@ hello:
 Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflows-enabled/ and restarting** Nyno):
 ```
 tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
+>>> Sending: c{"apiKey":"changeme"}
+{"status":"ok","type":"connect"}
+>>> Sending: q{"name":"Alice","path":"/test_nyno"}
+{"route":"/test_nyno","system":"default","status":"ok","execution_time_seconds":0.019,"execution":[{"input":{"name":"Alice"},"output":"","details":{"error":true,"missing":["i"],"node_id":"1","node_title":"route_/test_nyno","new_context":{"name":"Alice"}}},{"input":{"name":"Alice","O_1":""},"output":"hi node 2!","details":{"command":["echo","hi node 2!"],"bash":true,"stderr":"","exitCode":0,"node_id":"2","node_title":"node_2","new_context":{"name":"Alice","O_1":"","O_2":"hi node 2!"}}},{"input":{"name":"Alice","O_1":"","O_2":"hi node 2!"},"output":"always hi from node 4!","details":{"command":["echo","always hi from node 4!"],"bash":true,"stderr":"","exitCode":0,"node_id":"4","node_title":"node_4","new_context":{"name":"Alice","O_1":"","O_2":"hi node 2!","O_4":"always hi from node 4!"}}}]}
 
 ```
 
