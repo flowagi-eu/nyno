@@ -43,7 +43,7 @@ hello:
     - "${name}"
 ```
 
-Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflow-enabled/ and restarting** Nyno):
+Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflows-enabled/ and restarting** Nyno):
 ```
 tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 
