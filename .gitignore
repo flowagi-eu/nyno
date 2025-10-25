@@ -19,6 +19,8 @@ workflows-enabled/*
 !extensions/nyno-echo/**
 !extensions/hello/
 !extensions/hello/**
+!extensions/hello-py/
+!extensions/hello-py/**
 !extensions/hello-php/
 !extensions/hello-php/**
 !extensions/hello-js/
