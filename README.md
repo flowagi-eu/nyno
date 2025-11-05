@@ -29,7 +29,7 @@ In Nyno, every **Python, JavaScript or PHP** script can become a reusable comman
 Just export a function (with args and context) and call it in any workflow using plain YAML text.
 
 Example (JavaScript)
-```
+```js
 // extensions/hello/command.js
 export function hello(args, context) {
   const name = args[0] || "World";
@@ -38,14 +38,18 @@ export function hello(args, context) {
 ```
 
 Example in Workflow (YAML):
-```
+```yaml
 hello:
     - "${name}"
 ```
 
 Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflows-enabled/ and restarting** Nyno):
-```
+```bash
 tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
+```
+
+Example output
+```
 >>> Sending: c{"apiKey":"changeme"}
 {"status":"ok","type":"connect"}
 >>> Sending: q{"name":"Alice","path":"/test_nyno"}
@@ -66,20 +70,21 @@ tcpman localhost:6001/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
 ### Install Nyno using Docker/Podman
 
 #### 1. Clone the Repo
-```
+```bash
 git clone https://github.com/empowerd-cms/nyno
 cd nyno
 ```
 
 #### 2. Build the Container
-```
+```bash
 build-container.sh "podman" # Podman can be slightly faster
 build-container.sh "docker"
 ```
 
 #### 3. Run the Container
 Make sure you to build the container first.
-```
+
+```bash
 run-container-prod.sh "podman" # for maximum performance, GUI at https://localhost:5173
 run-container-dev.sh "podman" # for maximum logging/debugging mode, GUI at http://localhost:4173
 #
@@ -89,12 +94,15 @@ run-container-prod.sh "docker" # for maximum performance, GUI at https://localho
 run-container-dev.sh "docker" # for maximum logging/debugging mode, GUI at http://localhost:4173
 ```
 
+---
+
+
 
 ### Install Nyno on Linux Host
 
 Note: Nyno is dependent on Best.js which needs to be installed to run Nyno. If you plan to run PHP-based extensions, you'll also need to install PHP Swoole for high-performing PHP commands.
 
-```
+```bash
 # install Best.js
 git clone https://github.com/empowerd-cms/best.js
 cd best.js
@@ -119,7 +127,8 @@ sudo pecl install swoole
 
 ### More Examples and Documentation
 Example Python extension:
-```
+
+```py
 # extensions/hello-py/command.py
 def hello_py(args, context):
     name = args[0] if args else "World"
@@ -128,7 +137,8 @@ def hello_py(args, context):
 ```
 
 Example PHP extension:
-```
+
+```php
 <?php
 // extensions/hello-php/command.php
 function hello_php($args, &$context) { // & important!
@@ -138,8 +148,6 @@ function hello_php($args, &$context) { // & important!
 
 ```
 
-
-Got it! Here’s a **small, precise edit** you can insert into your existing README under the **“Create New Steps or Use Extensions”** section to explain `context` usage for passing data between steps:
 
 ---
 
@@ -159,7 +167,7 @@ export function some_extension(args, context) {
 
 
 Example Workflow output:
-```
+```json
 {
     "route": "\/test_runners",
     "system": "default",
@@ -235,3 +243,4 @@ Example Workflow output:
 ---
 
 Nyno (“Nine-oh”) is  open-source & Proudly build with [Best.JS](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative.
+
