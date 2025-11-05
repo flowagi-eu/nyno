@@ -33,7 +33,8 @@ Example (JavaScript)
 // extensions/hello/command.js
 export function hello(args, context) {
   const name = args[0] || "World";
-  return { output: `Hello, ${name}!` };
+context['hello'] = `Hello, ${name}!`;
+return 0;
 }
 ```
 
@@ -132,7 +133,8 @@ Example Python extension:
 # extensions/hello-py/command.py
 def hello_py(args, context):
     name = args[0] if args else "World"
-    return {"output": f"Hello, {name} from Python!"}
+    context["hello-py"] = f"Hello, {name} from Python!"
+    return 0
 
 ```
 
@@ -141,9 +143,10 @@ Example PHP extension:
 ```php
 <?php
 // extensions/hello-php/command.php
-function hello_php($args, &$context) { // & important!
+function hello_php($args, &$context) { // & required to modify context
     $name = $args[0] ?? "World";
-    return ["output" => "Hello, $name from PHP!"];
+    $context["hello-php"] = "Hello, $name from PHP!";
+    return 0;
 }
 
 ```
