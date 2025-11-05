@@ -5,7 +5,6 @@ bun.lock
 src/tcp/routes
 output
 input
-envs
 src/extension-data.json
 workflows-available
 extensions-available
@@ -14,6 +13,7 @@ pyproject.toml
 
 # Ignore everything in the extensions/ directory
 extensions/*
+envs/*
 workflows-enabled/*
 
 # Except these
