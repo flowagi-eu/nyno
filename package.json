@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Simple React SSR with Vite and Express",
   "type": "module",
+  "bin": {
+    "nyno": "./cli/cli.js"
+  },
   "scripts": {
     "dev": "node server-dev.js",
     "build:client": "vite build --outDir dist/client",

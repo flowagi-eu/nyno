@@ -287,12 +287,12 @@ const handleDialogKeyDown = (e) => {
           <Background variant="dots" gap={12} size={1} />
         </ReactFlow>
 
-        <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog.Root className="dialog_root" open={isOpen} onOpenChange={setIsOpen}>
           <Dialog.Portal>
             <Dialog.Overlay
               style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)" }}
             />
-            <Dialog.Content
+            <Dialog.Content className="dialog_content"
 	    onKeyDown={handleDialogKeyDown}
               style={{
                 background: "#171717",

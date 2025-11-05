@@ -4,12 +4,49 @@ import net from "net";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-
-const PORT = 4001;
-const VALID_API_KEY = "changeme";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+// Load Nyno Main Ports/config
+
+function load_nyno_ports(path = "envs/ports.env") {
+  const env = {};
+  const lines = fs.readFileSync(path, "utf-8").split("\n");
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line || line.startsWith("#")) continue;
+    if (line.includes("#")) line = line.split("#")[0].trim();
+    if (line.includes("=")) {
+      let [key, value] = line.split("=", 2);
+      key = key.trim();
+      value = value.trim();
+
+      // Remove quotes
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+
+      // Convert numeric values
+      if (!isNaN(value) && value !== "") value = Number(value);
+
+      env[key] = value;
+    }
+  }
+  return env;
+}
+
+// Example usage
+const portsFile = path.resolve(__dirname, "../../../envs/ports.env");
+const ports = load_nyno_ports(portsFile);
+console.log(ports);
+
+const host = ports['HOST'] ?? 'localhost';
+
+const PORT = ports['JS'] ?? 4001;
+const VALID_API_KEY = ports['SECRET'] ?? "changeme";
+
 
 globalThis.state = {
 
@@ -94,7 +131,7 @@ async function startWorker() {
     });
   });
 
-  server.listen(PORT, "localhost", () => {
+  server.listen(PORT, host, () => {
     console.log(`[JS Worker ${process.pid}] Listening on port ${PORT}`);
   });
 }

@@ -8,11 +8,43 @@ import time
 import importlib.util
 import glob
 from datetime import datetime
+import codecs
+decoder = codecs.getincrementaldecoder('utf-8')()
 
-HOST = "127.0.0.1"
-PORT = 5000
+# Load Nyno Ports/main config
+def load_nyno_ports(path="envs/ports.env"):
+    env = {}
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "#" in line:
+                line = line.split("#", 1)[0].strip()
+            if "=" in line:
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+
+                # Remove surrounding quotes if any
+                if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+                    value = value[1:-1]
+
+                # Convert numeric strings to int
+                if value.isdigit():
+                    value = int(value)
+
+                env[key] = value
+    return env
+
+# Example usage
+ports = load_nyno_ports()
+print(ports)
+
+HOST = ports.get('HOST','localhost')
+PORT = ports.get('PY',5000)
 NUM_WORKERS = (os.cpu_count() or 1) * 3
-VALID_API_KEY = "changeme"
+VALID_API_KEY = ports.get('SECRET','changeme')
 
 # ===========================================================
 #  Base State (built-in functions)
@@ -59,7 +91,8 @@ def handle_client(conn, addr):
             data = conn.recv(4096)
             if not data:
                 break
-            buffer += data.decode()
+            # buffer += data.decode()
+            buffer += decoder.decode(data) # prevent utf8 related errors
 
             while "\n" in buffer:
                 line, buffer = buffer.split("\n", 1)

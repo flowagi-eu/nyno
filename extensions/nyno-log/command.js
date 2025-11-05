@@ -27,7 +27,7 @@ if (!pgClient) {
 
 	await dbClient.connect();
 	App.set('db_nyno_log', dbClient);
-        pgClient = App.get('db_nyno_log');
+    pgClient = App.get('db_nyno_log');
 	console.log('[+TCP] Postgres client db_nyno_log connected');
   }
 

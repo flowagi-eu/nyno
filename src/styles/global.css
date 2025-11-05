@@ -15,6 +15,24 @@ body .react-flow__node-default
 
 }
 
+.dialog_content textarea {
+background: black;border: 1px solid;color: #5cbffaff;font-size: 18px;padding: 9px;display: block;box-sizing: border-box;
+}
+
+
+.dialog_content fieldset {
+background: black;
+color: #5cbffaff!important;
+}
+
+.dialog_content fieldset label{
+color: #5cbffaff!important;
+}
+.dialog_content fieldset input {
+color: #5cbffaff!important;
+font-size: 18px;
+}
+
 body .react-flow__node-input,
 body .react-flow__node-default
 {

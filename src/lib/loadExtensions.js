@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { Client } from 'pg';
 import App from '../App.js';
+import { dbDelta } from '../../sdk/model/dbDelta.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +73,11 @@ async function loadExtensions() {
   }
 
   App.set('extensions', extensions);
+
+  // also then create database tables
+
+
+ await dbDelta();
   return extensions;
 }
 

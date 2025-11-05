@@ -23,6 +23,18 @@
     "yaml": "nyno-echo:\n  args:\n    - \"${i}\"\n",
     "emoji": ""
   },
+  "nyno-http-get": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-http-post": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-json-sql": {
+    "yaml": null,
+    "emoji": ""
+  },
   "nyno-log": {
     "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n",
     "emoji": ""
@@ -42,6 +54,22 @@
   "nyno-serper-search": {
     "yaml": "nyno-serper-search:\n    args:\n        - \"${apiKey}\"\n        - \"${search}\"\n\n",
     "emoji": "🔗"
+  },
+  "nyno-serper-search-advanced": {
+    "yaml": "nyno-serper-search:\n    args:\n        - \"${apiKey}\"\n        - \"${search}\"\n\n",
+    "emoji": "🔗"
+  },
+  "nyno-sql": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-transform": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-transform-flatten": {
+    "yaml": null,
+    "emoji": ""
   },
   "send-email-sw": {
     "yaml": "send-email-sw:\n  args:\n    - \"${email_receiver}\"   # $1\n    - \"${subject}\"          # $2\n    - \"${text}\"             # $3\n    - \"${from_name}\"        # $4\n    - \"${from_email}\"       # $5\n    - \"${api_key}\"          # $6\n\n",

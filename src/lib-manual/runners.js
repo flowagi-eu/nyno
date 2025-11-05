@@ -8,8 +8,45 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
+// Load main Nyno ports/config
+
+function load_nyno_ports(path = "envs/ports.env") {
+  const env = {};
+  const lines = fs.readFileSync(path, "utf-8").split("\n");
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line || line.startsWith("#")) continue;
+    if (line.includes("#")) line = line.split("#")[0].trim();
+    if (line.includes("=")) {
+      let [key, value] = line.split("=", 2);
+      key = key.trim();
+      value = value.trim();
+
+      // Remove quotes
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+
+      // Convert numeric values
+      if (!isNaN(value) && value !== "") value = Number(value);
+
+      env[key] = value;
+    }
+  }
+  return env;
+}
+
+const portsFile = path.resolve(__dirname, '../../envs/ports.env');
+const ports = load_nyno_ports(portsFile);
+console.log('[MAIN RUNNER PORTS]',ports);
+
+
+const host = ports['host'] ?? 'localhost';
+
 const RUNNERS = {
-  php: { host: "localhost", port: 6000, cmd: "php", file: path.resolve(__dirname, "runners/runner.php"), checkFunction:() => {
+  php: { host, port: ports['PE'] ?? 9003, cmd: "php", file: path.resolve(__dirname, "runners/runner.php"), checkFunction:() => {
     const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
@@ -17,7 +54,7 @@ const RUNNERS = {
     .filter(d => d.isDirectory())
     .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.php')));
   } },
-  js: { host: "localhost", port: 4001, cmd: "node", file: path.resolve(__dirname, "runners/runner.js"), checkFunction:() => {
+  js: { host, port: ports["JS"] ?? 9072, cmd: "node", file: path.resolve(__dirname, "runners/runner.js"), checkFunction:() => {
     const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
@@ -25,7 +62,7 @@ const RUNNERS = {
     .filter(d => d.isDirectory())
     .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.js')));
   } },
-  py: { host: "localhost", port: 5000, cmd: "python3", file: path.resolve(__dirname, "runners/runner.py"), checkFunction:() => {
+  py: { host, port: ports['PY'] ?? 9006, cmd: "python3", file: path.resolve(__dirname, "runners/runner.py"), checkFunction:() => {
     const extensionsDir = path.resolve(__dirname, '../../extensions');
     if (!fs.existsSync(extensionsDir)) return false;
 
@@ -36,7 +73,7 @@ const RUNNERS = {
 };
 const RUNNERS_DISABLED = {};
 
-const API_KEY = "changeme";
+const API_KEY = ports['SECRET'] ?? 'changeme';
 const connections = {};
 const pending = { php: [], js: [], py: [], bash:[] };
 
@@ -126,7 +163,7 @@ function runFunctionSingle(language, functionName, args = [],context={}) {
   if (!client || client.destroyed) throw new Error(`${language} runner not connected`);
 
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error(`runFunction timeout for ${language}:${functionName}`)), 5000);
+    const timeout = setTimeout(() => reject(new Error(`runFunction timeout for ${language}:${functionName}`)), 9999999);
 
     pending[language].push((msg) => {
       clearTimeout(timeout);

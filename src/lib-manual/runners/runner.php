@@ -1,13 +1,52 @@
 <?php
 use Swoole\Server;
 
-$server = new Server("127.0.0.1", 6000);
-$VALID_API_KEY = "changeme";
+$basedir = __DIR__ . "/../../../";
+$basedir_envs_ports = $basedir . "/envs/ports.env";
+
+// Load Main Nyno Envs (ports.env)
+function load_nyno_ports($path = "envs/ports.env") {
+    $env = [];
+    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#')) continue;
+        if (strpos($line, '#') !== false)
+            $line = substr($line, 0, strpos($line, '#'));
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+
+            // Remove quotes
+            if ((str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+                (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+                $value = substr($value, 1, -1);
+            }
+
+            // Convert numeric values
+            if (is_numeric($value)) $value = (int)$value;
+	    else $value = (string)$value;
+
+            $env[$key] = $value;
+        }
+    }
+    return $env;
+}
+
+// Example usage
+$ports = load_nyno_ports($basedir_envs_ports);
+var_dump($ports);
+
+$pe_port = $ports['PE'] ?? 9003;
+$api_key = $ports['SECRET'] ?? "changeme";
+$host = $ports['HOST'] ?? 'localhost';
+
+$server = new Server($host, $pe_port);
+$VALID_API_KEY = $api_key;
 
 // Global state with built-in functions
 $STATE = [
-    "say_hello" => fn() => "Hello from PHP worker",
-    "add" => fn($a, $b) => $a + $b,
+    // "say_hello" => fn() => "Hello from PHP worker",
 ];
 
 // Preload all extensions
