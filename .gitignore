@@ -31,4 +31,6 @@ workflows-enabled/*
 !extensions/hello-js/**
 !workflows-enabled/test-languages.json 
 !workflows-enabled/test-basic-decision-tree.json
-!envs/ports.env
+
+# ignore container created db
+pgdata
