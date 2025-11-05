@@ -3,12 +3,12 @@
 
 
 
-## Nyno 2.0: The Multi-Language Workflow Engine
+## Nyno 2.1: The Multi-Language Workflow Engine + Language
 
 ### 🧠 Create New Steps in the languages you love.
 ### 🔗 Connect everything with plain YAML text.
 
-Nyno is an **open-source multi-language workflow engine** that lets you build, extend, and connect automation in the languages you already know — **Python, PHP, JavaScript**, or even **Bash**.
+Nyno is an **open-source multi-language workflow engine** and [language](https://github.com/empowerd-cms/nyno-lang) that lets you build, extend, and connect automation in the languages you already know — **Python, PHP, JavaScript**, or even **Bash**.
 
 runs in its own high-performance worker engine
 Each language (except Bash) runs in its own **high-performance worker engine**. Functions and commands can be called using the human-readable **YAML text** format.
