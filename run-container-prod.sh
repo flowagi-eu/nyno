@@ -13,12 +13,17 @@ mkdir -p envs
 mkdir -p output
 
 
+source "$(pwd)/envs/ports.env"
+
+echo "WF:$WF"
+echo "GU:$GU"
+
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
--e APP_ENV=prod \
+-v $(pwd):/app \
 -v $(pwd)/workflows-enabled:/app/workflows-enabled \
 -v $(pwd)/envs:/app/envs \
 -v $(pwd)/output:/app/output \
 -v $(pwd)/extensions:/app/extensions \
--p 6001:6001 -p 4173:4173 -p 5173:5173 $IMAGE_NAME bash
+-p "$WF:$WF" -p "$GU:$GU" $IMAGE_NAME bash
 

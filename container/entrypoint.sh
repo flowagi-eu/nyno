@@ -40,16 +40,28 @@ echo "[DEBUG] Postgres is ready!"
 # -- Create Postgres Databaes for nyno-logs extension
 mkdir envs -p
 
+# Check if .venv directory exists
+if [ -d ".venv" ]; then
+    # Check if the activate script exists
+    if [ -f ".venv/bin/activate" ]; then
+        echo "Activating virtual environment..."
+        source .venv/bin/activate
+    else
+        echo "Error: .venv/bin/activate not found."
+        exit 1
+    fi
+fi
+
 sudo bash extensions/nyno-log/setup.sh
 
 
 # --- Start Best.js server in proper mode ---
 if [ "$APP_ENV" = "prod" ]; then
     echo "[DEBUG] Starting Best.js in production mode..."
-    exec bestjsserver --prod
+    exec ./run-prod.sh
 else
     echo "[DEBUG] Starting Best.js in development mode..."
-    exec bestjsserver
+    exec ./run-dev.sh
 fi
 
 

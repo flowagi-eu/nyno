@@ -106,7 +106,7 @@ cd ../
 git clone https://github.com/empowerd-cms/nyno
 cd nyno
 npm install # or # bun install
-bestjserver # runs Nyno
+bash run-dev.sh # runs Nyno
 
 # optionally Install PHP, build tools and Swoole
 sudo apt update
@@ -131,12 +131,32 @@ Example PHP extension:
 ```
 <?php
 // extensions/hello-php/command.php
-function hello_php($args, $context) {
+function hello_php($args, &$context) { // & important!
     $name = $args[0] ?? "World";
     return ["output" => "Hello, $name from PHP!"];
 }
 
 ```
+
+
+Got it! Here’s a **small, precise edit** you can insert into your existing README under the **“Create New Steps or Use Extensions”** section to explain `context` usage for passing data between steps:
+
+---
+
+Example using `context` to Pass Data Between Steps
+
+
+```js
+export function some_extension(args, context) {
+  const result = args[0] || "default value";
+
+  // Save output in context for the next step
+  context['MY_RESULT'] = result;
+
+  return 0; // default path
+}
+```
+
 
 Example Workflow output:
 ```

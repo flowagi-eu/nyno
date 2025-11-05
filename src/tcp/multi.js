@@ -21,6 +21,9 @@ function debugLog(...args) {
  */
 export async function runYamlTool(node, context = {}) {
 
+
+
+
   let nodeName = node.func;
   let yamlContent = node.info ?? '';
   let node_id = node.id ?? '';
@@ -104,15 +107,31 @@ const replaceEnv = (value) => {
 if (cmdSpec.flags) {
   for (const key in cmdSpec.flags) {
     const val = cmdSpec.flags[key];
+
     if (Array.isArray(val)) {
       for (const item of val) {
         args.push(key.length === 1 ? `-${key}` : `--${key}`);
-        args.push(replaceEnv(String(item)));
+        let fullValue = (replaceEnv(String(item)));
+        args.push(fullValue);
       }
     } else {
       args.push(key.length === 1 ? `-${key}` : `--${key}`);
-      if (val != null) args.push(replaceEnv(String(val)));
+      if (val != null) {
+        	let fullValue = (replaceEnv(String(val)));
+	      args.push(fullValue);
+      }
     }
+  }
+}
+
+if (cmdSpec.context) {
+  for (const key in cmdSpec.context) {
+    const val = cmdSpec.context[key];
+      if (val != null) {
+	  let fullValue = (replaceEnv(String(val)));
+	  // also add to context
+	  context[key] = fullValue;
+      }
   }
 }
 
@@ -179,15 +198,35 @@ if (unreplaced.length > 0) {
  * Run a workflow from start node
  */
 export async function runWorkflow(workflow, startNodeId, context = {}) {
-  const nodes = Object.fromEntries(workflow.nodes.map((n) => [n.id, n]));
+  const oldNodes = Object.fromEntries(workflow.nodes.map((n) => [n.id, n]));
   const log = [];
   let current = startNodeId;
+   console.log('old nodes',oldNodes);
 
+const nodes = {};
+  for(const [key,value] of Object.entries(oldNodes)) {
+
+	  console.log('key,value',[key,value]);
+	const node = value;
+	nodes[key] = {
+	    id: node.id,
+	    func: node.func,
+	    info: node.info, // raw yaml
+	    args: node.args, // extracted args?
+	    next: node.next, // next? if not nextMap?
+	}
+	
+  }
+
+   console.log('nodes',nodes);
   debugLog(`Starting workflow at node: ${startNodeId}`);
 
   while (current && nodes[current]) {
     const node = nodes[current];
     debugLog(`Processing node: ${node.id} (${node.func})`);
+
+	// clear old context system tokens
+	if('set_context' in context) delete context['set_context'];
 
     const input = JSON.parse(JSON.stringify(context));
     
@@ -224,9 +263,9 @@ export async function runWorkflow(workflow, startNodeId, context = {}) {
        debugLog(`Node output: ${outputValue}`);
 
 	  const nextMap = JSON.parse(outputValue).r ?? '';
-    if (node.type === 'multiIf' && node.nextMap) {
+    if (node.nextMap) {
       current = node.nextMap[nextMap] ?? node.nextMap['0'] ?? null;
-      debugLog(`Next node determined by multiIf: ${current}`);
+      debugLog(`Next node determined: ${current}`);
     } else {
       current = node.next ?? null;
       debugLog(`Next node: ${current}`);
@@ -234,6 +273,9 @@ export async function runWorkflow(workflow, startNodeId, context = {}) {
   }
 
   debugLog('Workflow finished');
+	if("NYNO_ONE_VAR" in context) {
+		return context[context.NYNO_ONE_VAR];
+	}
   return { log, context };
 }
 
@@ -290,6 +332,11 @@ export default function register(router) {
 
         const startTime = Date.now();
         const result = await runWorkflow(workflow, node.id, context);
+
+	if("NYNO_ONE_VAR" in context){
+		return result;
+	}
+
         const endTime = Date.now();
 
         return {
@@ -320,8 +367,7 @@ export default function register(router) {
         node.nextMap = {};
         targets.forEach((t, i) => (node.nextMap[i.toString()] = t));
         delete node.next;
-        node.type = 'multiIf';
-        debugLog(`Node ${node.id} converted to multiIf with nextMap`, node.nextMap);
+        debugLog(`Node ${node.id}: set nextMap`, node.nextMap);
       }
     }
   }
