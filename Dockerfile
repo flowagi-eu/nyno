@@ -45,10 +45,10 @@ RUN git clone https://github.com/empowerd-cms/best.js /opt/best.js && \
 COPY . /app
 
 # --- Install Nyno dependencies ---
-RUN bun install
+RUN cd /app && bun install
 
 # --- Expose ports ---
-EXPOSE 6001 5432 4173 5173
+EXPOSE 9024 9057 9003 9006 9072
 
 # --- Entrypoint ---
 COPY container/entrypoint.sh /entrypoint.sh

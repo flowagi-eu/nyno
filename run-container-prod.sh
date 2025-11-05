@@ -20,7 +20,6 @@ echo "GU:$GU"
 
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
--v $(pwd):/app \
 -v $(pwd)/workflows-enabled:/app/workflows-enabled \
 -v $(pwd)/envs:/app/envs \
 -v $(pwd)/output:/app/output \
