@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Generate a random UUIDv4 string.
+ *
+ * @return string
+ */
+function generateUUIDv4() {
+    $data = random_bytes(16);
+
+    // Set version to 0100
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    // Set bits 6-7 to 10
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+/**
+ * Generate an image using GPT Image 1 API.
+ */
+function generateImageWithGPTImage1($apiKey, $prompt, $size = "1024x1024") {
+    $endpoint = "https://api.openai.com/v1/images/generations";
+
+    $postFields = [
+        "model" => "gpt-image-1",
+        "prompt" => $prompt,
+        "size" => $size,
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $endpoint);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Content-Type: application/json",
+        "Authorization: Bearer " . $apiKey
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
+
+    $response = curl_exec($ch);
+    if ($response === false) {
+        error_log("cURL error: " . curl_error($ch));
+        curl_close($ch);
+        return false;
+    }
+
+    $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $decoded = json_decode($response, true);
+    if ($httpStatus !== 200) {
+        error_log("API returned HTTP $httpStatus: " . $response);
+        return false;
+    }
+
+    return $decoded['data'] ?? false;
+}
+
+// -----------------
+// CLI Usage
+// -----------------
+if ($argc < 3) {
+    echo "Usage: nyno-openai-image-gen <api_key> <prompt>\n";
+    echo "Example:\n";
+    echo "  nyno-openai-image-gen sk-XXXX \"a cyberpunk cityscape at night\"\n";
+    exit(1);
+}
+
+$apiKey = $argv[1];
+$prompt = $argv[2];
+
+$result = generateImageWithGPTImage1($apiKey, $prompt);
+
+if ($result) {
+    @mkdir('output', 0777, true);
+    foreach ($result as $imageData) {
+        if (isset($imageData['b64_json'])) {
+            $imgBytes = base64_decode($imageData['b64_json']);
+            $filename = 'output/' . generateUUIDv4() . ".png";
+            file_put_contents($filename, $imgBytes);
+            echo "Saved: $filename\n";
+        } elseif (isset($imageData['url'])) {
+            echo "Result URL: " . $imageData['url'] . "\n";
+        }
+    }
+} else {
+    echo "Image generation failed.\n";
+}
+

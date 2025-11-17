@@ -1,0 +1,4 @@
+- step: ai-openai-image-edit
+  args: 
+    - ${IMAGE_FILE_PATH}
+    - ${PROMPT}
