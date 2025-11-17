@@ -30,8 +30,6 @@ workflows-enabled/*
 !extensions/hello-js/
 !extensions/hello-js/**
 
-# Ignore everything in extensions
-extensions/*
 
 # Include specific folders inside extensions
 !extensions/ai-openai-image-edit/
