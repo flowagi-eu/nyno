@@ -1,0 +1,4 @@
+- step: serper-search:
+  args:
+    - ${QUERY} # ex. site:yoursite.com test keywords
+
