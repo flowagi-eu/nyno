@@ -79,7 +79,7 @@ cd nyno
 
 #### 2. Build the Container
 ```bash
-build-container.sh "podman" # or use docker
+./build-container.sh "podman" # or use docker
 ```
 
 #### 3. Run the Container
@@ -87,12 +87,12 @@ Make sure you to build the container first.
 
 For quick testing (minimal resource usage):
 ```bash
-run-container-dev.sh "podman" # or use docker, GUI at http://localhost:9057
+./run-container-dev.sh "podman" # or use docker, GUI at http://localhost:9057
 ```
 
 For production (maximum resource/workers usage):
 ```bash
-run-container-prod.sh "podman" # or use docker, GUI at http://localhost:9057
+./run-container-prod.sh "podman" # or use docker, GUI at http://localhost:9057
 
 ```
 
