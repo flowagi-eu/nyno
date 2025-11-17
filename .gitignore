@@ -52,6 +52,26 @@ workflows-enabled/*
 !extensions/nyno-transform-flatten/
 !extensions/nyno-write-file/
 !extensions/serper-search/
+!extensions/ai-openai-image-edit/**
+!extensions/ai-openai-image-gen/**
+!extensions/ai-openai-text/**
+!extensions/hello/**
+!extensions/hello-php/**
+!extensions/hello-py/**
+!extensions/hello-rb/**
+!extensions/nyno-echo/**
+!extensions/nyno-extract-file-paths/**
+!extensions/nyno-extract-hrefs/**
+!extensions/nyno-http-get/**
+!extensions/nyno-http-post/**
+!extensions/nyno-log/**
+!extensions/nyno-read-file/**
+!extensions/nyno-scrape/**
+!extensions/nyno-sql/**
+!extensions/nyno-transform/**
+!extensions/nyno-transform-flatten/**
+!extensions/nyno-write-file/**
+!extensions/serper-search/**
 
 
 
