@@ -1,0 +1,7 @@
+workflow:
+  - step: nyno-transform
+    args:
+      - [{"city":"Amsterdam"},{"city":"Madrid"},{"city":"Tokyo"}]
+      - site:linkedin.com/in ceo %.city%
+
+

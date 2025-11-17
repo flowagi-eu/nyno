@@ -1,0 +1,20 @@
+workflow:
+  - id: 1
+    step: nyno-echo
+    args:
+      - ${i}
+    next:
+      - 2
+      - 3
+  - id: 2
+    step: nyno-echo
+    args:
+      - hi from node2!
+    next: []
+  - id: 3
+    step: nyno-echo
+    args:
+      - hi from node 3!
+    next: []
+route: /test_nyno
+guidata: '{"nodes":[{"id":"1","func":"route /test_nyno","info":"nyno-echo:\n  args:\n    - \"${i}\"\n","next":["2","3"],"position":{"x":6,"y":-42.5},"type":"input"},{"id":"2","func":"node 2","info":"nyno-echo:\n  args:\n    - \"hi from node2!\"\n","next":[],"position":{"x":-70.5,"y":97},"type":null},{"id":"3","func":"node 3","info":"nyno-echo:\n  args:\n    - \"hi from node 3!\"\n","next":[],"position":{"x":100,"y":100},"type":null}],"edges":[{"source":"1","sourceHandle":null,"target":"2","targetHandle":null,"id":"reactflow__edge-1-2"},{"source":"1","sourceHandle":null,"target":"3","targetHandle":null,"id":"reactflow__edge-1-3"}]}'

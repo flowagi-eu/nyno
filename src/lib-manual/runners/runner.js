@@ -40,7 +40,7 @@ function load_nyno_ports(path = "envs/ports.env") {
 // Example usage
 const portsFile = path.resolve(__dirname, "../../../envs/ports.env");
 const ports = load_nyno_ports(portsFile);
-console.log(ports);
+//console.log(ports);
 
 const host = ports['HOST'] ?? 'localhost';
 
@@ -58,6 +58,8 @@ async function loadExtensions() {
     .filter(d => d.isDirectory())
     .map(d => path.join(extBase, d.name));
 
+	let extensionsLoaded = [];
+
   for (const dir of dirs) {
     const cmdFile = path.join(dir, "command.js");
     if (fs.existsSync(cmdFile)) {
@@ -71,7 +73,7 @@ async function loadExtensions() {
         
         if (module[funcName]) {
           globalThis.state[folder] = module[funcName]; // directly assign function
-          console.log(`[JS Runner] Loaded extension ${funcName}`);
+          extensionsLoaded.push(`${funcName}`);
         } else {
           console.warn(`[JS Runner] Failed to load extension ${dir} does not export a function called ${funcName}`);
         }
@@ -80,11 +82,12 @@ async function loadExtensions() {
       }
     }
   }
+
+	//console.log("["+(extensionsLoaded.length)+"] Loaded JS extensions:" + JSON.stringify(extensionsLoaded));
 }
 
 async function startWorker() {
   await loadExtensions();
-  console.log('globalThis.state', Object.keys(globalThis.state));
 
   const server = net.createServer((socket) => {
     let authenticated = false;
@@ -137,7 +140,11 @@ async function startWorker() {
 }
 
 if (cluster.isPrimary) {
-  const numCPUs = os.cpus().length * 3;
+const isProd = process.env.NODE_ENV === 'production';
+  let numCPUs = 2;
+  if(isProd) {
+     numCPUs = os.cpus().length * 3;
+  }
   console.log(`[JS Runner Master] Forking ${numCPUs} workers...`);
   for (let i = 0; i < numCPUs; i++) cluster.fork();
 

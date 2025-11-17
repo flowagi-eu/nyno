@@ -1,0 +1,3 @@
+- step: nyno-extract-file-paths
+  args:
+    - ["Message 1 with /file/path/abslute.png", "Message 2 ~/Workflows/test"]

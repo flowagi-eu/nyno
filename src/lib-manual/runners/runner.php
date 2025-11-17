@@ -35,13 +35,21 @@ function load_nyno_ports($path = "envs/ports.env") {
 
 // Example usage
 $ports = load_nyno_ports($basedir_envs_ports);
-var_dump($ports);
+//var_dump($ports);
 
 $pe_port = $ports['PE'] ?? 9003;
 $api_key = $ports['SECRET'] ?? "changeme";
 $host = $ports['HOST'] ?? 'localhost';
+$isProd = getenv('NODE_ENV') === 'production';
+$num_workers = 2;
+if($isProd) {
+	    $num_workers = intval(shell_exec('nproc')) * 3; // Linux/Mac
+}
 
 $server = new Server($host, $pe_port);
+$server->set([
+    'worker_num' => $num_workers,
+]);
 $VALID_API_KEY = $api_key;
 
 // Global state with built-in functions
@@ -57,13 +65,13 @@ foreach (glob(__DIR__ . "/../../../extensions/*/command.php") as $file) {
     $funcName = strtolower(str_replace("-", "_", $bname));
     if(is_callable($funcName)) {
 	    $STATE[$bname] = $funcName;
-        echo "[PHP Runner] Loaded extension $bname\n";
+        //echo "[PHP Runner] Loaded extension $bname\n";
     } else {
         echo "[PHP Runner] Failed to Load extension $bname with name $funcName \n";
     }
 }
 
-var_dump('php $STATE[$bname]',$STATE[$bname]);
+//var_dump('php $STATE[$bname]',$STATE[$bname]);
 
 // Handle incoming data
 $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, $VALID_API_KEY) {

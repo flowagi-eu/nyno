@@ -16,7 +16,7 @@ extensions/*
 envs/*
 workflows-enabled/*
 
-# Except these
+# Except these extensions
 !extensions/nyno-log/
 !extensions/nyno-log/**
 !extensions/nyno-echo/
@@ -29,11 +29,42 @@ workflows-enabled/*
 !extensions/hello-php/**
 !extensions/hello-js/
 !extensions/hello-js/**
-!workflows-enabled/test-languages.json 
-!workflows-enabled/test-basic-decision-tree.json
+
+# Ignore everything in extensions
+extensions/*
+
+# Include specific folders inside extensions
+!extensions/ai-openai-image-edit/
+!extensions/ai-openai-image-gen/
+!extensions/ai-openai-text/
+!extensions/hello/
+!extensions/hello-php/
+!extensions/hello-py/
+!extensions/hello-rb/
+!extensions/nyno-echo/
+!extensions/nyno-extract-file-paths/
+!extensions/nyno-extract-hrefs/
+!extensions/nyno-http-get/
+!extensions/nyno-http-post/
+!extensions/nyno-log/
+!extensions/nyno-read-file/
+!extensions/nyno-scrape/
+!extensions/nyno-sql/
+!extensions/nyno-transform/
+!extensions/nyno-transform-flatten/
+!extensions/nyno-write-file/
+!extensions/serper-search/
+
+
+
+# Except these workflows
+!workflows-enabled/test_nyno.nyno 
+!workflows-enabled/test_nyno_runners.nyno
 
 # Envs exceptions
 !envs/ports.env
 
 # ignore container created db
 pgdata
+
+

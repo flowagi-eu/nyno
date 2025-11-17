@@ -1,78 +1,110 @@
 {
-  "code-check-indentation": {
-    "yaml": "code-check-indentation:\n   args:\n       - \"${FILE_PATHS}\"\n",
-    "emoji": ""
+  "ai-openai-image-edit": {
+    "yaml": "- step: ai-openai-image-edit\n  args: \n    - ${IMAGE_FILE_PATH}\n    - ${PROMPT}",
+    "emoji": "🤖"
   },
-  "curl-post": {
-    "yaml": "curl:\n  flags:\n    s: null\n    X: \"POST\"\n    H:\n      - \"Accept: application/json\"\n      - \"Content-Type: application/json\"\n    d: '{\"title\": \"New Todo\", \"completed\": false, \"userId\": 1}'\n  args:\n    - \"https://jsonplaceholder.typicode.com/todos\"\n",
-    "emoji": ""
+  "ai-openai-image-gen": {
+    "yaml": "- step: ai-openai-image-gen\n  args: \n    - ${PROMPT}",
+    "emoji": "🤖"
+  },
+  "ai-openai-text": {
+    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}",
+    "emoji": "🤖"
   },
   "hello": {
-    "yaml": "hello:\n  args:\n    - \"${name}\"\n",
+    "yaml": null,
     "emoji": ""
   },
   "hello-php": {
-    "yaml": "hello-php:\n  args:\n    - \"${name}\"\n",
+    "yaml": null,
     "emoji": ""
   },
   "hello-py": {
-    "yaml": "hello-py:\n  args:\n    - \"${name}\"\n",
+    "yaml": null,
+    "emoji": ""
+  },
+  "hello-rb": {
+    "yaml": null,
     "emoji": ""
   },
   "nyno-echo": {
-    "yaml": "nyno-echo:\n  args:\n    - \"${i}\"\n",
+    "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
+    "emoji": ""
+  },
+  "nyno-extract-file-paths": {
+    "yaml": "- step: nyno-extract-file-paths\n  args:\n    - [\"Message 1 with /file/path/abslute.png\", \"Message 2 ~/Workflows/test\"]",
+    "emoji": ""
+  },
+  "nyno-extract-hrefs": {
+    "yaml": "- step: nyno_extract_hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"",
     "emoji": ""
   },
   "nyno-http-get": {
-    "yaml": null,
+    "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
     "emoji": ""
   },
   "nyno-http-post": {
-    "yaml": null,
+    "yaml": "- step: nyno-http-post\n  args:\n    - ${URL}\n    - ${POST_DATA}",
     "emoji": ""
   },
   "nyno-json-sql": {
-    "yaml": null,
+    "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
     "emoji": ""
   },
   "nyno-log": {
-    "yaml": "nyno-log:\n  args:\n    - \"${JSON}\"\n",
+    "yaml": "- step: nyno-log:\n  args:\n    - \"${JSON}\"\n",
     "emoji": ""
   },
-  "nyno-openai-image-edit": {
-    "yaml": "nyno-openai-image-edit:\n\targs:\n\t- \"${apiKey}\n\t- \"${imagePath}\n\t- \"${prompt}\n\n",
-    "emoji": "🤖"
+  "nyno-read-file": {
+    "yaml": "- step: nyno-read-file\n  args:\n    - ${FILE_PATH}\n",
+    "emoji": ""
   },
-  "nyno-openai-image-gen": {
-    "yaml": "nyno-openai-image-gen:\n    args:\n        - \"${apiKey}\"\n        - \"${prompt}\"",
-    "emoji": "🤖"
+  "nyno-read-files": {
+    "yaml": "- step: nyno-read-files\n  args:\n    - [\".path/dir1/*.command\", \".path/dir1/template.yml\"]\n    - 'object' # remove to output text\n",
+    "emoji": ""
   },
-  "nyno-openai-text": {
-    "yaml": "nyno-openai-text:\n    args:\n        - \"${apiKey}\"\n        - \"${prompt}\"\n        - \"${reasoningEffort}\" (optional) // minimal, low, medium, high; defaults to \"low\"\n\n",
-    "emoji": "🤖"
-  },
-  "nyno-serper-search": {
-    "yaml": "nyno-serper-search:\n    args:\n        - \"${apiKey}\"\n        - \"${search}\"\n\n",
-    "emoji": "🔗"
-  },
-  "nyno-serper-search-advanced": {
-    "yaml": "nyno-serper-search:\n    args:\n        - \"${apiKey}\"\n        - \"${search}\"\n\n",
-    "emoji": "🔗"
+  "nyno-scrape": {
+    "yaml": "- step: nyno-scrape:\n  args:\n    - \"${LOOP_URL_STRUCTURE}\" # ex http://localhost/blog/page/:index\n    - \"${QUERY_SELECTOR}\" # ex \".post_link a\"\n    - \"${START_PAGE}\" # ex 1\n    - \"${END_PAGE}\" # ex 10",
+    "emoji": ""
   },
   "nyno-sql": {
-    "yaml": null,
+    "yaml": "- step: nyno-sql\n  args:\n    - ${QUERY}\n    - ${PARAMS} # optional",
     "emoji": ""
   },
   "nyno-transform": {
-    "yaml": null,
+    "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
     "emoji": ""
   },
   "nyno-transform-flatten": {
+    "yaml": "- step: nyno-transform-flatten\n  args:\n    - ${OBJECTS}\n    - \"key\" # or \"key.subkey\" or \"key.subkey.subsubkey\"",
+    "emoji": ""
+  },
+  "nyno-write-file": {
+    "yaml": "- step: nyno-write-file\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
+    "emoji": ""
+  },
+  "pseudo-dsl-to-flat-ast": {
     "yaml": null,
     "emoji": ""
   },
-  "send-email-sw": {
-    "yaml": "send-email-sw:\n  args:\n    - \"${email_receiver}\"   # $1\n    - \"${subject}\"          # $2\n    - \"${text}\"             # $3\n    - \"${from_name}\"        # $4\n    - \"${from_email}\"       # $5\n    - \"${api_key}\"          # $6\n\n",
+  "pseudo-flat-ast-to-js": {
+    "yaml": null,
     "emoji": ""
+  },
+  "pseudo-flat-ast-to-php": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-python": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-ruby": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "serper-search": {
+    "yaml": "- step: serper-search:\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",
+    "emoji": "🔗"
   }
 }

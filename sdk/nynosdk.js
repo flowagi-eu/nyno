@@ -6,9 +6,7 @@ import { save } from './model/dbDelta.js';
 
 export async function middleware(args,context){
 	let pgClient = App.get('db_nyno_log');
-	
-	console.log('pgclient in middleware',pgClient);
-	context['middleware'] = 'lets do a postgres insert of last_result';
+	context['middleware'] = 'postgres insert of last_result';
 	if('last_result' in context) {
 		const res = await save(context['last_result']);
 		console.log('res',res);

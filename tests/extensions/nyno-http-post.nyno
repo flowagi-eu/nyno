@@ -1,0 +1,9 @@
+context:
+  URL: "https://empowerd.dev" # example
+  POST_DATA:
+    - key1: value1
+workflow:
+  - step: nyno-http-post
+    args:
+      - ${URL}
+      - ${POST_DATA}

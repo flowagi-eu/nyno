@@ -1,0 +1,5 @@
+workflow:
+  - step: nyno-sql
+    args:
+      - "SELECT * FROM json_storage LIMIT 10"
+

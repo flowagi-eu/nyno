@@ -5,8 +5,8 @@ import json
 from queue import Queue
 
 HOST = 'localhost'
-PORT = 6001
-API_KEY = "changeme"
+PORT = 9024
+API_KEY = "change_me"
 TEST_JSON = {"test": "log 1"}
 NUM_THREADS = 10
 DURATION = 10
