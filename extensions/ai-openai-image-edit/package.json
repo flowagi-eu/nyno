@@ -1,0 +1,11 @@
+{
+  "name": "nyno-openai-image-edit",
+  "version": "1.0.0",
+  "description": "OpenAI Image Editing with nyno",
+  "bin": {
+    "nyno-openai-image-edit": "./bin/openaiphp-image-edit-gpt1"
+  },
+  "license": "Apache2"
+}
+
+
