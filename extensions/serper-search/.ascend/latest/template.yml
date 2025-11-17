@@ -1,0 +1,5 @@
+nyno-serper-search:
+    args:
+        - "${apiKey}"
+        - "${search}"
+

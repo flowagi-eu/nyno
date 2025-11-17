@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Check if API key and search query were provided
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "Usage: $0 <API_KEY> <search_query>"
+  exit 1
+fi
+
+# Assign arguments to variables
+API_KEY="$1"
+QUERY="$2"
+
+# Make the API request
+curl -s --location 'https://google.serper.dev/search' \
+  --header "X-API-KEY: $API_KEY" \
+  --header 'Content-Type: application/json' \
+  --data "{\"q\":\"$QUERY\"}"
+

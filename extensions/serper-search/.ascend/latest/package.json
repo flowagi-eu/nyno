@@ -1,0 +1,9 @@
+{
+  "name": "nyno-serper-search",
+  "version": "1.0.0",
+  "description": "Serper Search with nyno",
+  "type":"module",
+  "license": "Apache2"
+}
+
+
