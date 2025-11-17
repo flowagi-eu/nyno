@@ -1,4 +1,3 @@
-// ../lib/runExtension.js
 import net from "net";
 import { spawn } from "child_process";
 import path from "path";
@@ -40,7 +39,7 @@ function load_nyno_ports(path = "envs/ports.env") {
 
 const portsFile = path.resolve(__dirname, '../../envs/ports.env');
 const ports = load_nyno_ports(portsFile);
-console.log('[MAIN RUNNER PORTS]',ports);
+//console.log('[MAIN RUNNER PORTS]',ports);
 
 
 const host = ports['host'] ?? 'localhost';
@@ -70,12 +69,19 @@ const RUNNERS = {
     .filter(d => d.isDirectory())
     .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.py')));
   } },
+  rb: { host, port: ports['RB'] ?? 9045, cmd: "ruby", file: path.resolve(__dirname, "runners/runner.rb"), checkFunction:() => {
+    const extensionsDir = path.resolve(__dirname, '../../extensions');
+    if (!fs.existsSync(extensionsDir)) return false;
+    return fs.readdirSync(extensionsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .some(dir => fs.existsSync(path.join(extensionsDir, dir.name, 'command.rb')));
+  } },
 };
 const RUNNERS_DISABLED = {};
 
 const API_KEY = ports['SECRET'] ?? 'changeme';
 const connections = {};
-const pending = { php: [], js: [], py: [], bash:[] };
+const pending = { rb:[],php: [], js: [], py: [], bash:[] };
 
 // --- Spawn a single runner ---
 function startRunner(type) {
@@ -190,7 +196,9 @@ export async function runFunction(functionName, args = [],context={}) {
   return {"fnError":`Function "${functionName}" not found on any runner`};
 }
 
+export async function initRunners() {
 // --- Initialize runners & connections immediately ---
 startRunners();
 setTimeout(connectAllRunners, 1000);
+}
 

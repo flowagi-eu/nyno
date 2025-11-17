@@ -3,8 +3,7 @@ import extensions from "@/extension-data.json";
 import { YamlFormToggle } from "@/components/YamlFormToggle";
 
 // --- Template imports (as plain text)
-import echo from "@/templates/echo.yml?raw";
-import echoWithVar from "@/templates/echo-with-var.yml?raw";
+import YAML from 'js-yaml';
 
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
@@ -18,7 +17,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import "reactflow/dist/style.css";
 
 export default function FlowPage() {
-  const keywordEmojis = { route: "🌐", db: "🗄️", email: "✉️", log: "📜", api: "🔗" };
+  const keywordEmojis = { route: "🌐" }; // , db: "🗄️", email: "✉️", log: "📜", api: "🔗"
 
   const initialNodes = [
     {
@@ -38,19 +37,20 @@ export default function FlowPage() {
 
   // --- Templates for textarea
 const templates = {
-  "": "",
-  "Echo": echo,
-  "Echo with Var": echoWithVar,
 };
 
+const emojis = {};
 
 // --- Get existing extensions
-console.log('existing extensions found in app.jsx',extensions);
 
-for (const [folder, { yaml }] of Object.entries(extensions)) {
+for (const [folder, { yaml, emoji }] of Object.entries(extensions)) {
   if (!yaml) continue; // skip empty entries
   const command = folder.toLowerCase().replace(/\s+/g, "-");
   templates[folder] = yaml; // set yaml in templates
+
+  if(emoji){
+    emojis[folder] = emoji;
+  }
 }
 
   // --- Undo history
@@ -149,63 +149,144 @@ for (const [folder, { yaml }] of Object.entries(extensions)) {
     pushHistory(newNodes, newEdges);
   };
 
-  // --- Export JSON including `info`
-  const exportJSON = () => {
-    const phpNodes = nodes.map((n) => {
-      const cleanFunc =
-        typeof n.data.rawLabel === "string"
-          ? n.data.rawLabel.replace(/\s+/g, "_").replace(/^_+/, "")
-          : "node";
-      return {
-        id: n.id,
-        func: cleanFunc,
-        info: n.data.info || "",
-        args: n.data.args || [],
-        next: edges.find((e) => e.source === n.id)?.target || null,
-        position: n.position,
-        type: n.type || null,
-      };
-    });
+const exportYAML = () => {
+  // --- Prepare guidata first
+  const guidataNodes = nodes.map((n) => ({
+    id: n.id,
+    func:
+      typeof n.data.rawLabel === "string"
+        ? n.data.rawLabel
+        : "node",
+    info: n.data.info || "",
+    next: edges.filter((e) => e.source === n.id).map((e) => e.target),
+    position: n.position,
+    type: n.type || null,
+  }));
 
-    const json = JSON.stringify({ nodes: phpNodes, edges }, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "flow.json";
-    a.click();
-  };
+  const guidata = { nodes: guidataNodes, edges };
 
-  // --- Import JSON including `info`
-  const importJSON = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = JSON.parse(evt.target.result);
-        if (!data.nodes || !data.edges) return alert("Invalid flow JSON");
+  // --- Build workflow using guidata
+  const workflow = [];
 
-        const importedNodes = data.nodes.map((n) => ({
-          id: n.id,
-          position: n.position || { x: 50 * parseInt(n.id), y: 50 * parseInt(n.id) },
-          data: {
-            label: n.func || `node ${n.id}`,
-            rawLabel: n.func || `node ${n.id}`,
-            info: n.info || "",
-            args: n.args || [],
-          },
-          type: n.type || undefined,
+  guidata.nodes.forEach((node) => {
+    if (!node.info) return;
+
+    try {
+      const parsedInfo = YAML.load(node.info);
+
+      let steps = [];
+
+      if (Array.isArray(parsedInfo)) {
+        steps = parsedInfo;
+      } else if (parsedInfo && typeof parsedInfo === "object") {
+        steps = Object.entries(parsedInfo).map(([stepName, stepData]) => ({
+          step: stepName,
+          args: stepData?.args || [],
         }));
-
-        setNodes(importedNodes);
-        setEdges(data.edges);
-        pushHistory(importedNodes, data.edges);
-      } catch {
-        alert("Error parsing JSON");
       }
-    };
-    reader.readAsText(file);
+
+      steps.forEach((step) => {
+        workflow.push({
+          id: parseInt(node.id),
+          step: step.step,
+          args: step.args || [],
+          next: node.next.map((x) => parseInt(x)),
+        });
+      });
+    } catch (err) {
+      console.warn("Failed to parse node info YAML for node", node.id, err);
+    }
+  });
+
+  // --- Extract first node's route if present
+  let firstNodeRoute = null;
+  const firstNodeLabel = nodes[0]?.data?.rawLabel || "";
+  if (firstNodeLabel.toLowerCase().startsWith("route")) {
+    firstNodeRoute = firstNodeLabel.replace(/^route\s*/i, "").trim();
+  }
+
+  // --- Dump YAML: workflow first, then route, then guidata
+  let yamlStr = YAML.dump({ workflow }, { noRefs: true, flowLevel: -1 });
+
+  if (firstNodeRoute) {
+    yamlStr += `route: ${firstNodeRoute}\n`;
+  }
+
+  yamlStr += `guidata: '${JSON.stringify(guidata)}'\n`;
+
+  // --- Trigger download
+  const blob = new Blob([yamlStr], { type: "application/x-yaml" });
+  const a = document.createElement("a");
+  let firstNodeCleanTitle = firstNodeRoute
+    ? firstNodeRoute.replace(/[\/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_")
+    : "export";
+    firstNodeCleanTitle = firstNodeCleanTitle.replace(/^_+/, ""); // replace prefix _
+  a.href = URL.createObjectURL(blob);
+  a.download = firstNodeCleanTitle + ".nyno";
+  a.click();
+};
+
+
+
+
+
+const clearAll = () => {
+  setNodes([]);
+  setEdges([]);
+  setSelectedNode(null);
+  setIsOpen(false);
+  pushHistory([], []);
+};
+
+
+
+  // --- Import YAML including guidata
+const importYAML = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      // Parse full YAML
+      const yamlContent = YAML.load(evt.target.result);
+
+      if (!yamlContent?.guidata) return alert("Invalid YAML: missing guidata");
+
+      // Parse guidata JSON string
+      const guidata = JSON.parse(yamlContent.guidata);
+      if (!guidata.nodes || !guidata.edges)
+        return alert("Invalid guidata format");
+
+      // Map nodes
+      const importedNodes = guidata.nodes.map((n) => ({
+        id: n.id,
+        position: n.position || { x: 50 * parseInt(n.id), y: 50 * parseInt(n.id) },
+        data: {
+          label: n.func || `node ${n.id}`,
+          rawLabel: n.func || `node ${n.id}`,
+          info: n.info || "",
+          args: n.args || [],
+        },
+        type: n.type || undefined,
+      }));
+
+      // Restore nodes and edges
+      setNodes(importedNodes);
+      setEdges(guidata.edges);
+      pushHistory(importedNodes, guidata.edges);
+    } catch (err) {
+      console.error(err);
+      alert("Error parsing YAML");
+    } finally {
+      // ✅ Clear the file input
+      e.target.value = "";
+    }
   };
+  reader.readAsText(file);
+};
+
+
 
 const handleDialogKeyDown = (e) => {
   // Do nothing if user is typing in a textarea
@@ -249,16 +330,20 @@ const handleDialogKeyDown = (e) => {
     <ReactFlowProvider>
       <div style={{ width: "100%", height: "100vh" }}>
         <div style={{ position: "absolute", bottom: 9, right: 9, zIndex: 20 }}>
+          
           <button onClick={addNode} style={{ marginRight: 5 }}>
             Add Node
           </button>
-          <button onClick={removeNode} style={{ marginRight: 5 }}>
-            Remove Node
+          <button onClick={exportYAML} style={{ marginRight: 5 }}>
+            Export File
           </button>
-          <button onClick={exportJSON} style={{ marginRight: 5 }}>
-            Export JSON
-          </button>
-          <input type="file" onChange={importJSON} />
+          <button onClick={clearAll}>
+    Clear All
+  </button>
+          <input type="file"  accept=".nyno"  onChange={importYAML} />
+
+          
+
         </div>
 
         <ReactFlow
@@ -292,58 +377,71 @@ const handleDialogKeyDown = (e) => {
             <Dialog.Overlay
               style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)" }}
             />
-            <Dialog.Content className="dialog_content"
-	    onKeyDown={handleDialogKeyDown}
-              style={{
-                background: "#171717",
-                borderRadius: "8px",
-                padding: "1rem 3rem",
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "300px",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-              }}
-            >
-              {selectedNode && (
-                <>
-                  <div style={{ marginTop: "1rem" }}>
-                    <input
-                      type="text"
-                      value={selectedNode.data.rawLabel}
-                      onChange={(e) => handleFieldChange("label", e.target.value)}
-                      style={{ width: "100%", marginBottom: "0.5rem","fontSize":"24px", background:"none",color:"white",border:"none" }}
-                    />
-                    <label>Template</label>
-                    <select
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        handleFieldChange("info", templates[val] || "");
-                      }}
-                      style={{ width: "100%", marginBottom: "0.5rem" }}
-                    >
-                      {Object.keys(templates).map((t) => (
-                        <option key={t} value={t}>
-                          {t || "None"}
-                        </option>
-                      ))}
-                    </select>
+           <Dialog.Content
+  className="dialog_content"
+  onKeyDown={handleDialogKeyDown}
+  style={{
+    background: "#171717",
+    borderRadius: "8px",
+    padding: "1rem 3rem",
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "300px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+  }}
+>
+  {selectedNode && (
+    <>
+      <div style={{ marginTop: "1rem" }}>
+        <input
+          type="text"
+          value={selectedNode.data.rawLabel}
+          onChange={(e) => handleFieldChange("label", e.target.value)}
+          style={{
+            width: "100%",
+            marginBottom: "0.5rem",
+            fontSize: "24px",
+            background: "none",
+            color: "white",
+            border: "none",
+          }}
+        />
+        <label>Template</label>
+        <select
+          onChange={(e) => handleFieldChange("info", templates[e.target.value] || "")}
+          style={{ background:"black",color:"white","border":"none",width: "100%", marginBottom: "0.5rem", "padding":"9px","fontSize": "1rem" }}
+        >
+          {Object.keys(templates).map((t) => (
+            <option key={t} value={t}>
+              {emojis[t] || ""} {t || "None"}
+            </option>
+          ))}
+        </select>
 
-		      <YamlFormToggle
-  value={selectedNode.data.info}
-  onChange={(val) => handleFieldChange("info", val)}
-/>
+        <YamlFormToggle
+          value={selectedNode.data.info}
+          onChange={(val) => handleFieldChange("info", val)}
+        />
+      </div>
 
-                  </div>
-                  <div style={{ textAlign: "right", marginTop: "1rem" }}>
-                    <Dialog.Close asChild>
-                      <button style={{ padding: "0.5rem 1rem" }}>Close</button>
-                    </Dialog.Close>
-                  </div>
-                </>
-              )}
-            </Dialog.Content>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
+        <button
+          onClick={removeNode}
+          style={{ padding: "0.5rem 1rem", background: "none", border:"none", color: "white", borderRadius: "4px" }}
+        >
+          Delete Node
+        </button>
+
+        <Dialog.Close asChild>
+          <button style={{ padding: "0.5rem 1rem" }}>Close</button>
+        </Dialog.Close>
+      </div>
+    </>
+  )}
+</Dialog.Content>
+
           </Dialog.Portal>
         </Dialog.Root>
       </div>

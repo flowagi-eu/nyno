@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+ENV_FILE="envs/.nyno_log_db.env"
+
+if [ -f "$ENV_FILE" ]; then
+  echo "$ENV_FILE already exists. Remove this file to install new db"
+  exit 0
+fi
+
 # Store the invoking user
 ORIGINAL_USER=$(whoami)
 

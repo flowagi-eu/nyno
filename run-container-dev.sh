@@ -20,6 +20,7 @@ echo "Engines:"
 echo "PY:$PY"
 echo "JS:$JS"
 echo "PHP:$PE"
+echo "RB:$RB"
 
 
 # --- Run the container ---
@@ -29,5 +30,6 @@ $CONTAINER_TOOL run -it \
 -v $(pwd)/output:/app/output \
 -v $(pwd)/extensions:/app/extensions \
 -p "$PY:$PY" -p "$JS:$JS" -p "$PE:$PE" \
+-p "$RB:$RB" \
 -p "$WF:$WF" -p "$GU:$GU" $IMAGE_NAME bash
 

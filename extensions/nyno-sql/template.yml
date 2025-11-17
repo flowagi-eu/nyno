@@ -1,0 +1,4 @@
+- step: nyno-sql
+  args:
+    - ${QUERY}
+    - ${PARAMS} # optional

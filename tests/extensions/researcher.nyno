@@ -1,0 +1,5 @@
+workflow:
+  - step: serper-search
+    args:
+      - site:linkedin.com/in CEO of FlowAGI
+

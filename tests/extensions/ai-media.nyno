@@ -1,0 +1,7 @@
+workflow:
+  - step: ai-openai-image-edit
+    args:
+      - /path/to/file.png
+      - improve the colors of this logo
+
+

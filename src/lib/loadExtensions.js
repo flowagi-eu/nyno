@@ -53,13 +53,13 @@ async function loadExtensions() {
 
     if (fs.existsSync(commandFile)) {
       const module = await import(pathToFileURL(commandFile).href);
-      console.log('Loaded extension command: ' + folder);
+      //console.log('Loaded extension command: ' + folder);
       command = module.default;
     }
 
     if (fs.existsSync(yamlFile)) {
       const fileContent = fs.readFileSync(yamlFile, 'utf8');
-      console.log('Loaded extension YAML: ' + folder);
+      //console.log('Loaded extension YAML: ' + folder);
       yamlData = fileContent;
     }
 

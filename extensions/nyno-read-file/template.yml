@@ -1,0 +1,3 @@
+- step: nyno-read-file
+  args:
+    - ${FILE_PATH}

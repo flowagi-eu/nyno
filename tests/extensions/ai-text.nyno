@@ -1,0 +1,5 @@
+workflow:
+  - step: ai-openai-text
+    args:
+      - cool short python code example
+

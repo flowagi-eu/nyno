@@ -1,0 +1,4 @@
+- step: nyno-http-post
+  args:
+    - ${URL}
+    - ${POST_DATA}

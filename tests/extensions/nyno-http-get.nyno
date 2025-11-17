@@ -1,0 +1,6 @@
+context:
+  URL: "http://localhost:9057" # example
+workflow:
+  - step: nyno-http-get
+    args:
+      - ${URL}

@@ -48,5 +48,5 @@ export async function nyno_log(args, context) {
   // Store output in the context
   context.NYNO_LOG_OUTPUT = 'ok';
 
-  return { output: 'ok' };
+  return 0;
 }

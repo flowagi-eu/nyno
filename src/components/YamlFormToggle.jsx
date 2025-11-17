@@ -99,18 +99,13 @@ export function YamlFormToggle({ value, onChange }) {
 
   return (
     <div>
-      <button onClick={toggleView} style={{ marginBottom: 6 }}>
-        {isFormView ? "Back to YAML" : "Edit as Form"}
-      </button>
-      {!isFormView ? (
+      
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           style={{ width: "100%", height: 120 }}
         />
-      ) : (
-        <div ref={formContainerRef} />
-      )}
+     
     </div>
   );
 }

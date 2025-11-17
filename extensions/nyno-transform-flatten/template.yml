@@ -1,0 +1,4 @@
+- step: nyno-transform-flatten
+  args:
+    - ${OBJECTS}
+    - "key" # or "key.subkey" or "key.subkey.subsubkey"

@@ -1,375 +1,237 @@
 import fs from 'fs';
-import { runFunction } from '../lib-manual/runners.js';
-import App from '../App.js';
 import path from 'path';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
-import { spawn,spawnSync } from 'child_process';
-
+import { spawn } from 'child_process';
+import { runFunction } from '../lib-manual/runners.js';
+import { runYamlToolParser,getOriginalKeys }  from '../lib-manual/runYamlToolParser.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function debugLog(...args) {
-	if(process.env.NODE_ENV!=='production') {
-  		console.log('[DEBUG]', ...args);
-	}
+  if (process.env.NODE_ENV !== 'production') console.log('[DEBUG]', ...args);
+}
+
+
+/**
+ * Run a workflow from a YAML string content.
+ * @param {string} yamlContent - The full YAML workflow as string
+ * @param {object} context - Optional initial context
+ */
+export async function runYamlString(yamlContent) {
+  let workflowData;
+  try {
+    workflowData = yaml.load(yamlContent);
+  } catch (err) {
+    return { error: true, message: 'Invalid YAML', details: err.message };
+  }
+
+  return runWorkflow(workflowData, null, workflowData.context ?? {});
 }
 
 /**
- * Run a single YAML node
+ * Run a single NYNO/YAML node
  */
-export async function runYamlTool(node, context = {}) {
+export async function runYamlTool(node, globalContext = {},options={}) {
 
+  let parsed = runYamlToolParser(node,globalContext,options);
+  if(parsed.error) return parsed;
 
+	  const nodeName = node.step || node.func;
+	const { step, args, context } = parsed;
 
+  debugLog(`Executing step: ${nodeName} with args:`, args);
 
-  let nodeName = node.func;
-  let yamlContent = node.info ?? '';
-  let node_id = node.id ?? '';
-
-  // if its empty return early
-	if(yamlContent.trim().length==0) return {"output":{"r":"","c":context}};
-
-  debugLog(`Running YAML node: ${nodeName}`);
-  debugLog('Context before execution:', context);
-
-  let cmdName, cmdSpec, args;
-  if(!yamlContent.includes(':')){
-	// assume its command without args
-	cmdName = yamlContent.trim();
-	args = [];
-	cmdSpec = {};
-  } else {
-  try {
-    const doc = yaml.load(yamlContent);
-    debugLog('Parsed YAML:', doc);
-
-    if (!doc || typeof doc !== 'object' || Object.keys(doc).length !== 1) {
-      return { error: 'YAML must contain exactly one top-level command.' };
-    }
-
-    cmdName = Object.keys(doc)[0];
-    cmdSpec = doc[cmdName];
-    args = [];
-
-  }
-	catch (err) {
-    debugLog(`Error parsing YAML for node ${nodeName}:`, err.message);
-    return { error: err.message };
-    //return { error: err.message,nodeName,context };
-  }
+  const output = await runFunction(nodeName, args, context);
+  console.log('output runFunction',output);
+  if (!output.fnError) {
+    return { output, command: [nodeName, ...args] };
   }
 
+  return await new Promise((resolve) => {
+    const child = spawn(nodeName, args);
+    let stdout = '';
+    let stderr = '';
 
-const unreplaced = [];
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => (stderr += chunk));
 
-const replaceEnv = (value) => {
-  // Match exactly one variable like "${VAR}"
-  const onlyVarMatch = value.match(/^\$\{(\w+)\}$/);
-  if (onlyVarMatch) {
-    const key = onlyVarMatch[1];
-    if (!(key in context)) {
-      unreplaced.push(key);
-      return '';
-    }
-    const val = context[key];
+    child.on('error', (err) => {
+      debugLog(`Failed to start command ${nodeName}:`, err.message);
+      resolve({ error: stderr, errMsg: err.message, command: [nodeName, ...args], output: { r: '', c: context }, bash: true });
+    });
 
-    // If val is an object/array, return it directly
-    if (typeof val === 'object' && val !== null) {
-      return val;
-    }
-
-    // Otherwise, return the value as-is
-    return val;
-  }
-
-  // Otherwise, replace variables inside a string
-  return value.replace(/\$\{(\w+)\}/g, (_, key) => {
-    if (!(key in context)) {
-      unreplaced.push(key);
-      return '';
-    }
-
-    const val = context[key];
-
-    // If object/array, convert to JSON string for safe embedding
-    if (typeof val === 'object' && val !== null) {
-      return JSON.stringify(val);
-    }
-
-    return String(val);
-  });
-};
-
-
-
-if (cmdSpec.flags) {
-  for (const key in cmdSpec.flags) {
-    const val = cmdSpec.flags[key];
-
-    if (Array.isArray(val)) {
-      for (const item of val) {
-        args.push(key.length === 1 ? `-${key}` : `--${key}`);
-        let fullValue = (replaceEnv(String(item)));
-        args.push(fullValue);
-      }
-    } else {
-      args.push(key.length === 1 ? `-${key}` : `--${key}`);
-      if (val != null) {
-        	let fullValue = (replaceEnv(String(val)));
-	      args.push(fullValue);
-      }
-    }
-  }
-}
-
-if (cmdSpec.context) {
-  for (const key in cmdSpec.context) {
-    const val = cmdSpec.context[key];
-      if (val != null) {
-	  let fullValue = (replaceEnv(String(val)));
-	  // also add to context
-	  context[key] = fullValue;
-      }
-  }
-}
-
-if (cmdSpec.args) {
-  for (const item of cmdSpec.args) {
-    args.push(replaceEnv(String(item)));
-  }
-}
-
-if (unreplaced.length > 0) {
-  return { error: true,output:{r:'',c:context}, missing: [...new Set(unreplaced)] };
-}
-
-    debugLog(`Executing command: ${cmdName} with args:`, args);
-
-
-    // First check extensions/py/php/js.. 
-	const output = await runFunction(cmdName, args,context);
-	 debugLog('runFunction',{output});
-
-	if(!output.fnError) {
-	  return {
-          command: [cmdName, ...args],
-          context,
-          output,
-	  };
-	}
-
-    return await new Promise((resolve) => {
-      const child = spawn(cmdName, args);
-      let stdout = '';
-      let stderr = '';
-
-      child.stdout.on('data', (chunk) => (stdout += chunk));
-      child.stderr.on('data', (chunk) => (stderr += chunk));
-
-      child.on('error', (err) => {
-        debugLog(`Failed to start command ${cmdName}:`, err.message);
-        //resolve({ error: err.message });
-    	resolve({ error: stderr, errMsg: err.message,cmdName,args,output:{r:'',c:context},bash:true, });
-      });
-
-      child.on('close', (exitCode) => {
-        const output = stdout.trim();
-        context[`O_${node_id}`] = output;
-        debugLog(`Command finished: ${cmdName} exitCode=${exitCode}`);
-        debugLog('stdout:', stdout.trim());
-        debugLog('stderr:', stderr.trim());
-        debugLog('Context after execution:', context);
-
-        resolve({
-          command: [cmdName, ...args],
-          bash:true,
-          stderr:stderr.trim(),
-          output:{r:output,c:context},
-          exitCode,
-        });
+    child.on('close', (exitCode) => {
+      const outputStr = stdout.trim();
+      context[`O_${node.id}`] = outputStr;
+      resolve({
+        command: [nodeName, ...args],
+        bash: true,
+        stderr: stderr.trim(),
+        output: { r: outputStr, c: context },
+        exitCode,
       });
     });
-   
+  });
 }
 
 /**
- * Run a workflow from start node
+ * Run a NYNO workflow
  */
-export async function runWorkflow(workflow, startNodeId, context = {}) {
-  const oldNodes = Object.fromEntries(workflow.nodes.map((n) => [n.id, n]));
+export async function runWorkflow(workflowData, startNodeId, context = {}) {
   const log = [];
-  let current = startNodeId;
-   console.log('old nodes',oldNodes);
 
-const nodes = {};
-  for(const [key,value] of Object.entries(oldNodes)) {
+  const originalKeys = getOriginalKeys(workflowData);
+  console.log('originalKeys in runWorkflow',originalKeys);
 
-	  console.log('key,value',[key,value]);
-	const node = value;
-	nodes[key] = {
-	    id: node.id,
-	    func: node.func,
-	    info: node.info, // raw yaml
-	    args: node.args, // extracted args?
-	    next: node.next, // next? if not nextMap?
-	}
-	
+
+  // Convert workflow array into nodeMap keyed by id
+  const nodes = {};
+  let lastNode = 0;
+  for (const step of workflowData.workflow) {
+    if(!("id" in step)) {
+	lastNode++;
+	step.id = lastNode;
+    } else {
+	lastNode = step.id;
+    }
+    nodes[lastNode] = { ...step };
   }
 
-   console.log('nodes',nodes);
-  debugLog(`Starting workflow at node: ${startNodeId}`);
+  // Build nextMap for multiple branches
+  for (const node of Object.values(nodes)) {
+    if (node.next && Array.isArray(node.next)) {
+      node.nextMap = {};
+      node.next.forEach((n, i) => (node.nextMap[i.toString()] = n));
+      delete node.next;
+
+      console.log('new node with nextMap',JSON.stringify(node));
+    }
+  }
+
+  let current = startNodeId || workflowData.workflow[0]?.id;
+  debugLog(`Starting workflow with node: ${current}`);
 
   while (current && nodes[current]) {
     const node = nodes[current];
-    debugLog(`Processing node: ${node.id} (${node.func})`);
-
-	// clear old context system tokens
-	if('set_context' in context) delete context['set_context'];
 
     const input = JSON.parse(JSON.stringify(context));
-    
-    const yamlOutput = await runYamlTool(node, context);
 
-     const outputValue =
-      typeof yamlOutput.output === 'string' ? yamlOutput.output : JSON.stringify(yamlOutput.output);
- 
+    console.log('node before ruNYamlTool',node);
+    const result = await runYamlTool(node, context,{originalKeys});
 
+    console.log('result',JSON.stringify(result));
+    const output = result.output.r;
+    context = JSON.parse(JSON.stringify(result.output.c ?? {}));
 
-      debugLog('yamlOutput',yamlOutput);
-
-      const output = yamlOutput.output.r;
-
-    context = JSON.parse(JSON.stringify(yamlOutput.output.c ?? {})); // sync next context changes
+    console.log('context in the loop',context);
     context[`O_${node.id}`] = output;
 
-    const details = JSON.parse(JSON.stringify(yamlOutput)); // clone
+    const details = JSON.parse(JSON.stringify(result));
+    details.node_id = node.id;
+    details.node_title = node.step || node.func;
+    details.new_context = details.output.c;
+    delete details.output;
+        console.log('details in the loop',details);
 
-    details['node_id'] = node.id;
-    details['node_title'] = node.func;
 
-    details['new_context'] = details.output.c;
-    // remove double info
-    delete details['output'];
+    log.push({ input, output, details });
 
-    //delete yamlOutput['output'];
-    log.push({
-      input,
-      output,
-      details, 
-    });
+    if("error" in details) break; // early access
 
-       debugLog(`Node output: ${outputValue}`);
-
-	  const nextMap = JSON.parse(outputValue).r ?? '';
+    console.log('nextMapKey output', output);
+    const nextMapKey = output || '0';
+    console.log('nextMapKey value',nextMapKey);
     if (node.nextMap) {
-      current = node.nextMap[nextMap] ?? node.nextMap['0'] ?? null;
-      debugLog(`Next node determined: ${current}`);
+      current = node.nextMap[nextMapKey] ?? node.nextMap['0'] ?? null;
+    } else if (node.next && node.next.length > 0) {
+      current = node.next[0];
     } else {
-      current = node.next ?? null;
-      debugLog(`Next node: ${current}`);
+      current = null;
     }
   }
 
   debugLog('Workflow finished');
-	if("NYNO_ONE_VAR" in context) {
-		return context[context.NYNO_ONE_VAR];
-	}
+  if ('NYNO_ONE_VAR' in context) {
+    return context[context.NYNO_ONE_VAR];
+  }
   return { log, context };
 }
 
 /**
- * Multi-tenant route registration (pre-register all routes)
+ * Multi-tenant NYNO route registration
  */
 export default function register(router) {
-  const tenantRoutes = {}; // { system: Map<route, handler> }
-  const defaultRoutes = {};
 
+
+  router.on('/run-nyno', async (socket, data) => {
+    if (!socket.authenticated) return { error: 'Not authenticated' };
+
+    const { yamlContent } = data;
+    if (!yamlContent) return { error: 'No YAML content provided' };
+
+ 
+	 console.log('got data',data);
+    const startTime = Date.now();
+    const result = await runYamlString(yamlContent);
+	 console.log('got result',result);
+    const endTime = Date.now();
+
+    return {
+      route: '/run-nyno',
+      status: result.error ? 'error' : 'ok',
+      execution_time_seconds: (endTime - startTime) / 1000,
+      execution: result.log ?? [],
+      context: result.context ?? {},
+      error: result.error,
+      errorMessage: result.message,
+    };
+  });
+
+
+  // load dynamic routes
   const routesDir = path.join(__dirname, '../../workflows-enabled');
 
-  // --- Load tenant directories ---
-  for (const system of fs.readdirSync(routesDir)) {
-    const systemPath = path.join(routesDir, system);
-    //debugLog(`Trying Loading workflows for tenant path: ${systemPath}`);
-    if (!fs.statSync(systemPath).isDirectory()) continue;
-    //debugLog(`is dir: ${systemPath}`);
-
-    tenantRoutes[system] = {};
-
+  const loadWorkflowsFromDir = (systemPath, systemName) => {
+    const workflows = {};
     for (const file of fs.readdirSync(systemPath)) {
-      //debugLog(`is file: ${file}`);
-      if (!file.endsWith('.json')) continue;
+      if (!file.endsWith('.nyno')) continue;
 
-      const workflow = JSON.parse(fs.readFileSync(path.join(systemPath, file), 'utf-8'));
-      generateNextMaps(workflow);
-      registerWorkflow(tenantRoutes[system], workflow, system);
-      debugLog(`Loaded workflow for tenant ${system}: ${file}`);
-    }
-  }
+      const workflowData = yaml.load(fs.readFileSync(path.join(systemPath, file), 'utf-8'));
+      workflows[file] = workflowData;
 
-  // --- Load default routes ---
-  for (const file of fs.readdirSync(routesDir)) {
-    const fullPath = path.join(routesDir, file);
-    if (fs.statSync(fullPath).isFile() && file.endsWith('.json')) {
-      const workflow = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
-      generateNextMaps(workflow);
-      registerWorkflow(defaultRoutes, workflow);
-      debugLog(`Loaded default workflow: ${file}`);
-    }
-  }
-
-  function registerWorkflow(map, workflow, system = 'default') {
-    for (const node of workflow.nodes) {
-      if (!node.func.startsWith('route_')) continue;
-      const route = '/' + node.func.slice('route_'.length).replace(/^\/+/, '');
-      router.on(route, async (socket, data) => {
+      const routePath = workflowData.route || '/' + path.basename(file, '.nyno');
+      router.on(routePath, async (socket, data) => {
         if (!socket.authenticated) return { error: 'Not authenticated' };
-
         const context = { ...data };
-        delete context['path']; // not needed for workflows themselves
-        if (system) socket.system = system;
+        delete context['path'];
+        if (systemName) socket.system = systemName;
 
         const startTime = Date.now();
-        const result = await runWorkflow(workflow, node.id, context);
-
-	if("NYNO_ONE_VAR" in context){
-		return result;
-	}
-
+        const result = await runWorkflow(workflowData, null, context);
         const endTime = Date.now();
 
         return {
-          route,
-          system: system || socket.system || 'default',
+          route: routePath,
+          system: systemName || socket.system || 'default',
           status: 'ok',
           execution_time_seconds: (endTime - startTime) / 1000,
           execution: result.log,
-          context: result.c,
+          context: result.context,
         };
-      },system);
+      }, systemName);
     }
+    return workflows;
+  };
+
+  // Load tenant workflows
+  for (const system of fs.readdirSync(routesDir)) {
+    const systemPath = path.join(routesDir, system);
+    if (!fs.statSync(systemPath).isDirectory()) continue;
+    loadWorkflowsFromDir(systemPath, system);
   }
 
-  function generateNextMaps(workflow) {
-    debugLog('generateNextMaps',workflow);
-    const nodesById = Object.fromEntries(workflow.nodes.map((n) => [n.id, n]));
-    const childrenMap = {};
-    for (const edge of workflow.edges || []) {
-      if (!childrenMap[edge.source]) childrenMap[edge.source] = [];
-      childrenMap[edge.source].push(edge.target);
-    }
-
-    for (const node of workflow.nodes) {
-      const targets = childrenMap[node.id] || [];
-      if (targets.length > 1) {
-        targets.sort((a, b) => (nodesById[a].position?.x || 0) - (nodesById[b].position?.x || 0));
-        node.nextMap = {};
-        targets.forEach((t, i) => (node.nextMap[i.toString()] = t));
-        delete node.next;
-        debugLog(`Node ${node.id}: set nextMap`, node.nextMap);
-      }
-    }
-  }
+  // Load default workflows
+  loadWorkflowsFromDir(routesDir, 'default');
 }
-

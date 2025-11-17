@@ -1,0 +1,38 @@
+workflow:
+  - id: 1
+    step: nyno-echo
+    args:
+      - ${i}
+    next:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+  - id: 2
+    step: hello-py
+    args:
+      - hello from hello-py
+    next: []
+  - id: 3
+    step: hello-php
+    args:
+      - hello from php
+    next: []
+  - id: 4
+    step: hello
+    args:
+      - hello from js
+    next: []
+  - id: 5
+    step: echo
+    args:
+      - hello from bash
+    next: []
+  - id: 6
+    step: hello-rb
+    args:
+      - hello from ruby
+    next: []
+route: /test_nyno_runners
+guidata: '{"nodes":[{"id":"1","func":"route /test_nyno_runners","info":"nyno-echo:\n  args:\n    - \"${i}\"\n","next":["2","3","4","5","6"],"position":{"x":198.43496475541212,"y":-79.38902357480467},"type":"input"},{"id":"2","func":"python test","info":"- step: hello-py\n  args:\n    - \"hello from hello-py\"","next":[],"position":{"x":-159.5,"y":83},"type":null},{"id":"3","func":"php test","info":"hello-php:\n  args:\n    - \"hello from php\"\n","next":[],"position":{"x":9,"y":84.5},"type":null},{"id":"4","func":"js test","info":"hello:\n  args:\n    - \"hello from js\"\n","next":[],"position":{"x":162,"y":83.5},"type":null},{"id":"5","func":"bash test","info":"echo:\n  args:\n    - \"hello from bash\"\n","next":[],"position":{"x":344.5,"y":83.5},"type":null},{"id":"6","func":"ruby test","info":"hello-rb:\n  args:\n    - \"hello from ruby\"\n","next":[],"position":{"x":494.6037276662614,"y":86.25700875233741},"type":null}],"edges":[{"source":"1","sourceHandle":null,"target":"2","targetHandle":null,"id":"reactflow__edge-1-2"},{"source":"1","sourceHandle":null,"target":"3","targetHandle":null,"id":"reactflow__edge-1-3"},{"source":"1","sourceHandle":null,"target":"4","targetHandle":null,"id":"reactflow__edge-1-4"},{"source":"1","sourceHandle":null,"target":"5","targetHandle":null,"id":"reactflow__edge-1-5"},{"source":"1","sourceHandle":null,"target":"6","targetHandle":null,"id":"reactflow__edge-1-6"}]}'

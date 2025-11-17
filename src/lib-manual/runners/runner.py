@@ -39,21 +39,22 @@ def load_nyno_ports(path="envs/ports.env"):
 
 # Example usage
 ports = load_nyno_ports()
-print(ports)
+#print(ports)
 
 HOST = ports.get('HOST','localhost')
 PORT = ports.get('PY',5000)
-NUM_WORKERS = (os.cpu_count() or 1) * 3
+
+is_prod = os.getenv('NODE_ENV') == 'production'
+NUM_WORKERS=2
+if is_prod:
+    NUM_WORKERS = (os.cpu_count() or 1) * 3
+
 VALID_API_KEY = ports.get('SECRET','changeme')
 
 # ===========================================================
 #  Base State (built-in functions)
 # ===========================================================
 STATE = {
-    "say_hello": lambda: f"Hello from Python worker {os.getpid()}",
-    "current_time": lambda: datetime.utcnow().isoformat(),
-    "add": lambda a, b: a + b,
-    "heavy_task": lambda: (time.sleep(0.5) or "Heavy task done"),
 }
 
 # ===========================================================
@@ -74,7 +75,7 @@ def load_extensions():
 
         if hasattr(module, func_name):
             STATE[mod_name] = getattr(module, func_name)
-            print(f"[Python Runner] Loaded extension {mod_name}")
+            #print(f"[Python Runner] Loaded extension {mod_name}")
         else:
             print(f"[Python Runner] Failed Loaded extension {mod_name} with name {func_name}")
 
