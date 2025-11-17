@@ -12,7 +12,7 @@ uv.lock
 pyproject.toml
 
 # Ignore everything in the extensions/ directory
-extensions/*
+# tmp commented extensions/*
 envs/*
 workflows-enabled/*
 
