@@ -27,6 +27,10 @@
     "yaml": null,
     "emoji": ""
   },
+  "nyno-db-insert": {
+    "yaml": "- step: nyno-db-insert\n  args:\n    - ${JSON}\n",
+    "emoji": ""
+  },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
     "emoji": ""
@@ -81,26 +85,6 @@
   },
   "nyno-write-file": {
     "yaml": "- step: nyno-write-file\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
-    "emoji": ""
-  },
-  "pseudo-dsl-to-flat-ast": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-js": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-php": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-python": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-ruby": {
-    "yaml": null,
     "emoji": ""
   },
   "serper-search": {
