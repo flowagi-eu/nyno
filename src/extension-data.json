@@ -63,6 +63,10 @@
     "yaml": "- step: nyno-log:\n  args:\n    - \"${JSON}\"\n",
     "emoji": "📝"
   },
+  "nyno-push-update": {
+    "yaml": "- step: nyno-push-update\n  args:\n    - ${USERNAME}\n    - ${COMMIT_MSG}\n    - ${REPO_DIR}\n",
+    "emoji": "💻"
+  },
   "nyno-scrape": {
     "yaml": "- step: nyno-scrape:\n  args:\n    - \"${LOOP_URL_STRUCTURE}\" # ex http://localhost/blog/page/:index\n    - \"${QUERY_SELECTOR}\" # ex \".post_link a\"\n    - \"${START_PAGE}\" # ex 1\n    - \"${END_PAGE}\" # ex 10",
     "emoji": "🌐"
