@@ -2,7 +2,6 @@ import { execFileSync } from "child_process";
 import path from "path";
 
 export function nyno_push_update(args, context) {
-    // ---- argument parsing ----
     if (args.length < 2 && !context["GHP_TOKEN"]) {
         const msg = "Usage: push_update <github_username> <commit_message> [repo_path] (GHP_TOKEN must be set in context)";
         context["push-update.error"] = msg;
