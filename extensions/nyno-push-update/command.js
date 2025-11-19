@@ -2,6 +2,7 @@ import { execFileSync } from "child_process";
 import path from "path";
 
 export function nyno_push_update(args, context) {
+    const setName = context["set_context"] || "push-update";
     if (args.length < 2 && !context["GHP_TOKEN"]) {
         const msg = "Usage: push_update <github_username> <commit_message> [repo_path] (GHP_TOKEN must be set in context)";
         context["push-update.error"] = msg;
@@ -11,9 +12,29 @@ export function nyno_push_update(args, context) {
     const USERNAME = args[0];
     const TOKEN = context["GHP_TOKEN"]; // use token from context
     const COMMIT_MSG = args[1];
-    const REPO_PATH = args[2] || ".";
+    const REPO_PATH = args[2];
 
-    const setName = context["set_context"] || "push-update";
+if(!USERNAME){
+                context[setName + ".error"] = `Username args[0] not set`;
+                return 1;
+}
+
+if(!TOKEN){
+                context[setName + ".error"] = `GHP_TOKEN context not set`;
+                return 1;
+}
+
+if(!COMMIT_MSG){
+                context[setName + ".error"] = `COMMIT_MSG args[1] not set`;
+                return 1;
+}
+
+if(!REPO_PATH){
+                context[setName + ".error"] = `REPO_PATH args[2] not set`;
+                return 1;
+}
+
+
 
     try {
         const cwd = path.resolve(REPO_PATH); // safe absolute path
