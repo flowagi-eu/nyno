@@ -1,3 +1,0 @@
-- step: nyno-db-insert
-  args:
-    - ${JSON}

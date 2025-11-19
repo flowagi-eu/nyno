@@ -1,8 +1,7 @@
-# extensions/read_files/command.py
 import glob
 import os
 
-def nyno_read_files(args, context):
+def nyno_search_files(args, context):
     """
     Args:
         args[0] = list of paths/globs, e.g. [".path/dir1/*.command", ".path/dir1/template.yml"]
