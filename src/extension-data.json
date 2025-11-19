@@ -27,65 +27,69 @@
     "yaml": null,
     "emoji": ""
   },
-  "nyno-db-insert": {
-    "yaml": "- step: nyno-db-insert\n  args:\n    - ${JSON}\n",
-    "emoji": ""
-  },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
-    "emoji": ""
+    "emoji": "🔢"
   },
   "nyno-extract-file-paths": {
     "yaml": "- step: nyno-extract-file-paths\n  args:\n    - [\"Message 1 with /file/path/abslute.png\", \"Message 2 ~/Workflows/test\"]",
-    "emoji": ""
+    "emoji": "✂️"
   },
   "nyno-extract-hrefs": {
     "yaml": "- step: nyno_extract_hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"",
-    "emoji": ""
+    "emoji": "✂️"
+  },
+  "nyno-file-read": {
+    "yaml": "- step: nyno-file-read\n  args:\n    - ${FILE_PATH}\n",
+    "emoji": "📁"
+  },
+  "nyno-file-write": {
+    "yaml": "- step: nyno-file-write\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
+    "emoji": "📁"
   },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
-    "emoji": ""
+    "emoji": "🌐"
   },
   "nyno-http-post": {
     "yaml": "- step: nyno-http-post\n  args:\n    - ${URL}\n    - ${POST_DATA}",
-    "emoji": ""
+    "emoji": "🌐"
   },
   "nyno-json-sql": {
     "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
-    "emoji": ""
+    "emoji": "🛢️"
   },
   "nyno-log": {
     "yaml": "- step: nyno-log:\n  args:\n    - \"${JSON}\"\n",
-    "emoji": ""
-  },
-  "nyno-read-file": {
-    "yaml": "- step: nyno-read-file\n  args:\n    - ${FILE_PATH}\n",
-    "emoji": ""
-  },
-  "nyno-read-files": {
-    "yaml": "- step: nyno-read-files\n  args:\n    - [\".path/dir1/*.command\", \".path/dir1/template.yml\"]\n    - 'object' # remove to output text\n",
-    "emoji": ""
+    "emoji": "📝"
   },
   "nyno-scrape": {
     "yaml": "- step: nyno-scrape:\n  args:\n    - \"${LOOP_URL_STRUCTURE}\" # ex http://localhost/blog/page/:index\n    - \"${QUERY_SELECTOR}\" # ex \".post_link a\"\n    - \"${START_PAGE}\" # ex 1\n    - \"${END_PAGE}\" # ex 10",
-    "emoji": ""
+    "emoji": "🌐"
+  },
+  "nyno-search-files": {
+    "yaml": "- step: nyno-search-files\n  args:\n    - [\".path/dir1/*.command\", \".path/dir1/template.yml\"]\n    - 'object' # remove to output text\n",
+    "emoji": "🔎"
+  },
+  "nyno-search-grep": {
+    "yaml": "- step: nyno-search-grep\n  args:\n    - ${SEARCH}\n    - ${DIR}\n\n",
+    "emoji": "🔎"
   },
   "nyno-sql": {
     "yaml": "- step: nyno-sql\n  args:\n    - ${QUERY}\n    - ${PARAMS} # optional",
-    "emoji": ""
+    "emoji": "🛢️"
+  },
+  "nyno-sql-insert": {
+    "yaml": "- step: nyno-sql-insert\n  args:\n    - ${JSON}\n",
+    "emoji": "🛢️"
   },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
-    "emoji": ""
+    "emoji": "📄"
   },
   "nyno-transform-flatten": {
     "yaml": "- step: nyno-transform-flatten\n  args:\n    - ${OBJECTS}\n    - \"key\" # or \"key.subkey\" or \"key.subkey.subsubkey\"",
-    "emoji": ""
-  },
-  "nyno-write-file": {
-    "yaml": "- step: nyno-write-file\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
-    "emoji": ""
+    "emoji": "📄"
   },
   "serper-search": {
     "yaml": "- step: serper-search:\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",

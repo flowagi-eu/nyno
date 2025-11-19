@@ -32,7 +32,7 @@ if (!pgClient) {
 
 if (!pgClient) throw new Error('Postgres client failed to initialize');
 
-export async function nyno_db_insert(args, context) {
+export async function nyno_sql_insert(args, context) {
 	let payload = args[0]; // could be string or object
     console.log({ payload });
 

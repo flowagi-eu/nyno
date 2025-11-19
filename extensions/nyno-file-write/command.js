@@ -1,8 +1,8 @@
 import fs from "fs";
 
-export function nyno_write_file(args, context) {
+export function nyno_file_write(args, context) {
     // Determine output key (dynamic set_context)
-    const setName = context.set_context ?? "nyno_write_file";
+    const setName = context.set_context ?? "nyno_file_write";
 
     // Validate arguments
     if (!args || args.length < 2) {
