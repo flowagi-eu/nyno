@@ -1,0 +1,3 @@
+- step: nyno-guardrails
+  args:
+    - ["PROMPT"] # keys to check/override

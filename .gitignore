@@ -8,8 +8,10 @@ input
 src/extension-data.json
 workflows-available
 extensions-available
+private-extensions
 uv.lock
 pyproject.toml
+extensions-untested
 
 # Ignore everything in the extensions/ directory
 # tmp commented extensions/*
