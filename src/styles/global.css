@@ -51,3 +51,10 @@ body .react-flow__node-default
 .react-flow__edge-path, .react-flow__connection-path {
   stroke: #009ad5!important;
 }
+
+.node-emoji {
+  display: block;
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+

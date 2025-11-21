@@ -47,6 +47,10 @@
     "yaml": "- step: nyno-file-write\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
     "emoji": "📁"
   },
+  "nyno-guardrails": {
+    "yaml": "- step: nyno-guardrails\n  args:\n    - [\"PROMPT\"] # keys to check/override\n",
+    "emoji": "🛡️"
+  },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
     "emoji": "🌐"
