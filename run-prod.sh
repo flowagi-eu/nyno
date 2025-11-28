@@ -2,6 +2,8 @@
 source envs/ports.env
 source .venv/bin/activate
 
+export RUN_PROD=1
+
 bash scripts/check_host.sh
 if [ $? -eq 1 ]; then
     echo "missing dependencies."

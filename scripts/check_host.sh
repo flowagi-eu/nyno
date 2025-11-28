@@ -123,7 +123,7 @@ else
     echo -e "${YELLOW}$error_count problem(s) detected.${RESET}"
     echo ""
     echo "Fix the issues above, then re-run:"
-    echo "  ./scripts/doctor.sh"
+    echo "  bash install-postgres-db.sh"
     echo ""
     exit 1
 fi
