@@ -22,6 +22,7 @@ echo "RB:$RB"
 
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
+-e APP_ENV=prod \
 -v $(pwd)/workflows-enabled:/app/workflows-enabled \
 -v $(pwd)/envs:/app/envs \
 -v $(pwd)/output:/app/output \
