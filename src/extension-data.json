@@ -79,10 +79,6 @@
     "yaml": "- step: nyno-guardrails\n  args:\n    - [\"PROMPT\"] # keys to check/override\n",
     "emoji": "🛡️"
   },
-  "nyno-html-to-markdown": {
-    "yaml": "- step: nyno-html-to-markdown\n  args:\n    - ${prev}\n",
-    "emoji": "🔁"
-  },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
     "emoji": "🌐"
