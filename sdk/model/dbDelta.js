@@ -12,6 +12,16 @@ export async function dbDelta() {
   `);
 
   console.log("✅ Table 'json_storage' is ready.");
+  
+  await pgClient.query(`
+    CREATE TABLE IF NOT EXISTS trigger_loop_results (
+      id UUID PRIMARY KEY DEFAULT uuidv7(),
+      data JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+
+  console.log("✅ Table 'trigger_loop_results' is ready.");
 }
 
 export async function save(data) {

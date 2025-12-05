@@ -34,19 +34,20 @@ if (!pgClient) {
 if(!pgClient) throw new Error('Postgres client failed to initialize');
 
 export async function nyno_log(args, context) {
+  let setName = context['set_context'] ?? 'prev';
   const logJson = args[0]; // assume JSON string
 	console.log({logJson});
   // Insert the JSON log into queue_logs
-  await pgClient.query(
+  const res1 = await pgClient.query(
     'INSERT INTO queue_logs(line) VALUES ($1::jsonb)',
     [logJson]
   );
 
   // Flush log older than 5 seconds
-  await pgClient.query('SELECT flush_queue()');
+  const res2 = await pgClient.query('SELECT flush_queue()');
 
   // Store output in the context
-  context.NYNO_LOG_OUTPUT = 'ok';
+  context[setName] = { res1, res2 } 
 
   return 0;
 }

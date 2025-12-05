@@ -8,6 +8,8 @@
  * @return int
  */
 function nyno_extract_file_paths($args, &$context) {
+	$setName = $context['set_context'] ?? 'prev';
+
     $filePaths = [];
     // This pattern matches paths starting with / or ~/ and captures quoted paths
     $pattern = '/(?:^|\s)(?:\"([^\"]+)\"|\'([^\']+)\'|(\/[^\s]+)|(~\/[^\s]+))/';
@@ -21,7 +23,7 @@ function nyno_extract_file_paths($args, &$context) {
 
     //$context['file_paths'] = $filePaths;
     if (!empty($filePaths)) {
-        $context['fs_matches'] = $filePaths;
+        $context[$setName] = $filePaths;
         return 0;
     } else {
         return 1;

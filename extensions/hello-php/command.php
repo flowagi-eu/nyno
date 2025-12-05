@@ -3,5 +3,6 @@
 function hello_php($args, &$context) {
     $name = $args[0] ?? "World";
     $context['custom_php_var'] = 'php';
+    $context['prev'] = 'php';
     return "Hello, $name from PHP!";
 }

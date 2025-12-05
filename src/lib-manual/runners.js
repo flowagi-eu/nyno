@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
+import "./watchers.js";
+
 // Load main Nyno ports/config
 
 function load_nyno_ports(path = "envs/ports.env") {
@@ -164,7 +166,7 @@ function connectAllRunners() {
 }
 
 // --- Run function on a single runner ---
-function runFunctionSingle(language, functionName, args = [],context={}) {
+export function runFunctionSingle(language, functionName, args = [],context={}) {
   const client = connections[language];
   if (!client || client.destroyed) throw new Error(`${language} runner not connected`);
 

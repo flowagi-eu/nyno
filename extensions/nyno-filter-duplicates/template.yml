@@ -1,0 +1,3 @@
+- step: nyno-filter-duplicates
+  args:
+    - ${OBJECTS}

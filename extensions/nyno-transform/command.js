@@ -2,7 +2,7 @@
 export function nyno_transform(args, context) {
   const list = args[0];
   const transformations = args.slice(1);
-  const setName = 'nyno_transform';
+  const setName = 'prev';
 
   if (!Array.isArray(list)) {
     context[setName + '.error'] = { error: "args[0] must be an array" };

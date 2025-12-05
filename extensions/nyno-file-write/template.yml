@@ -1,4 +1,4 @@
 - step: nyno-file-write
   args:
     - ${OUTPUT_FILE_PATH}
-    - ${OUTPUT_FILE_CONTENT}
+    - ${prev}

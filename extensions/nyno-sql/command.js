@@ -8,7 +8,7 @@ export async function nyno_sql(args, context) {
     const queryInput = args[0];
     const queryArgs = args[1] ?? [];
 
-    let setName = 'nyno_sql';
+    let setName = 'prev';
     if('set_context' in context) {
 	    setName = context['set_context'];
     }

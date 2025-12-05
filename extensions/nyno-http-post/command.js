@@ -3,9 +3,14 @@ export async function nyno_http_post(args, context) {
   const url = args[0];
   const body = args[1] ?? null;
   const headers = args[2] ?? {};
+
+	let setName;
+  if("set_context" in context) setName = context['set_context'];
+  else setName = 'prev';
+
+
   let output = 1; // default failure
 
-  context['body'] = body;
 
   context['last_http_method'] = 'post';
   if (!url) {
@@ -24,19 +29,13 @@ export async function nyno_http_post(args, context) {
 
     const text = await response.text();
 
-    context.HTTP_LAST_RESPONSE = text;
-    context.HTTP_LAST_STATUS = response.status;
-    context.HTTP_LAST_ERROR = response.ok ? null : `HTTP error ${response.status}`;
-
-    output = response.ok ? 0 : 1; // 0 = success, 1 = failure
+    context[setName] = { HTTP_RESPONSE:text, HTTP_STATUS: response.status, HTTP_ERROR: response.ok ? null : `HTTP error ${response.status}`};
+    return 0
   } catch (err) {
-    context.HTTP_LAST_RESPONSE = null;
-    context.HTTP_LAST_STATUS = null;
-    context.HTTP_LAST_ERROR = err.message;
-    output = 1;
+    context[setName] = { HTTP_RESPONSE:"", HTTP_STATUS: "", HTTP_ERROR: err.message};
+    return -1;
   }
 
-  return output;
 }
 
 /*

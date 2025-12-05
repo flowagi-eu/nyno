@@ -2,7 +2,7 @@
 import fs from "fs";
 
 export function nyno_file_read(args, context) {
-    const setName = ("set_context" in context) ? context["set_context"] : "nyno_file_read";
+    const setName = ("set_context" in context) ? context["set_context"] : "prev";
 
     if (!args || args.length === 0) {
         context[setName + ".error"] = { message: "No file path provided." };
@@ -13,7 +13,12 @@ export function nyno_file_read(args, context) {
 
     try {
         const content = fs.readFileSync(filePath, "utf8");
-        context[setName] = content;
+	if(filePath.endsWith('json')) {
+        	context[setName] = JSON.parse(content);
+
+        } else {
+        	context[setName] = content;
+	}
         return 0;
 
     } catch (err) {

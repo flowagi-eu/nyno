@@ -2,7 +2,7 @@ import fs from "fs";
 
 export function nyno_file_write(args, context) {
     // Determine dynamic output key
-    const setName = context.set_context ?? "nyno_file_write";
+    const setName = context.set_context ?? "prev";
 
     // Validate arguments
     if (!args || args.length < 2) {

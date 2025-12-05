@@ -4,7 +4,7 @@ export async function nyno_http_get(args, context) {
 
   let setName;
   if("set_context" in context) setName = context['set_context'];
-  else setName = 'nyno_http_get';
+  else setName = 'prev';
 
   if (!url) {
     context[setName + '.error'] = {"usageError": "No URL provided" };

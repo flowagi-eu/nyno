@@ -1,6 +1,9 @@
 // src/pages/flow.jsx
 import extensions from "@/extension-data.json";
 import { YamlFormToggle } from "@/components/YamlFormToggle";
+import { RunButton } from "@/components/RunButton";
+
+
 
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
@@ -133,7 +136,7 @@ export default function FlowPage() {
     pushHistory(newNodes, newEdges);
   };
 
-  const exportYAML = () => {
+  const getDynamicText = () => {
     const guidataNodes = nodes.map((n) => ({
       id: n.id,
       func: typeof n.data.rawLabel === "string" ? n.data.rawLabel : "node",
@@ -172,10 +175,18 @@ export default function FlowPage() {
     let yamlStr = YAML.dump({ workflow }, { noRefs: true, flowLevel: -1 });
     if (firstNodeRoute) yamlStr += `route: ${firstNodeRoute}\n`;
     yamlStr += `guidata: '${JSON.stringify(guidata)}'\n`;
+    return yamlStr;
+  };
+
+  const exportYAML = () => {
+    const yamlStr = getDynamicText();
 
     const blob = new Blob([yamlStr], { type: "application/x-yaml" });
     const a = document.createElement("a");
-    let firstNodeCleanTitle = firstNodeRoute ? firstNodeRoute.replace(/[\/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_") : "export";
+    let obj = YAML.load(yamlStr);
+    let firstNodeRoute = obj.route;
+
+    let firstNodeCleanTitle = firstNodeRoute ? firstNodeRoute.replace(/[\/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_") : "flow";
     firstNodeCleanTitle = firstNodeCleanTitle.replace(/^_+/, "");
     a.href = URL.createObjectURL(blob);
     a.download = firstNodeCleanTitle + ".nyno";
@@ -243,6 +254,7 @@ export default function FlowPage() {
 
   return (
     <ReactFlowProvider>
+	  <RunButton getText={getDynamicText} />
       <div style={{ width: "100%", height: "100vh" }}>
         <div style={{ position: "absolute", bottom: 9, right: 9, zIndex: 20 }}>
           <button onClick={addNode} style={{ marginRight: 5 }}>Add Node</button>
@@ -262,7 +274,7 @@ export default function FlowPage() {
           onNodeDragStop={(_, node) => { const updatedNodes = nodes.map((n) => n.id === node.id ? { ...n, position: node.position } : n); setNodes(updatedNodes); pushHistory(updatedNodes, edges); }}
           fitView
         >
-          <Background variant="dots" gap={12} size={1} />
+          <Background variant="dots" gap={9} size={0.81} />
         </ReactFlow>
 
         <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>

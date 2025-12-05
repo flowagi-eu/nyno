@@ -11,7 +11,7 @@ function ai_openai_image_gen($args, &$context) {
 
     $setName = array_key_exists("set_context", $context)
         ? $context["set_context"]
-        : "ai_openai_image_gen";
+        : "prev";
 
     // Define the generateUUIDv4 function locally
     $generateUUIDv4 = function() {

@@ -5,7 +5,8 @@ import { middleware } from '../../sdk/nynosdk.js';
 
 export async function serper_search(args, context) {
   let loop_args = [];
-  context['all_results'] = [];
+  let setName = context.set_context ?? 'prev';
+  context[setName] = [];
 
 	 console.log('args',args);
   // Handle list of queries or single query
@@ -36,7 +37,7 @@ export async function serper_search(args, context) {
       });
 
       const data = await response.json();
-      context['all_results'].push(data);
+      context[setName].push(data);
       context['last_result'] = { key:QUERY, data };
       await middleware([QUERY], context);
       return data;

@@ -27,6 +27,22 @@
     "yaml": null,
     "emoji": ""
   },
+  "intel-classifier-leader-vs-agency": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "intel-ngram-counter": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-accumulator": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-array-to-item": {
+    "yaml": "- step: nyno-array-to-item\n  args:\n    - ${prev}\n\n",
+    "emoji": "🧼"
+  },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
     "emoji": "🔢"
@@ -39,17 +55,33 @@
     "yaml": "- step: nyno_extract_hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"",
     "emoji": "✂️"
   },
+  "nyno-extract-urls": {
+    "yaml": "- step: nyno-extract-urls\n  args:\n    - ${TEXT}\n    - path/includes #optional\n",
+    "emoji": ""
+  },
   "nyno-file-read": {
     "yaml": "- step: nyno-file-read\n  args:\n    - ${FILE_PATH}\n",
     "emoji": "📁"
   },
   "nyno-file-write": {
-    "yaml": "- step: nyno-file-write\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${OUTPUT_FILE_CONTENT}\n",
+    "yaml": "- step: nyno-file-write\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${prev}\n",
     "emoji": "📁"
+  },
+  "nyno-filter-duplicates": {
+    "yaml": "- step: nyno-filter-duplicates\n  args:\n    - ${OBJECTS}\n",
+    "emoji": ""
+  },
+  "nyno-glob-v": {
+    "yaml": null,
+    "emoji": ""
   },
   "nyno-guardrails": {
     "yaml": "- step: nyno-guardrails\n  args:\n    - [\"PROMPT\"] # keys to check/override\n",
     "emoji": "🛡️"
+  },
+  "nyno-html-to-markdown": {
+    "yaml": "- step: nyno-html-to-markdown\n  args:\n    - ${prev}\n",
+    "emoji": "🔁"
   },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
@@ -63,9 +95,25 @@
     "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
     "emoji": "🛢️"
   },
+  "nyno-list-count": {
+    "yaml": null,
+    "emoji": ""
+  },
   "nyno-log": {
     "yaml": "- step: nyno-log:\n  args:\n    - \"${JSON}\"\n",
     "emoji": "📝"
+  },
+  "nyno-markdown-to-data": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-markdown-to-html": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "nyno-notify": {
+    "yaml": "- step: nyno-notify\n  args:\n    - \"Title Notification\"\n    - \"Sub title\"",
+    "emoji": "📄"
   },
   "nyno-push-update": {
     "yaml": "- step: nyno-push-update\n  args:\n    - ${USERNAME}\n    - ${COMMIT_MSG}\n    - ${REPO_DIR}\n",
@@ -83,6 +131,10 @@
     "yaml": "- step: nyno-search-grep\n  args:\n    - ${SEARCH}\n    - ${DIR}\n\n",
     "emoji": "🔎"
   },
+  "nyno-sort-kv": {
+    "yaml": null,
+    "emoji": ""
+  },
   "nyno-sql": {
     "yaml": "- step: nyno-sql\n  args:\n    - ${QUERY}\n    - ${PARAMS} # optional",
     "emoji": "🛢️"
@@ -91,12 +143,20 @@
     "yaml": "- step: nyno-sql-insert\n  args:\n    - ${JSON}\n",
     "emoji": "🛢️"
   },
+  "nyno-sql-read": {
+    "yaml": "- step: nyno-sql-read\n  args:\n    - keys: [\"maps\"]\n      limit: 10\n\n",
+    "emoji": ""
+  },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
     "emoji": "📄"
   },
   "nyno-transform-flatten": {
     "yaml": "- step: nyno-transform-flatten\n  args:\n    - ${OBJECTS}\n    - \"key\" # or \"key.subkey\" or \"key.subkey.subsubkey\"",
+    "emoji": "📄"
+  },
+  "nyno-trigger": {
+    "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄"
   },
   "serper-search": {
