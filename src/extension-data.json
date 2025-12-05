@@ -57,7 +57,7 @@
   },
   "nyno-extract-urls": {
     "yaml": "- step: nyno-extract-urls\n  args:\n    - ${TEXT}\n    - path/includes #optional\n",
-    "emoji": ""
+    "emoji": "✂️"
   },
   "nyno-file-read": {
     "yaml": "- step: nyno-file-read\n  args:\n    - ${FILE_PATH}\n",
@@ -69,7 +69,7 @@
   },
   "nyno-filter-duplicates": {
     "yaml": "- step: nyno-filter-duplicates\n  args:\n    - ${OBJECTS}\n",
-    "emoji": ""
+    "emoji": "🧼"
   },
   "nyno-glob-v": {
     "yaml": null,
@@ -141,7 +141,7 @@
   },
   "nyno-sql-read": {
     "yaml": "- step: nyno-sql-read\n  args:\n    - keys: [\"maps\"]\n      limit: 10\n\n",
-    "emoji": ""
+    "emoji": "🛢️"
   },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
