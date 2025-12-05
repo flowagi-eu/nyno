@@ -1,9 +1,11 @@
-
-![Nyno Workflow Example](/h/26ab99978c0ffd5a6ee4188c928cf0506bfbc767032bdab0295890d2aa5cc1b9/screenshot-from-2025-10-23-20-37-24.webp)
-
+![Nyno Workflow Example](/h/b1f210ac4d25e98169a878c7aadba513e681d565109dc7ffcc9e62843379c87f/screenshot-from-2025-12-05-23-08-56.webp)
 
 
-## Nyno 3.0: Open-Source Backend for Workflow-based AGI. Extend with Python, PHP, JS and Ruby. Route with YAML.
+
+## Nyno 4.0: Open-Source Backend for Workflow-based AGI. Extend with Python, PHP, JS and Ruby. Route with YAML. Instantly Run.
+
+
+
 
 ### 🧠 Create New Workflow Steps in  languages you love.
 ### 🔗 Connect everything with plain YAML text (.nyno).
@@ -13,7 +15,7 @@ Nyno is an **open-source multi-language workflow engine** and [language](https:/
 
 Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in human-readable **YAML Workflows** (.nyno files).
 
-### Introducing "The Engine" that powers Nyno 3.0
+### Introducing "The Engine" that powers Nyno 4.0
 To achieve most requests/per second we're using multi-process worker engines where feasible. Nyno will spawns 2 light-weight workers for each language in `dev` mode or 3 workers for every language and CPU core in `prod` mode. This means that if you have 4 CPU cores, it will spawn 12 ready-to-run workers to run workflow steps.
 
 
@@ -85,12 +87,7 @@ cd nyno
 #### 3. Run the Container
 Make sure you to build the container first.
 
-For quick testing (minimal resource usage):
-```bash
-./run-container-dev.sh "podman" # or use docker, GUI at http://localhost:9057
-```
 
-For production (maximum resource/workers usage):
 ```bash
 ./run-container-prod.sh "podman" # or use docker, GUI at http://localhost:9057
 
@@ -175,74 +172,28 @@ export function some_extension(args, context) {
 Example Workflow output:
 ```json
 {
-    "route": "\/test_runners",
-    "system": "default",
-    "status": "ok",
-    "execution_time_seconds": 0.012,
-    "execution": [
-        {
-            "input": {
-                "i": "0",
-                "name": "Alice"
-            },
-            "output": "0",
-            "details": {
-                "command": [
-                    "nyno-echo",
-                    "0"
-                ],
-                "context": {
-                    "i": "0",
-                    "name": "Alice"
-                },
-                "node_id": "1",
-                "node_title": "route_\/test_runners",
-                "new_context": {
-                    "i": "0",
-                    "name": "Alice",
-                    "NYNO_ECHO_ARGS": [
-                        "0"
-                    ]
-                }
-            }
-        },
-        {
-            "input": {
-                "i": "0",
-                "name": "Alice",
-                "NYNO_ECHO_ARGS": [
-                    "0"
-                ],
-                "O_1": "0"
-            },
-            "output": "Hello, Alice!",
-            "details": {
-                "command": [
-                    "hello",
-                    "Alice"
-                ],
-                "context": {
-                    "i": "0",
-                    "name": "Alice",
-                    "NYNO_ECHO_ARGS": [
-                        "0"
-                    ],
-                    "O_1": "0"
-                },
-                "node_id": "2",
-                "node_title": "test-js",
-                "new_context": {
-                    "i": "0",
-                    "name": "Alice",
-                    "NYNO_ECHO_ARGS": [
-                        "0"
-                    ],
-                    "O_1": "0",
-                    "custom_js_var": "js"
-                }
-            }
+  "status": "ok",
+  "execution": [
+    {
+      "node": 2,
+      "input": {
+        "args": [
+          0
+        ],
+        "context": {}
+      },
+      "output": {
+        "r": 0,
+        "c": {
+          "LAST_STEP": "nyno-echo",
+          "prev": [
+            0
+          ]
         }
-    ]
+      }
+    }
+  ],
+  "execution_time_seconds": 0.001
 }
 ```
 
