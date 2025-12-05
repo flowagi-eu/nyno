@@ -1,3 +1,0 @@
-- step: nyno-html-to-markdown
-  args:
-    - ${prev}
