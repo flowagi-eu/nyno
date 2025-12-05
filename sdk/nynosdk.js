@@ -3,6 +3,17 @@ import App from '../src/App.js'; // import the singleton
 // todo for middleware
 //
 import { save } from './model/dbDelta.js';
+import { NynoClient } from '../drivers/nynoclient.js';
+
+let nynoClient;
+export async function runWorkflow(path,data={}){
+	if(!nynoClient){
+		// todo load envs
+		nynoClient = await NynoClient.create("change_me");
+	}
+
+	return nynoClient.runWorkflow(path,data);
+}
 
 export async function middleware(args,context){
 	let pgClient = App.get('db_nyno_log');

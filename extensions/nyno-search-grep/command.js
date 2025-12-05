@@ -15,7 +15,7 @@ export function nyno_search_grep(args, context) {
     const dir = args[1] || ".";
     const recursive = (args[2] === "true");
 
-    const setName = context.set_context ? context.set_context : "grep-search";
+    const setName = context.set_context ? context.set_context : "prev";
 
     if (!pattern) {
         context[setName + ".error"] = { error: "Missing search pattern." };

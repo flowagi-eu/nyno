@@ -15,11 +15,7 @@ def nyno_search_files(args, context):
 
     paths = args[0]
     return_object = len(args) > 1 and isinstance(args[1], str) and args[1].lower() == 'object'
-
-    if "set_context" in context:
-        set_name = context["set_context"]
-    else:
-        set_name = "nyno_read_files"
+    set_name = context.get("set_context", 'prev')
 
     result = {}
     text_output = ""

@@ -25,7 +25,7 @@ function load_nyno_ports($path = "envs/ports.env") {
 
             // Convert numeric values
             if (is_numeric($value)) $value = (int)$value;
-	    else $value = (string)$value;
+            else $value = (string)$value;
 
             $env[$key] = $value;
         }
@@ -35,55 +35,70 @@ function load_nyno_ports($path = "envs/ports.env") {
 
 // Example usage
 $ports = load_nyno_ports($basedir_envs_ports);
-//var_dump($ports);
 
 $pe_port = $ports['PE'] ?? 9003;
 $api_key = $ports['SECRET'] ?? "changeme";
 $host = $ports['HOST'] ?? 'localhost';
 $isProd = getenv('NODE_ENV') === 'production';
-$num_workers = 2;
-if($isProd) {
-	    $num_workers = intval(shell_exec('nproc')) * 3; // Linux/Mac
-}
+$num_workers = $isProd ? intval(shell_exec('nproc')) * 3 : 2;
 
 $server = new Server($host, $pe_port);
 $server->set([
     'worker_num' => $num_workers,
 ]);
+
 $VALID_API_KEY = $api_key;
 
 // Global state with built-in functions
-$STATE = [
-    // "say_hello" => fn() => "Hello from PHP worker",
-];
+$STATE = [];
 
-// Preload all extensions
+// Preload extensions
 foreach (glob(__DIR__ . "/../../../extensions/*/command.php") as $file) {
-    require_once $file; // preload the file
+    require_once $file;
     $folder = dirname($file);
     $bname = basename($folder);
     $funcName = strtolower(str_replace("-", "_", $bname));
-    if(is_callable($funcName)) {
-	    $STATE[$bname] = $funcName;
-        //echo "[PHP Runner] Loaded extension $bname\n";
+
+    if (is_callable($funcName)) {
+        $STATE[$bname] = $funcName;
     } else {
-        echo "[PHP Runner] Failed to Load extension $bname with name $funcName \n";
+        echo "[PHP Runner] Failed to Load extension $bname with name $funcName\n";
     }
 }
 
-//var_dump('php $STATE[$bname]',$STATE[$bname]);
-
-// Handle incoming data
+// Handle incoming data (FIXED)
 $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, $VALID_API_KEY) {
     static $auth = [];
-    $lines = explode("\n", $data);
-    foreach ($lines as $line) {
-        if (!$line) continue;
+    static $buffers = [];
+
+    // Append fragment to connection buffer
+    $buffers[$fd] = ($buffers[$fd] ?? '') . $data;
+
+    // Process all complete messages ending with "\n"
+    while (($pos = strpos($buffers[$fd], "\n")) !== false) {
+
+        // Extract one full line
+        $line = substr($buffers[$fd], 0, $pos);
+        $buffers[$fd] = substr($buffers[$fd], $pos + 1);
+
+        if ($line === '') continue;
+
+        // Type = first char
         $type = $line[0];
         $raw = substr($line, 1);
-        $payload = json_decode($raw, true);
 
-        if ($type === "c") { // authenticate
+        // Decode JSON
+        $payload = json_decode($raw, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            var_dump('<BEGIN_JSON_ERROR>');
+            echo json_last_error_msg();
+            var_dump('<END_JSON_ERROR>');
+            continue;
+        }
+
+        // Authentication
+        if ($type === "c") {
             if (($payload['apiKey'] ?? '') === $VALID_API_KEY) {
                 $auth[$fd] = true;
                 $server->send($fd, json_encode(["status" => "OK"]) . "\n");
@@ -91,27 +106,36 @@ $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, 
                 $server->send($fd, json_encode(["status" => "ERR", "error" => "Invalid apiKey"]) . "\n");
                 $server->close($fd);
             }
-        } elseif (empty($auth[$fd])) {
+            continue;
+        }
+
+        // Must be authenticated
+        if (empty($auth[$fd])) {
             $server->send($fd, json_encode(["status" => "ERR", "error" => "Not authenticated"]) . "\n");
             $server->close($fd);
-        } elseif ($type === "r") { // run function
+            continue;
+        }
+
+        // Run function
+        if ($type === "r") {
             $bname = $payload['functionName'] ?? '';
             $args = $payload['args'] ?? [];
             $context = $payload['context'] ?? [];
+
             if (!isset($STATE[$bname]) || !is_callable($STATE[$bname])) {
                 $server->send($fd, json_encode(["fnError" => "not exist"]) . "\n");
-            } else {
-                try {
-                    $result = call_user_func_array($STATE[$bname], [$args,&$context]);
-                    $server->send($fd, json_encode(["r" => $result, "c"=>$context]) . "\n");
-                } catch (Exception $e) {
-                    $server->send($fd, json_encode(["error" => $e->getMessage()]) . "\n");
-                }
+                continue;
+            }
+
+            try {
+                $result = call_user_func_array($STATE[$bname], [$args, &$context]);
+                $server->send($fd, json_encode(["r" => $result, "c" => $context]) . "\n");
+            } catch (Exception $e) {
+                $server->send($fd, json_encode(["error" => $e->getMessage()]) . "\n");
             }
         }
     }
 });
 
-// Start the Swoole server
+// Start server
 $server->start();
-

@@ -1,0 +1,7 @@
+workflow:
+  - step: nyno-sql-read
+    args:
+      - keys: ["mdfinal"]
+        limit: 1
+        offset: 20
+

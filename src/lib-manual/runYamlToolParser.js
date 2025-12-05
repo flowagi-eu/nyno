@@ -17,9 +17,26 @@ export function getOriginalKeys(workflowData) {
 
   if (Array.isArray(workflowData.workflow)) {
     for (const node of workflowData.workflow) {
+
+	    // collect original keys from context, ex. same as with args
       if (node.context && typeof node.context === "object") {
         Object.keys(node.context).forEach(k => keys.add(k));
       }
+
+
+	     // collect original keys from args, ex. if you use - offset: ${OFFSET} it will add offset to the original keys to replace
+
+	    if (node.args) {
+  const collectKeys = (v) => {
+    if (Array.isArray(v)) v.forEach(collectKeys);
+    else if (v && typeof v === "object") Object.keys(v).forEach(k => {
+      keys.add(k);
+      collectKeys(v[k]);
+    });
+  };
+  collectKeys(node.args);
+}
+
     }
   }
 
@@ -52,8 +69,10 @@ export function runYamlToolParser(node, globalContext = {}, options = {}) {
     if (value && typeof value === "object") {
       const out = {};
       for (const k of Object.keys(value)) {
+	      //console.log('object detected',value);
         // Only replace keys present in originalKeys
         if (originalKeys.has(k)) {
+		//console.log('key in originalKeys', k , value[k]);
           out[k] = replaceValue(value[k], k, depth + 1);
         } else {
           out[k] = value[k]; // leave new/dynamic keys untouched
@@ -68,6 +87,7 @@ export function runYamlToolParser(node, globalContext = {}, options = {}) {
     const wholeVarMatch = value.match(/^\$\{(\w+)\}$/);
     if (wholeVarMatch) {
       const varKey = wholeVarMatch[1];
+	   // console.log('wholeVarMatch varKey',varKey);
       if (key && originalKeys.has(key) && !(varKey in mergedContext)) {
         unreplaced.add(varKey);
         return "";
@@ -77,6 +97,7 @@ export function runYamlToolParser(node, globalContext = {}, options = {}) {
 
     // Partial variable replacement in strings
     return value.replace(/\$\{(\w+)\}/g, (_, varKey) => {
+	    //console.log('varKey and value',varKey,value);
       if (key && originalKeys.has(key) && !(varKey in mergedContext)) {
         unreplaced.add(varKey);
         return "";
@@ -110,6 +131,7 @@ workflow:
   - step: demo-step
     args:
       - \${URL}
+      - - deeperKey: \${URL}
     context:
       NODE_VAR: "node_specific_value"
       TOKEN: "NODE_OVERRIDE"

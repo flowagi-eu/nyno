@@ -3,7 +3,8 @@ import { JSDOM } from 'jsdom';
 
 export async function nyno_scrape(args, context) {
   let loop_args = [];
-  context['all_results'] = [];
+  let setName = context['set_context'] ?? 'prev';
+  context[setName] = [];
 
   const START_PAGE = Number(context.START_PAGE || 1);
   const END_PAGE = Number(context.END_PAGE || 1);
@@ -73,7 +74,7 @@ export async function nyno_scrape(args, context) {
 
     log(`Extracted ${links.length} links on page ${i}`);
 
-    context.all_results.push({ page: i, links });
+    context[setName].push({ page: i, links });
 
     // Scrape each link with delay
     for (let link of links) {

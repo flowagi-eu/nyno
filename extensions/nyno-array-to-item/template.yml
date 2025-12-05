@@ -1,0 +1,4 @@
+- step: nyno-array-to-item
+  args:
+    - ${prev}
+

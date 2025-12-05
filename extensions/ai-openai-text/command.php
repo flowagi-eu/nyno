@@ -11,7 +11,7 @@ function ai_openai_text($args, &$context) {
     // Determine the output key
     $setName = array_key_exists("set_context", $context)
         ? $context["set_context"]
-        : "ai_openai_text";
+        : "prev";
 
 
     // Check if args is empty and set usage message in context

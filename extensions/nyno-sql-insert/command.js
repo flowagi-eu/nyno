@@ -48,7 +48,7 @@ export async function nyno_sql_insert(args, context) {
     );
 
     // Store output in the context
-    context['nyno_db_insert'] = res;
+    context['prev'] = res;
 
     return 0;
 }

@@ -53,7 +53,7 @@ export async function nyno_json_sql(args, context) {
     const filePath = args[0];
     const queryInput = args[1];
 
-    let setName = 'nyno_json_sql';
+    let setName = 'prev';
     if('set_context' in context) {
 	setName = context['set_context'];
     }

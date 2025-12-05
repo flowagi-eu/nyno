@@ -19,6 +19,20 @@ export class NynoClient {
     this.connect();
   }
 
+  // Static create method with the same defaults
+  static async create(
+    credentials,
+    host = '127.0.0.1',
+    port = 9024,
+    maxRetries = 3,
+    retryDelay = 200
+  ) {
+    const client = new NynoClient(credentials, host, port, maxRetries, retryDelay);
+    await client.connect(); // ensure connection before returning
+    return client;
+  }
+
+
   connect() {
     return new Promise((resolve, reject) => {
       this.close();

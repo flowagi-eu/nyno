@@ -1,0 +1,4 @@
+- step: nyno-notify
+  args:
+    - "Title Notification"
+    - "Sub title"

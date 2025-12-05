@@ -3,7 +3,7 @@ export function nyno_guardrails(args, context) {
     let contextKeys = args && args[0] ? args[0] : "inputText";
     if (!Array.isArray(contextKeys)) contextKeys = [contextKeys]; // normalize
 
-    const setName = context["set_context"] || "guardrails";
+    const setName = context["set_context"] || "prev";
 
     const counts = {};
     let blocked = false;

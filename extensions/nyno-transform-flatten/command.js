@@ -2,16 +2,24 @@
 // Simple ES6 transformer that extracts nested arrays by path and flattens one level
 
 export function nyno_transform_flatten(args, context) {
-  const list = args[0];
+  let list = args[0];
+	if(!Array.isArray(list)){
+list = [list];
+	}
+
+	console.log('EXTENSION DEBUG! transform flatten list or JSON sr?',list);
+  
   const path = args[1]; // e.g., "data" or "items.children"
 
+
+  const setName = context["set_context"] ?? "prev";
   if (!Array.isArray(list)) {
-    context["result_transformer"] = { error: "args[0] must be an array" };
+    context[setName+".error"] = { error: "args[0] must be an array" };
     return 0;
   }
 
   if (!path || typeof path !== "string") {
-    context["result_transformer"] = { error: "args[1] must be a path string" };
+    context[setName+".error"] = { error: "args[1] must be a path string" };
     return 0;
   }
 
@@ -31,7 +39,7 @@ for (const item of list) {
 }
 
 
-  const setName = context["set_context"] ?? "result_transformer";
+
   context[setName] = output;
 
   return 0;
@@ -47,8 +55,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       path: "data"
     },
     {
+      desc: "1-level flatten (non array data)",
+      input: [{ id: 1, data: "test1" }, { id: 2, data: "test2" }],
+      path: "data"
+    },
+    {
       desc: "2-level flatten",
       input: [{ id: 1, items: { children: [1, 2] } }, { id: 2, items: { children: [3] } }],
+      path: "items.children"
+    },
+    {
+      desc: "2-level flatten (non array data)",
+      input: [{ id: 1, items: { children: "test3" } }, { id: 2, items: { children: "test4" } }],
       path: "items.children"
     },
     {
@@ -67,8 +85,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(ex.desc);
     console.log("Input:", JSON.stringify(ex.input));
     console.log("Path:", ex.path);
-    console.log("Output:", context.result_transformer);
+    console.log("Output:", context["nyno_transform_flatten"]);
     console.log("----");
   });
 }
-*/
+//*/

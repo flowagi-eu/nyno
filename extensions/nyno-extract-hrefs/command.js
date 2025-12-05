@@ -42,11 +42,11 @@ export function nyno_extract_hrefs(args, context) {
 
   // Apply extraction to all items in the list and flatten results
   const output = list.flatMap(item => {
-    if (typeof item !== "string") return [];
+    if (typeof item !== "string") item = JSON.stringify(item);
     return extractLinks(item);
   });
 
-  let setName = 'nyno-extract-hrefs';
+  let setName = 'prev';
   if ('set_context' in context) {
     setName = context['set_context'];
   }
