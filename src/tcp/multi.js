@@ -29,9 +29,7 @@ export default function register(router) {
 	 console.log('got data 2',data);
     const endTime = Date.now();
 
-	  if("NYNO_ONE_VAR" in context) {
 		return result;
-	  }
 
     return {
       route: '/run-nyno',
