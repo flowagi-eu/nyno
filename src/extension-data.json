@@ -155,6 +155,26 @@
     "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄"
   },
+  "pseudo-dsl-to-flat-ast": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-js": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-php": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-python": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "pseudo-flat-ast-to-ruby": {
+    "yaml": null,
+    "emoji": ""
+  },
   "serper-search": {
     "yaml": "- step: serper-search:\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",
     "emoji": "🔗"

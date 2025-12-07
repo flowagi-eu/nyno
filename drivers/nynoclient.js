@@ -13,13 +13,12 @@ export class NynoClient {
     this.port = port;
     this.socket = null;
     this.buffer = '';
-    this.lineResolvers = []; // <-- queue of pending reads
+    this.lineResolvers = [];
     this.maxRetries = maxRetries;
     this.retryDelay = retryDelay;
     this.connect();
   }
 
-  // Static create method with the same defaults
   static async create(
     credentials,
     host = '127.0.0.1',
@@ -28,25 +27,19 @@ export class NynoClient {
     retryDelay = 200
   ) {
     const client = new NynoClient(credentials, host, port, maxRetries, retryDelay);
-    await client.connect(); // ensure connection before returning
+    await client.connect();
     return client;
   }
-
 
   connect() {
     return new Promise((resolve, reject) => {
       this.close();
+      this.socket = net.createConnection({ host: this.host, port: this.port }, () => {
+        this.socket.setEncoding("utf8");
+        const msg = "c" + JSON.stringify(this.credentials) + "\n";
+        this.socket.write(msg);
+      });
 
-      this.socket = net.createConnection(
-        { host: this.host, port: this.port },
-        () => {
-          this.socket.setEncoding("utf8");
-          const msg = "c" + JSON.stringify(this.credentials) + "\n";
-          this.socket.write(msg);
-        }
-      );
-
-      // Attach listeners ONCE per socket
       this.socket.on("data", (chunk) => {
         this.buffer += chunk;
 
@@ -56,11 +49,9 @@ export class NynoClient {
           this.buffer = this.buffer.slice(idx + 1);
 
           if (this.lineResolvers.length > 0) {
-            // resolve a waiting _readLine()
             const resolveFn = this.lineResolvers.shift();
             resolveFn(line);
           } else {
-            // this resolves the connect() promise
             try {
               const res = JSON.parse(line);
               if (res.status) resolve(res);
@@ -92,20 +83,16 @@ export class NynoClient {
     }
   }
 
-  async runWorkflow(path, data = {}) {
+  async sendRequest(prefix, payload) {
     let attempts = 0;
 
     while (true) {
       try {
         await this.ensureConnected();
-
-        const payload = { path, ...data };
-        const msg = "q" + JSON.stringify(payload) + "\n";
+        const msg = prefix + JSON.stringify(payload) + "\n";
         await this._write(msg);
-
         const line = await this._readLine();
         return JSON.parse(line);
-
       } catch (err) {
         attempts++;
         if (attempts > this.maxRetries) {
@@ -125,6 +112,14 @@ export class NynoClient {
     }
   }
 
+  async runWorkflow(path, data = {}) {
+    return this.sendRequest('q', { path, ...data });
+  }
+
+  async runNyno(yamlContent, context = {}) {
+    return this.sendRequest('q', { path:"/run-nyno", yamlContent, context });
+  }
+
   async ensureConnected() {
     if (!this.socket || this.socket.destroyed) {
       await this.connect();
@@ -133,15 +128,12 @@ export class NynoClient {
 
   _write(msg) {
     return new Promise((resolve, reject) => {
-      this.socket.write(msg, "utf8", (err) =>
-        err ? reject(err) : resolve()
-      );
+      this.socket.write(msg, "utf8", (err) => (err ? reject(err) : resolve()));
     });
   }
 
   _readLine() {
     return new Promise((resolve, reject) => {
-      // queue up a reader
       this.lineResolvers.push(resolve);
     });
   }

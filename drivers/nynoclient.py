@@ -16,7 +16,6 @@ class NynoClient:
 
     def connect(self):
         self.close()
-
         self.sock = socket.create_connection((self.host, self.port), timeout=self.timeout)
         self.sock.settimeout(self.timeout)
 
@@ -31,24 +30,16 @@ class NynoClient:
             self.close()
             raise Exception(f"Nyno authentication failed: {result.get('error') if isinstance(result, dict) else result}")
 
-    def run_workflow(self, path, data=None):
+    def send_request(self, prefix, payload):
         attempts = 0
-
         while True:
             try:
                 self.ensure_connected()
-
-                payload = {"path": path}
-                if data:
-                    payload.update(data)
-
-                msg = 'q' + json.dumps(payload) + '\n'
+                msg = prefix + json.dumps(payload) + '\n'
                 self.send_raw(msg)
-
                 resp = self.read_line()
                 if not resp:
                     raise Exception("Empty response from server")
-
                 result = json.loads(resp)
                 return result
             except Exception as e:
@@ -62,6 +53,18 @@ class NynoClient:
                     self.connect()
                 except Exception as ce:
                     print(f"Reconnect attempt failed: {ce}")
+
+    def run_workflow(self, path, data=None):
+        payload = {"path": path}
+        if data:
+            payload.update(data)
+        return self.send_request('q', payload)
+
+    def run_nyno(self, yaml_content, context=None):
+        if context is None:
+            context = {}
+        payload = {"path":"/run-nyno","yamlContent": yaml_content, "context": context}
+        return self.send_request('q', payload)
 
     def ensure_connected(self):
         if self.sock is None:
@@ -80,7 +83,7 @@ class NynoClient:
                 raise ConnectionError("Socket closed")
             buf += chunk
             if b'\n' in buf:
-                line, _, _ = buf.partition(b'\n')
+                line, _, buf = buf.partition(b'\n')
                 return line.decode('utf-8').strip()
 
     def close(self):
