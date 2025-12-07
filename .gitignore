@@ -12,6 +12,7 @@ private-extensions
 uv.lock
 pyproject.toml
 extensions-untested
+extensions
 
 # Ignore everything in the extensions/ directory
 # tmp commented extensions/*
