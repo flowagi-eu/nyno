@@ -62,14 +62,29 @@ class NynoClient
      */
     public function run_workflow(string $path, array $data = []): array
     {
+        return $this->sendRequest('q', array_merge(['path' => $path], $data));
+    }
+
+    /**
+     * Run the /run-nyno path with YAML or arbitrary context
+     */
+    public function run_nyno_code(string $yamlContent, array $context = []): array
+    {
+        return $this->sendRequest('q', ["path"=>"/run-nyno",'yamlContent' => $yamlContent, 'context' => $context]);
+    }
+
+    /**
+     * Generalized request sender with retries
+     */
+    private function sendRequest(string $prefix, array $payload): array
+    {
         $attempts = 0;
 
         while (true) {
             try {
                 $this->ensureConnected();
 
-                $payload = array_merge(['path' => $path], $data);
-                $msg = 'q' . json_encode($payload) . "\n";
+                $msg = $prefix . json_encode($payload) . "\n";
                 $this->writeRaw($msg);
 
                 $response = $this->readResponse();
@@ -84,20 +99,15 @@ class NynoClient
 
                 return $result;
             } catch (Exception $e) {
-                // Attempt reconnect on connection failure
                 $attempts++;
                 if ($attempts > $this->maxRetries) {
                     throw new Exception("Nyno request failed after {$this->maxRetries} retries: " . $e->getMessage());
                 }
 
-                // Log or print reconnect attempt
                 error_log("Nyno connection lost, retrying (#{$attempts})...");
-
-                // Wait (exponential backoff)
                 usleep($this->retryDelay * 1e6);
                 $this->retryDelay *= 2;
 
-                // Try to reconnect
                 try {
                     $this->connect();
                 } catch (Exception $ce) {
