@@ -8,7 +8,7 @@
     "emoji": "🤖"
   },
   "ai-openai-text": {
-    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}",
+    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
   "hello": {
