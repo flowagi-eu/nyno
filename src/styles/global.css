@@ -15,8 +15,10 @@ body .react-flow__node-default
 
 }
 
-.dialog_content textarea {
+.dialog_content textarea, .rnh_textarea {
 background: black;border: 1px solid;color: #5cbffaff;font-size: 18px;padding: 9px;display: block;box-sizing: border-box;
+box-shadow:none!important;
+outline:none!important;
 }
 
 

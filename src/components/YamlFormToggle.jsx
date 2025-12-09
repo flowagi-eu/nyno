@@ -102,6 +102,7 @@ export function YamlFormToggle({ value, onChange }) {
       
         <textarea
           value={value}
+          spellCheck={false}
           onChange={(e) => onChange(e.target.value)}
           style={{ width: "100%", height: 120 }}
         />
