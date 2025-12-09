@@ -15,7 +15,7 @@ Nyno is an **open-source multi-language workflow engine** and [language](https:/
 
 Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in human-readable **YAML Workflows** (.nyno files).
 
-### Introducing "The Engine" that powers Nyno 4.0
+### Introducing "The Engine" that powers Nyno
 To achieve most requests/per second we're using multi-process worker engines where feasible. Nyno will spawns 2 light-weight workers for each language in `dev` mode or 3 workers for every language and CPU core in `prod` mode. This means that if you have 4 CPU cores, it will spawn 12 ready-to-run workers to run workflow steps.
 
 
