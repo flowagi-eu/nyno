@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 export function RunButton({ getText }) {
+  const [oneVarMode, setOneVarMode] = useState(false);
+const [oneVarText, setOneVarText] = useState(`context:
+  NYNO_ONE_VAR: "prev"`);
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -34,7 +38,20 @@ export function RunButton({ getText }) {
     setResult(null);
     setUnauthorized(false);
     try {
-      const textToSend = getText ? getText() : "";
+
+const baseText = getText ? getText() : "";
+const oneVarPrefix = oneVarMode ? oneVarText : "";
+
+const textToSend = [oneVarPrefix, baseText]
+  .filter(Boolean)
+  .join("\n\n")
+  .trim();
+
+      if(textToSend.includes('workflow: []')) {
+        alert("Please use \"Add Node\" to add at least one node.")
+        return;
+      }
+      console.log('textToSend',textToSend);
       const res = await fetch("/run-nyno-http", {
         method: "POST",
         headers: {
@@ -142,7 +159,32 @@ const blob = new Blob([(result)], { type: "application/json" });
                 <p className="rnh_loading_text mt-4">Loading...</p>
               </div>
             ) : (
-              <pre className="rnh_result whitespace-pre-wrap text-sm">{result}</pre>
+              <div>
+                <div style={{textAlign:'right'}}>
+<input
+  type="checkbox"
+  className="rnh_checkbox"
+  checked={oneVarMode}
+  onChange={(e) => setOneVarMode(e.target.checked)}
+ />{" "}
+Custom Context
+                </div>
+                <div>
+{oneVarMode && (
+  <textarea
+  spellCheck={false}
+    className="rnh_textarea w-full mt-3 p-2 border rounded text-sm"
+    placeholder="Enter single variable value..."
+    value={oneVarText}
+    onChange={(e) => setOneVarText(e.target.value)}
+              style={{ width: "100%", height: 120 }}
+
+  />
+)}
+
+                </div>
+                <pre className="rnh_result whitespace-pre-wrap text-sm">{result}</pre>
+              </div>
             )}
 
             <div className="mt-6 flex justify-end gap-2">

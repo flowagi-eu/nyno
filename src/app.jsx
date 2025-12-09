@@ -2,7 +2,7 @@
 import extensions from "@/extension-data.json";
 import { YamlFormToggle } from "@/components/YamlFormToggle";
 import { RunButton } from "@/components/RunButton";
-
+import { Position } from "reactflow";
 
 
 // --- Template imports (as plain text)
@@ -23,12 +23,7 @@ export default function FlowPage() {
   const keywordEmojis = { route: "🌐" };
 
   const initialNodes = [
-    {
-      id: "1",
-      position: { x: 0, y: 0 },
-      data: { label: "route /test_nyno", rawLabel: "route /test_nyno", info: "", args: [], emoji: "🌐" },
-      type: "input",
-    },
+   
   ];
 
   const initialEdges = [];
@@ -118,7 +113,11 @@ export default function FlowPage() {
     const newNode = {
       id,
       position: { x: 50 * nodes.length, y: 50 * nodes.length },
-      data: { label: `node ${id}`, rawLabel: `node ${id}`, info: "", args: [], emoji: "" },
+      data: { label: `node ${id}`, rawLabel: `node ${id}`, info: `- step: nyno-http-get
+  args:
+    - \${URL}`, args: [], emoji: "🌐" },
+    //   sourcePosition: Position.Right,
+    //targetPosition: Position.Left,
     };
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);

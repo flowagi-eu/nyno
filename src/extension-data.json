@@ -31,6 +31,10 @@
     "yaml": null,
     "emoji": ""
   },
+  "intel-linkedin-url-to-username": {
+    "yaml": "- step: intel-linkedin-url-to-username\n  args: [\"linkedin url or list of urls\"]\n",
+    "emoji": ""
+  },
   "intel-ngram-counter": {
     "yaml": null,
     "emoji": ""
