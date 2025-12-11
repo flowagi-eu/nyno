@@ -1,4 +1,8 @@
 {
+  "ai-mistral-text": {
+    "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
+    "emoji": "🤖"
+  },
   "ai-openai-image-edit": {
     "yaml": "- step: ai-openai-image-edit\n  args: \n    - ${IMAGE_FILE_PATH}\n    - ${PROMPT}",
     "emoji": "🤖"
@@ -8,7 +12,7 @@
     "emoji": "🤖"
   },
   "ai-openai-text": {
-    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n  context:\n    SYSTEM_PROMPT: \"\"\n",
+    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
   "hello": {
@@ -47,6 +51,10 @@
     "yaml": "- step: nyno-array-to-item\n  args:\n    - ${prev}\n\n",
     "emoji": "🧼"
   },
+  "nyno-bag-of-words": {
+    "yaml": "- step: nyno-bag-of-words\n  args:\n    - ${PROMPT}\n    - \n      - [\"revenue\", \"profit\"]\n      - [\"cost\", \"investment\"]\n\n",
+    "emoji": ""
+  },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
     "emoji": "🔢"
@@ -56,7 +64,7 @@
     "emoji": "✂️"
   },
   "nyno-extract-hrefs": {
-    "yaml": "- step: nyno_extract_hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"",
+    "yaml": "- step: nyno-extract-hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"\n",
     "emoji": "✂️"
   },
   "nyno-extract-urls": {
@@ -158,6 +166,10 @@
   "nyno-trigger": {
     "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄"
+  },
+  "openai-tool-gateway": {
+    "yaml": "- step: openai-tool-gateway\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n",
+    "emoji": ""
   },
   "pseudo-dsl-to-flat-ast": {
     "yaml": null,
