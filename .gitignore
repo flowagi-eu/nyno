@@ -20,6 +20,8 @@ envs/*
 workflows-enabled/*
 
 # Except these extensions
+!extensions/ai-mistral-text/
+!extensions/ai-mistral-text/**
 !extensions/nyno-log/
 !extensions/nyno-log/**
 !extensions/nyno-echo/
