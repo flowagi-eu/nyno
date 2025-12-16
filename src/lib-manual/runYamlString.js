@@ -24,9 +24,10 @@ debugLog('languageKeyValue length',Object.keys(languageKeyValue).length);
 /**
  * Run a workflow from a YAML string content.
  */
-export async function runYamlString(text) {
+export async function runYamlString(text,customContext=null) {
   // 1) text to object
   let obj = loadNynoWorkflowFromText(text);
+  if(customContext) obj.context = customContext;
   
   // 2) object to flattened object
   let flattenedObj = flattenWorkflow(obj);

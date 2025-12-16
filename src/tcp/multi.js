@@ -51,28 +51,20 @@ export default function register(router) {
     for (const file of fs.readdirSync(systemPath)) {
       if (!file.endsWith('.nyno')) continue;
 
-      const workflowData = yaml.load(fs.readFileSync(path.join(systemPath, file), 'utf-8'));
+      const workflowTextData = fs.readFileSync(path.join(systemPath, file), 'utf-8');
+      const workflowData = yaml.load(workflowTextData);
       workflows[file] = workflowData;
 
       const routePath = workflowData.route || '/' + path.basename(file, '.nyno');
+      console.log('[DYNAMIC ROUTE] ',{routePath});
       router.on(routePath, async (socket, data) => {
         if (!socket.authenticated) return { error: 'Not authenticated' };
         const context = { ...data };
         delete context['path'];
-        if (systemName) socket.system = systemName;
 
-        const startTime = Date.now();
-        const result = await runWorkflow(workflowData, null, context);
-        const endTime = Date.now();
+        const result = await runYamlString(workflowTextData,context); //  runWorkflow(workflowData, null, context);
 
-        return {
-          route: routePath,
-          system: systemName || socket.system || 'default',
-          status: 'ok',
-          execution_time_seconds: (endTime - startTime) / 1000,
-          execution: result.log,
-          context: result.context,
-        };
+        return result;
       }, systemName);
     }
     return workflows;
