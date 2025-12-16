@@ -15,6 +15,10 @@
     "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
+  "empowerd-call-api": {
+    "yaml": null,
+    "emoji": ""
+  },
   "hello": {
     "yaml": null,
     "emoji": ""
