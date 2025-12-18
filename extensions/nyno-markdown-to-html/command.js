@@ -1,5 +1,4 @@
 // extensions/markdown-to-html/command.js
-import matter from 'gray-matter';
 import MarkdownIt from 'markdown-it';
 
 export function nyno_markdown_to_html(args, context) {
@@ -19,15 +18,13 @@ export function nyno_markdown_to_html(args, context) {
         if (Array.isArray(input)) {
             // Handle list of Markdown strings
             context[setName] = input.map(item => {
-                const { data: frontMatter, content } = matter(item);
-                const html = md.render(content);
-                return { frontMatter, html };
+                const html = md.render(item);
+                return html;
             });
         } else {
             // Handle single Markdown string
-            const { data: frontMatter, content } = matter(input);
-            const html = md.render(content);
-            context[setName] = { frontMatter, html };
+            const html = md.render(input);
+            context[setName] = html;
         }
 
         return 0; // success
