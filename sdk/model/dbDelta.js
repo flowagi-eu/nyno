@@ -2,6 +2,7 @@ import App from '../../src/App.js'; // import the singleton
 
 export async function dbDelta() {
   const pgClient = App.get('db_nyno_log');
+  if(!pgClient) return;
 
   await pgClient.query(`
     CREATE TABLE IF NOT EXISTS json_storage (

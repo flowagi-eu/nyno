@@ -133,7 +133,7 @@
   },
   "nyno-markdown-to-html": {
     "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
-    "emoji": ""
+    "emoji": "📄"
   },
   "nyno-markdown-to-html-and-frontmatter": {
     "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
