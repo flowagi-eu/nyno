@@ -2,7 +2,7 @@
 
 
 
-## Nyno 4.1: Open-Source Backend for Workflow-based AGI. Extend with Python, PHP, JS and Ruby. Route with YAML. Instantly Run.
+## Nyno 4.2: Open-Source Backend for Workflow-based AGI. Extend with Python, PHP, JS and Ruby. Route with YAML. Instantly Run.
 - Try the Live Free Minimal Version: [https://europe.nyno.dev](https://europe.nyno.dev)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
 
