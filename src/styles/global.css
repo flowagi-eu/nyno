@@ -74,3 +74,14 @@ body .react-flow__node-default
   right: 0;
   bottom: 40px;
 }
+
+.chat-message {
+  background: #2f3339;
+  padding: 15px;
+  border-radius: 9px;
+  margin: 1rem 0;
+}
+
+.chat-message > p {
+margin:0;
+}

@@ -15,6 +15,18 @@
     "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
+  "em-admin": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "em-core": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "em-frontend": {
+    "yaml": null,
+    "emoji": ""
+  },
   "empowerd-call-api": {
     "yaml": null,
     "emoji": ""
@@ -120,7 +132,11 @@
     "emoji": ""
   },
   "nyno-markdown-to-html": {
-    "yaml": null,
+    "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
+    "emoji": ""
+  },
+  "nyno-markdown-to-html-and-frontmatter": {
+    "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
     "emoji": ""
   },
   "nyno-notify": {

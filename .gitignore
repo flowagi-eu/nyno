@@ -20,6 +20,8 @@ envs/*
 workflows-enabled/*
 
 # Except these extensions
+!extensions/nyno-markdown-to-html/
+!extensions/nyno-markdown-to-html/**
 !extensions/ai-mistral-text/
 !extensions/ai-mistral-text/**
 !extensions/nyno-log/

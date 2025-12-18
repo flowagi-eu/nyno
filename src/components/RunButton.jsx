@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { SimpleOutputToggle } from "@/components/SimpleOutputToggle";
 
 export function RunButton({ getText }) {
   const [oneVarMode, setOneVarMode] = useState(false);
 const [oneVarText, setOneVarText] = useState(`context:
   NYNO_ONE_VAR: "prev"`);
 
+    const [simpleOutput, setSimpleOutput] = useState(false);
+  
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -83,6 +86,43 @@ const textToSend = [oneVarPrefix, baseText]
       setLoading(false);
     }
   };
+
+
+const renderSimpleChat = () => {
+  if (!result) return null;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(result);
+  } catch {
+    return <div className="chat-message error">Invalid response</div>;
+  }
+
+  const execution = parsed?.execution;
+  if (!Array.isArray(execution) || execution.length === 0) {
+    return <div className="chat-message">No execution data</div>;
+  }
+
+  const lastStep = execution[execution.length - 1];
+  const context = lastStep?.output?.c || {};
+
+  const error = context["prev.error"];
+  const prev = context["prev"];
+
+  if (error) {
+    const html = typeof error === "string" ? error : JSON.stringify(error);
+    return <div className="chat-message error" dangerouslySetInnerHTML={{ __html: html }} />;
+  }
+
+  if (prev) {
+    const html = typeof prev === "string" ? prev : JSON.stringify(prev);
+    return <div className="chat-message" dangerouslySetInnerHTML={{ __html: html }} />;
+  }
+
+  return <div className="chat-message">No output</div>;
+};
+
+
 
   const handleSaveFile = async() => {
 
@@ -183,7 +223,16 @@ Custom Context
 )}
 
                 </div>
-                <pre className="rnh_result whitespace-pre-wrap text-sm">{result}</pre>
+{simpleOutput ? (
+  <div className="chat">
+    {renderSimpleChat()}
+  </div>
+) : (
+  <pre className="rnh_result whitespace-pre-wrap text-sm">
+    {result}
+  </pre>
+)}
+
               </div>
             )}
 
@@ -198,12 +247,23 @@ Custom Context
               </button>
 
               {!unauthorized && (
+                <div>
+                  <label className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    checked={simpleOutput}
+    onChange={(e) => setSimpleOutput(e.target.checked)}
+  />
+  Simple Chat Output
+</label>
+
                 <button 
                   onClick={handleSaveFile}
                   className="rnh_btn_save px-4 py-2 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-700"
                 >
                   Save as File
                 </button>
+                </div>
               )}
 
             </div>

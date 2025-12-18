@@ -4,7 +4,6 @@ import { YamlFormToggle } from "@/components/YamlFormToggle";
 import { RunButton } from "@/components/RunButton";
 import { Position } from "reactflow";
 
-
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
 
