@@ -1,0 +1,8 @@
+- step: ai-mistral-classifier
+  args:
+    - "Title, ex. Prompt Guardrails Violation Detector"
+    - "Descripion, ex: Match for violations."
+    - ${PROMPT}
+    - "minimal"
+
+
