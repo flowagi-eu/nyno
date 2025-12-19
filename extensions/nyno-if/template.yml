@@ -1,0 +1,3 @@
+- step: nyno-if
+  args:
+    - "${prev} is lower than 0.5"
