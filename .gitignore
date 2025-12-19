@@ -22,13 +22,10 @@ workflows-enabled/*
 # Except these extensions
 !extensions/ai-mistral-classifier/
 !extensions/ai-mistral-classifier/**
-
 !extensions/ai-openai-classifier/
 !extensions/ai-openai-classifier/**
-
 !extensions/nyno-if/
 !extensions/nyno-if/**
-
 !extensions/nyno-markdown-to-html/
 !extensions/nyno-markdown-to-html/**
 !extensions/ai-mistral-text/
