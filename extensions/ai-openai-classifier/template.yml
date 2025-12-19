@@ -1,6 +1,8 @@
-- step: ai-openai-text
+- step: ai-openai-classifier
   args:
     - ${PROMPT}
+    - "Title, ex. Prompt Guardrails Violation Detector"
+    - "Descripion, ex: Match for violations."
     - "minimal"
-  context:
-    SYSTEM_PROMPT: ""
+
+

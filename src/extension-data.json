@@ -55,18 +55,6 @@
     "yaml": null,
     "emoji": ""
   },
-  "intel-classifier-leader-vs-agency": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "intel-linkedin-url-to-username": {
-    "yaml": "- step: intel-linkedin-url-to-username\n  args: [\"linkedin url or list of urls\"]\n",
-    "emoji": ""
-  },
-  "intel-ngram-counter": {
-    "yaml": null,
-    "emoji": ""
-  },
   "nyno-accumulator": {
     "yaml": null,
     "emoji": ""
@@ -124,8 +112,8 @@
     "emoji": "🌐"
   },
   "nyno-if": {
-    "yaml": null,
-    "emoji": ""
+    "yaml": "- step: nyno-if\n  args:\n    - \"${prev} is lower than 0.5\"\n",
+    "emoji": "🔀"
   },
   "nyno-json-sql": {
     "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",

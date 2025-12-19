@@ -22,14 +22,19 @@ function nyno_if($args, &$context)
 
     $input = strtolower(trim($args[0]));
 
-    // Extract numbers
+
+     // Extract numbers (support floats)
     if (!preg_match('/(-?\d+(?:\.\d+)?).+?(-?\d+(?:\.\d+)?)/', $input, $m)) {
-        $context[$setName.'.error'] = "Could not extract numbers from input";
-        return -1;
+        $context['error'] = "Could not extract numbers from input";
+        return 1;
     }
 
-    $left  = $m[1] + 0;
-    $right = $m[2] + 0;
+    $left  = (float)$m[1];
+    $right = (float)$m[2];
+     
+    $context[$setName.'.left'] = $left;
+    $context[$setName.'.right'] = $right;
+
 
     $result = false;
 
@@ -51,8 +56,8 @@ function nyno_if($args, &$context)
         return 1;
     }
 
-    $context[$setName] = $result ? 1 : 0;
+    $context[$setName] = $result ? 0 :1;
 
-    return 0;
+    return $context[$setName];
 }
 
