@@ -17,7 +17,7 @@ function nyno_if($args, &$context)
     if (count($args) < 1) {
         $context[$setName.'.usage'] =
             'Usage: if_eval "10 is lower than 5"' . "\n";
-        return 1;
+        return -1;
     }
 
     $input = strtolower(trim($args[0]));
@@ -25,7 +25,7 @@ function nyno_if($args, &$context)
     // Extract numbers
     if (!preg_match('/(-?\d+(?:\.\d+)?).+?(-?\d+(?:\.\d+)?)/', $input, $m)) {
         $context[$setName.'.error'] = "Could not extract numbers from input";
-        return 1;
+        return -1;
     }
 
     $left  = $m[1] + 0;
