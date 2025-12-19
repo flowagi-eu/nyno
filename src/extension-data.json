@@ -1,6 +1,6 @@
 {
   "ai-mistral-classifier": {
-    "yaml": "- step: ai-mistral-classifier\n  args:\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - ${PROMPT}\n    - \"minimal\"\n\n\n",
+    "yaml": "- step: ai-mistral-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n",
     "emoji": "🤖"
   },
   "ai-mistral-text": {
@@ -8,7 +8,7 @@
     "emoji": "🤖"
   },
   "ai-openai-classifier": {
-    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
+    "yaml": "- step: ai-openai-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n\n",
     "emoji": "🤖"
   },
   "ai-openai-image-edit": {
