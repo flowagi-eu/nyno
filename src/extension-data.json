@@ -1,6 +1,14 @@
 {
+  "ai-mistral-classifier": {
+    "yaml": "- step: ai-mistral-classifier\n  args:\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - ${PROMPT}\n    - \"minimal\"\n\n\n",
+    "emoji": "🤖"
+  },
   "ai-mistral-text": {
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
+    "emoji": "🤖"
+  },
+  "ai-openai-classifier": {
+    "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
   "ai-openai-image-edit": {
@@ -114,6 +122,10 @@
   "nyno-http-post": {
     "yaml": "- step: nyno-http-post\n  args:\n    - ${URL}\n    - ${POST_DATA}",
     "emoji": "🌐"
+  },
+  "nyno-if": {
+    "yaml": null,
+    "emoji": ""
   },
   "nyno-json-sql": {
     "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
