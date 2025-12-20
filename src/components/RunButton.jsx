@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SimpleOutputToggle } from "@/components/SimpleOutputToggle";
 
-export function RunButton({ getText }) {
+export function RunButton({ getText, onExecution }) {
   const [oneVarMode, setOneVarMode] = useState(false);
 const [oneVarText, setOneVarText] = useState(`context:
   NYNO_ONE_VAR: "prev"`);
@@ -80,6 +80,9 @@ const textToSend = [oneVarPrefix, baseText]
       } else {
         setResult(data ? JSON.stringify(data, null, 2) : `Status ${res.status}`);
       }
+
+      // also highlight executed nodes in the gui
+      onExecution?.(data?.execution);
     } catch (err) {
       setResult("Error: " + err.message);
     } finally {
@@ -99,6 +102,12 @@ const renderSimpleChat = () => {
   }
 
   const execution = parsed?.execution;
+
+
+
+
+
+
   if (!Array.isArray(execution) || execution.length === 0) {
     return <div className="chat-message">No execution data</div>;
   }

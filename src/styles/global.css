@@ -85,3 +85,9 @@ body .react-flow__node-default
 .chat-message > p {
 margin:0;
 }
+
+.react-flow__node.node-executed {
+  border: 1px solid #01b3f7!important;
+  box-shadow: 0 0 5.1px #01b3f7!important;
+}
+
