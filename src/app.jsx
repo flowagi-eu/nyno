@@ -54,6 +54,26 @@ export default function FlowPage() {
     setHistoryIndex(newHistory.length - 1);
   };
 
+	const handleExecution = useCallback((execution) => {
+  if (!Array.isArray(execution)) return;
+
+  const executedIds = new Set(
+    execution.map((e) => String(e.node))
+  );
+
+  setNodes((nds) =>
+    nds.map((n) => ({
+      ...n,
+      data: {
+        ...n.data,
+        executed: executedIds.has(n.id),
+      },
+    }))
+  );
+}, [setNodes]);
+
+
+
   const handleUndo = useCallback(() => {
     if (historyIndex <= 0) return;
     const prevIndex = historyIndex - 1;
@@ -247,12 +267,14 @@ export default function FlowPage() {
 
   const renderedNodes = nodes.map((n) => ({
     ...n,
-    data: { ...n.data, label: renderLabel(n.data.rawLabel, n) },
+	    className: n.data.executed ? "node-executed" : "",
+    data: { ...n.data,  
+	    label: renderLabel(n.data.rawLabel, n) },
   }));
 
   return (
     <ReactFlowProvider>
-	  <RunButton getText={getDynamicText} />
+	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
         <div style={{ position: "absolute", bottom: 9, right: 9, zIndex: 20 }}>
           <button onClick={addNode} style={{ marginRight: 5 }}>Add Node</button>
