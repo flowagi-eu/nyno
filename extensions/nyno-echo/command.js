@@ -5,5 +5,7 @@ export function nyno_echo(args,context){
 	    context['prev'] = args;
 	}
 	
-	return args[0];
+	if (typeof args[0] === "number") return args[0];
+    if (typeof args[0] === "boolean") return args[0] ? 1 : 0;
+    return 0;
 }
