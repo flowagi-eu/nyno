@@ -154,7 +154,7 @@ export default function FlowPage() {
     pushHistory(newNodes, newEdges);
   };
 
-  const getDynamicText = () => {
+  const getDynamicText = (includeGuiData=false) => {
     const guidataNodes = nodes.map((n) => ({
       id: n.id,
       func: typeof n.data.rawLabel === "string" ? n.data.rawLabel : "node",
@@ -165,39 +165,50 @@ export default function FlowPage() {
     }));
     const guidata = { nodes: guidataNodes, edges };
 
-    const workflow = [];
+    let workflow = [];
     guidata.nodes.forEach((node) => {
       if (!node.info) return;
       try {
         const parsedInfo = YAML.load(node.info);
         let steps = [];
-        if (Array.isArray(parsedInfo)) steps = parsedInfo;
-        else if (parsedInfo && typeof parsedInfo === "object") {
+        if (parsedInfo && typeof parsedInfo === "object") {
           steps = Object.entries(parsedInfo).map(([stepName, stepData]) => ({
-            step: stepName,
+            step: stepData?.step || '',
             args: stepData?.args || [],
+            context: stepData?.context || {},
+            position: node?.position || {},
           }));
         }
         steps.forEach((step) => {
-          workflow.push({ id: parseInt(node.id), step: step.step, args: step.args || [], next: node.next.map((x) => parseInt(x)) });
+          workflow.push({ id: parseInt(node.id), position:step.position, step: step.step, args: step.args,context: step.context || [], next: node.next.map((x) => parseInt(x)) });
         });
       } catch (err) {
         console.warn("Failed to parse node info YAML for node", node.id, err);
       }
     });
 
+    const sortedNodes = [...workflow].sort(
+            (a, b) => a.position.y - b.position.y
+          );
+          workflow = sortedNodes;
+
+
     let firstNodeRoute = null;
     const firstNodeLabel = nodes[0]?.data?.rawLabel || "";
     if (firstNodeLabel.toLowerCase().startsWith("route")) firstNodeRoute = firstNodeLabel.replace(/^route\s*/i, "").trim();
 
-    let yamlStr = YAML.dump({ workflow }, { noRefs: true, flowLevel: -1 });
-    if (firstNodeRoute) yamlStr += `route: ${firstNodeRoute}\n`;
-    yamlStr += `guidata: '${JSON.stringify(guidata)}'\n`;
+
+    const yamlObj = { workflow };
+    if (firstNodeRoute) yamlObj.route = firstNodeRoute;
+    if(includeGuiData)  yamlObj.guidata = JSON.stringify(guidata);
+
+    let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: -1 });
     return yamlStr;
   };
 
   const exportYAML = () => {
-    const yamlStr = getDynamicText();
+    const includeGuiData = true;
+    const yamlStr = getDynamicText(includeGuiData);
 
     const blob = new Blob([yamlStr], { type: "application/x-yaml" });
     const a = document.createElement("a");
@@ -291,7 +302,15 @@ export default function FlowPage() {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onEdgeDoubleClick={onEdgeDoubleClick}
-          onNodeDragStop={(_, node) => { const updatedNodes = nodes.map((n) => n.id === node.id ? { ...n, position: node.position } : n); setNodes(updatedNodes); pushHistory(updatedNodes, edges); }}
+          onNodeDragStop={(_, node) => { 
+            const updatedNodes = nodes.map((n) => n.id === node.id ? { ...n, position: node.position } : n); 
+
+          // Sort nodes by y (descending) to get the highest first
+          const sortedNodes = [...updatedNodes].sort(
+            (a, b) => b.position.y - a.position.y
+          );
+
+            setNodes(sorted_nodes); pushHistory(sorted_nodes, edges); }}
           fitView
         >
           <Background variant="dots" gap={9} size={0.81} />
