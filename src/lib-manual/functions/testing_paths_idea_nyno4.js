@@ -56,9 +56,10 @@ console.log(workflowResult);
 
 
 
-
+const MAX_TOTAL_STEPS = 300;
 
 export async function traverseFullGraph(path, dynamicFunctions) {
+  let total_steps_executed = 0;
   const firstNode = path.firstNode;
   const result = [];
   let one_var = null;
@@ -70,6 +71,13 @@ export async function traverseFullGraph(path, dynamicFunctions) {
    if(loopForceStops && looped) return;
 
    async function visit(node) {
+    total_steps_executed++;
+
+    // early return security infinite loop prevention
+    if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+
+
+    console.log({total_steps_executed,MAX_TOTAL_STEPS})
     // early return if non existing node key id
     if (path[String(node)] === undefined) return; 
 
@@ -91,6 +99,10 @@ export async function traverseFullGraph(path, dynamicFunctions) {
             const nextChild = children[1];
             console.log('next node (from loop):',nextChild);
             await visit(nextChild);
+
+            // early return security infinite loop prevention
+            if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+
         }  
     }
     // Normal step: choose next child according to dynamic functions (default index 0)
@@ -106,6 +118,7 @@ export async function traverseFullGraph(path, dynamicFunctions) {
     path.step_context[node] || {}
   );
 
+      
       const fullResult = await dynamicFunctions[node](step,args,(context || {}));
       const resultCode = fullResult.r;
 
@@ -143,12 +156,19 @@ export async function traverseFullGraph(path, dynamicFunctions) {
         const nextChild = children[nextIndex] ;
         console.log('next node:',nextChild);
         if (nextChild !== undefined) await visit(nextChild);
+
+        // early return security infinite loop prevention
+        if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
       }
     } 
   }
 
   console.log('first node',firstNode,{looped});
   await visit(firstNode,null);
+
+  // early return security infinite loop prevention
+  if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+
 }
 
 await traverseGraph(firstNode,path, dynamicFunctions);

@@ -89,6 +89,7 @@ workflows-enabled/*
 
 
 # Except these workflows
+!workflows-enabled/test.nyno
 !workflows-enabled/test_nyno.nyno 
 !workflows-enabled/test_nyno_runners.nyno
 

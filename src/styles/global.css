@@ -61,8 +61,8 @@ body .react-flow__node-default
 }
 
 
-.rnh_button {   background: black;   color: #01b3f7;   border: 1px solid #0c9af8;   padding: 6px 15px;   border-radius: 9px;   margin: 9px;   font-size: 1.2rem; cursor:pointer;}
-.rnh_popup {   position: fixed;   right: 0;   top: 0;   bottom: 42px;   background: #03060b !important;   width: 333px;   z-index: 9999;   overflow: scroll;   padding-top: 4rem;   padding: 4rem 2rem;   box-sizing: border-box;padding: 5rem 3rem;
+.rnh_button {   background: black;   background: #01b3f7;   border: 1px solid #0c9af8;   padding: 6px 15px;   border-radius: 9px;   margin: 9px;   font-size: 1.2rem; cursor:pointer;}
+.rnh_popup {   position: fixed;   right: 0;   top: 0;   bottom: 0;   background: #03060b !important;   width: 333px;   z-index: 9999;   overflow: scroll;   padding-top: 4rem;   padding: 4rem 2rem;   box-sizing: border-box;padding: 5rem 3rem;
   box-sizing: border-box;
   border-left: 1px solid #03131e;
   background: #020409 !important; }
@@ -71,8 +71,9 @@ body .react-flow__node-default
 
 .rnh_btn_save {
   position: fixed;
-  right: 0;
-  bottom: 40px;
+ 
+  right: 6px;
+  bottom: 9px;
 }
 
 .chat-message {
@@ -89,5 +90,10 @@ margin:0;
 .react-flow__node.node-executed {
   border: 1px solid #01b3f7!important;
   box-shadow: 0 0 5.1px #01b3f7!important;
+}
+
+.react-flow__attribution a {
+
+  display: none;
 }
 

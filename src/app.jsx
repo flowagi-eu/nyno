@@ -126,6 +126,24 @@ export default function FlowPage() {
     }));
     pushHistory(updatedNodes, edges);
   };
+  
+  // --- Normalize workflow: ensure ids + next exist
+const normalizeWorkflow = (workflow) => {
+  return workflow.map((step, index) => {
+    const id = step.id ?? index + 1;
+
+    return {
+      ...step,
+      id,
+      next: Array.isArray(step.next)
+        ? step.next
+        : index < workflow.length - 1
+          ? [workflow[index + 1]?.id ?? index + 2]
+          : [],
+    };
+  });
+};
+
 
   const addNode = () => {
     const id = (nodes.length + 1).toString();
@@ -164,28 +182,40 @@ export default function FlowPage() {
       type: n.type || null,
     }));
     const guidata = { nodes: guidataNodes, edges };
+let workflow = [];
 
-    let workflow = [];
-    guidata.nodes.forEach((node) => {
-      if (!node.info) return;
-      try {
-        const parsedInfo = YAML.load(node.info);
-        let steps = [];
-        if (parsedInfo && typeof parsedInfo === "object") {
-          steps = Object.entries(parsedInfo).map(([stepName, stepData]) => ({
-            step: stepData?.step || '',
-            args: stepData?.args || [],
-            context: stepData?.context || {},
-            position: node?.position || {},
-          }));
-        }
-        steps.forEach((step) => {
-          workflow.push({ id: parseInt(node.id), position:step.position, step: step.step, args: step.args,context: step.context || [], next: node.next.map((x) => parseInt(x)) });
-        });
-      } catch (err) {
-        console.warn("Failed to parse node info YAML for node", node.id, err);
-      }
-    });
+guidata.nodes.forEach((node) => {
+  if (!node.info) return;
+
+  try {
+    const parsedInfo = Object.assign(
+      {},
+      node,
+      Array.isArray(YAML.load(node.info)) ? YAML.load(node.info)[0] : YAML.load(node.info) || {}
+    );
+
+    console.log('parsedInfo',parsedInfo);
+    // Skip nodes without a step
+    //if (!parsedInfo.step) return;
+
+
+    // repeatative gui only fields 
+    delete parsedInfo.info;
+    delete parsedInfo.func
+    delete parsedInfo.type;
+
+    parsedInfo.label = node.func || `node ${node.id}`;
+    parsedInfo.next = Array.isArray(node.next) ? node.next.map((x) => parseInt(x)) : [];
+
+    console.log('pushing to workflow',parsedInfo);
+    workflow.push(parsedInfo);
+
+  } catch (err) {
+    console.warn("Failed to parse node info YAML for node", node.id, err);
+  }
+});
+
+console.log('before sortedNodes workflow',workflow);
 
     const sortedNodes = [...workflow].sort(
             (a, b) => a.position.y - b.position.y
@@ -200,9 +230,8 @@ export default function FlowPage() {
 
     const yamlObj = { workflow };
     if (firstNodeRoute) yamlObj.route = firstNodeRoute;
-    if(includeGuiData)  yamlObj.guidata = JSON.stringify(guidata);
 
-    let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: -1 });
+    let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: 3 });
     return yamlStr;
   };
 
@@ -230,37 +259,70 @@ export default function FlowPage() {
     pushHistory([], []);
   };
 
-  const importYAML = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ const importYAML = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const yamlContent = YAML.load(evt.target.result);
-        if (!yamlContent?.guidata) return alert("Invalid YAML: missing guidata");
-        const guidata = JSON.parse(yamlContent.guidata);
-        if (!guidata.nodes || !guidata.edges) return alert("Invalid guidata format");
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      const yamlContent = YAML.load(evt.target.result);
+      if (!yamlContent?.workflow) return alert("Invalid YAML: missing workflow");
+      
+      yamlContent.workflow = normalizeWorkflow(yamlContent.workflow);
 
-        const importedNodes = guidata.nodes.map((n) => ({
-          id: n.id,
-          position: n.position || { x: 50 * parseInt(n.id), y: 50 * parseInt(n.id) },
-          data: { label: n.func || `node ${n.id}`, rawLabel: n.func || `node ${n.id}`, info: n.info || "", args: n.args || [], emoji: n.emoji || "" },
-          type: n.type || undefined,
-        }));
+      // Minimal spacing
+      const spacingX = 200;
+      const spacingY = 100;
 
-        setNodes(importedNodes);
-        setEdges(guidata.edges);
-        pushHistory(importedNodes, guidata.edges);
-      } catch (err) {
-        console.error(err);
-        alert("Error parsing YAML");
-      } finally {
-        e.target.value = "";
-      }
-    };
-    reader.readAsText(file);
+      const importedNodes = yamlContent.workflow.map((step, index) => ({
+        id: (step.id || index + 1).toString(),
+        position: {
+          x: step.position?.x || spacingX * index,
+          y: step.position?.y || spacingY * index,
+        },
+        data: {
+          label: step.label || `node ${index + 1}`,
+          rawLabel: step.label || `node ${index + 1}`,
+          func: step.label || `node ${index + 1}`,
+          info: YAML.dump([
+  {
+    step: step.step || "",
+    ...(step.args && step.args.length > 0 ? { args: step.args } : {}),
+    ...(step.context && Object.keys(step.context).length > 0 ? { context: step.context } : {}),
+}
+],{ flowLevel: 3 }),
+          emoji: emojis[step.step] || "🌐",
+        },
+        type: step.type || undefined,
+      }));
+
+      // Create edges based on `next` array
+      const importedEdges = [];
+      yamlContent.workflow.forEach((step) => {
+        if (!step.next) return;
+        step.next.forEach((targetId) => {
+          importedEdges.push({
+            id: `e${step.id}-${targetId}`,
+            source: step.id.toString(),
+            target: targetId.toString(),
+          });
+        });
+      });
+
+      setNodes(importedNodes);
+      setEdges(importedEdges);
+      pushHistory(importedNodes, importedEdges);
+    } catch (err) {
+      console.error(err);
+      alert("Error parsing YAML");
+    } finally {
+      e.target.value = "";
+    }
   };
+  reader.readAsText(file);
+};
+
 
   const handleDialogKeyDown = (e) => {
     if (e.key === "Enter" && document.activeElement?.tagName !== "TEXTAREA") {
@@ -287,7 +349,7 @@ export default function FlowPage() {
     <ReactFlowProvider>
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
-        <div style={{ position: "absolute", bottom: 9, right: 9, zIndex: 20 }}>
+        <div style={{ position: "absolute", bottom: 9, right: 300, zIndex: 20 }}>
           <button onClick={addNode} style={{ marginRight: 5 }}>Add Node</button>
           <button onClick={exportYAML} style={{ marginRight: 5 }}>Export File</button>
           <button onClick={clearAll}>Clear All</button>
@@ -310,7 +372,7 @@ export default function FlowPage() {
             (a, b) => b.position.y - a.position.y
           );
 
-            setNodes(sorted_nodes); pushHistory(sorted_nodes, edges); }}
+            setNodes(sortedNodes); pushHistory(sortedNodes, edges); }}
           fitView
         >
           <Background variant="dots" gap={9} size={0.81} />
