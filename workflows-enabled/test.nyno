@@ -1,0 +1,3 @@
+workflow:
+  - step: nyno-echo
+    args: ['test'] 
