@@ -4,7 +4,7 @@ import time
 
 
 class NynoClient:
-    def __init__(self, credentials, host='127.0.0.1', port=6001, timeout=2.0, max_retries=3, retry_delay=0.2):
+    def __init__(self, credentials, host='127.0.0.1', port=9024, timeout=2.0, max_retries=3, retry_delay=0.2):
         self.credentials = credentials
         self.host = host
         self.port = port
