@@ -1,4 +1,4 @@
-![Nyno Workflow Example](/h/b1f210ac4d25e98169a878c7aadba513e681d565109dc7ffcc9e62843379c87f/screenshot-from-2025-12-05-23-08-56.webp)
+![Nyno Workflow Example](/h/4cfe0ca5b3de0e521a80e4717b40d34bfebe937dc364e3d142af6455c17b149e/screenshot-from-2025-12-23-02-23-03.webp)
 
 
 
