@@ -22,24 +22,32 @@ function nyno_if($args, &$context)
 
     $input = strtolower(trim($args[0]));
 
-
+	$left = null;
+	$right = null;
      // Extract numbers (support floats)
+      if (!str_contains($input, 'contains')) { 
     if (!preg_match('/(-?\d+(?:\.\d+)?).+?(-?\d+(?:\.\d+)?)/', $input, $m)) {
         $context['error'] = "Could not extract numbers from input";
         return 1;
     }
-
+    
     $left  = (float)$m[1];
     $right = (float)$m[2];
-     
     $context[$setName.'.left'] = $left;
     $context[$setName.'.right'] = $right;
+     }
+     
+    
 
 
     $result = false;
 
     // Detect condition
-    if (str_contains($input, 'lower than') || str_contains($input, 'less than')) {
+    if (str_contains($input, 'contains')) {
+        $pieces = explode('contains',$input);
+        $result = str_contains($pieces[0],$pieces[1]);
+    }
+    elseif (str_contains($input, 'lower than') || str_contains($input, 'less than')) {
         $result = $left < $right;
 
     } elseif (str_contains($input, 'higher than') || str_contains($input, 'greater than')) {
@@ -56,7 +64,7 @@ function nyno_if($args, &$context)
         return 1;
     }
 
-    $context[$setName] = $result ? 0 :1;
+    $context[$setName] = $result ? 0 : 1;
 
     return $context[$setName];
 }
