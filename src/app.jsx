@@ -3,7 +3,7 @@ import extensions from "@/extension-data.json";
 import { YamlFormToggle } from "@/components/YamlFormToggle";
 import { RunButton } from "@/components/RunButton";
 import { Position } from "reactflow";
-
+import GitHubStarBadge from "@/components/GitHubStarBadge";
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
 
@@ -347,6 +347,7 @@ console.log('before sortedNodes workflow',workflow);
 
   return (
     <ReactFlowProvider>
+      <GitHubStarBadge />
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
         <div style={{ position: "absolute", bottom: 9, right: 300, zIndex: 20 }}>
