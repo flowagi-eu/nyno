@@ -6,7 +6,7 @@ import { Position } from "reactflow";
 import GitHubStarBadge from "@/components/GitHubStarBadge";
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
-
+import nynoWhite from "./assets/nyno-9-white.png";
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   Background,
@@ -347,6 +347,7 @@ console.log('before sortedNodes workflow',workflow);
 
   return (
     <ReactFlowProvider>
+    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 21,margin:'-5px 3px -5px 0px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
       <GitHubStarBadge />
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
