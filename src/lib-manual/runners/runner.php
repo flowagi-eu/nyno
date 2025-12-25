@@ -52,19 +52,31 @@ $VALID_API_KEY = $api_key;
 // Global state with built-in functions
 $STATE = [];
 
-// Preload extensions
-foreach (glob(__DIR__ . "/../../../extensions/*/command.php") as $file) {
-    require_once $file;
-    $folder = dirname($file);
-    $bname = basename($folder);
-    $funcName = strtolower(str_replace("-", "_", $bname));
 
-    if (is_callable($funcName)) {
-        $STATE[$bname] = $funcName;
-    } else {
-        echo "[PHP Runner] Failed to Load extension $bname with name $funcName\n";
+// Preload extensions from multiple possible directories
+$possibleExtDirs = [
+    __DIR__ . "/../../../extensions",           // main dev extensions
+    __DIR__ . "/../../../../nyno-private-extensions",   // private/custom extensions
+];
+
+foreach ($possibleExtDirs as $base) {
+    if (!is_dir($base)) continue;
+
+    foreach (glob($base . "/*/command.php") as $file) {
+        require_once $file;
+        $folder = basename(dirname($file));
+        $funcName = strtolower(str_replace("-", "_", $folder));
+
+        if (is_callable($funcName)) {
+            $STATE[$folder] = $funcName;
+            echo "[PHP Runner] Loaded extension $folder\n";
+        } else {
+            echo "[PHP Runner] Failed to load extension $folder (expected function $funcName)\n";
+        }
     }
 }
+
+
 
 // Handle incoming data (FIXED)
 $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, $VALID_API_KEY) {

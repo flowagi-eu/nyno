@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 // Load Nyno Main Ports/config
 
 function load_nyno_ports(path = "envs/ports.env") {
-  const env = {};
+  const env: any = {};
   const lines = fs.readFileSync(path, "utf-8").split("\n");
 
   for (let line of lines) {
@@ -19,9 +19,9 @@ function load_nyno_ports(path = "envs/ports.env") {
     if (!line || line.startsWith("#")) continue;
     if (line.includes("#")) line = line.split("#")[0].trim();
     if (line.includes("=")) {
-      let [key, value] = line.split("=", 2);
+      let [key, value1] = line.split("=", 2);
       key = key.trim();
-      value = value.trim();
+      let value: any = value1.trim();   // <- force any here
 
       // Remove quotes
       if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
@@ -38,7 +38,11 @@ function load_nyno_ports(path = "envs/ports.env") {
 }
 
 // Example usage
-const portsFile = path.resolve(__dirname, "../../../envs/ports.env");
+
+const repoRoot = process.cwd(); 
+const portsFile = path.join(repoRoot, "envs/ports.env"); 
+
+//const portsFile = path.resolve(__dirname, "../../../envs/ports.env");
 const ports = load_nyno_ports(portsFile);
 //console.log(ports);
 
@@ -53,38 +57,49 @@ globalThis.state = {
 };
 
 async function loadExtensions() {
-  const extBase = path.resolve(__dirname, "../../../extensions");
-  const dirs = fs.readdirSync(extBase, { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => path.join(extBase, d.name));
+  const repoRoot = process.cwd();
 
-	let extensionsLoaded = [];
+  const possibleExtDirs = [
+    path.join(repoRoot, "extensions"),        // dev / uncompiled
+    path.join(repoRoot, "dist-ts","nyno", "extensions"), // compiled TS output
+    path.join(repoRoot, "dist-ts","nyno-private-extensions"), // compiled TS output
+  ];
 
-  for (const dir of dirs) {
-    const cmdFile = path.join(dir, "command.js");
-    if (fs.existsSync(cmdFile)) {
+  let extensionsLoaded: string[] = [];
+
+  for (const extBase of possibleExtDirs) {
+    if (!fs.existsSync(extBase)) continue;
+
+    const dirs = fs.readdirSync(extBase, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => path.join(extBase, d.name));
+
+    for (const dir of dirs) {
+      const cmdFile = path.join(dir, "command.js");
+      if (!fs.existsSync(cmdFile)) continue;
+
       try {
-
         const module = await import(cmdFile);
 
         // derive function name from folder: lowercase, - → _
         const folder = path.basename(dir);
-        const funcName = folder.toLowerCase().replaceAll('-','_');
-        
+        const funcName = folder.toLowerCase().replaceAll("-", "_");
+
         if (module[funcName]) {
-          globalThis.state[folder] = module[funcName]; // directly assign function
-          extensionsLoaded.push(`${funcName}`);
+          globalThis.state[folder] = module[funcName]; // assign function
+          extensionsLoaded.push(funcName);
         } else {
-          console.warn(`[JS Runner] Failed to load extension ${dir} does not export a function called ${funcName}`);
+          console.warn(`[JS Runner] Failed to load extension ${dir} does not export ${funcName}`);
         }
       } catch (err) {
-        console.error("[JS Runner] Failed to load extension", cmdFile, err);
+        console.error(`[JS Runner] Failed to load extension ${cmdFile}`, err);
       }
     }
   }
 
-	//console.log("["+(extensionsLoaded.length)+"] Loaded JS extensions:" + JSON.stringify(extensionsLoaded));
+  console.log(`[JS Runner] Loaded ${extensionsLoaded.length} extensions: ${extensionsLoaded.join(", ")}`);
 }
+
 
 async function startWorker() {
   await loadExtensions();

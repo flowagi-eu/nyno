@@ -61,23 +61,36 @@ STATE = {
 #  Extension Loader (same as before)
 # ===========================================================
 def load_extensions():
-    base = os.path.join(os.path.dirname(__file__), "../../../extensions")
-    for cmd_file in glob.glob(f"{base}/*/command.py"):
-        mod_name = os.path.basename(os.path.dirname(cmd_file))
-        spec = importlib.util.spec_from_file_location(mod_name, cmd_file)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+    possible_ext_dirs = [
+        os.path.join(os.path.dirname(__file__), "../../../extensions"),          # main
+        os.path.join(os.path.dirname(__file__), "../../../../nyno-private-extensions"),  # private
+    ]
+
+    for ext_base in possible_ext_dirs:
+        if not os.path.exists(ext_base):
+            continue
+        for dir_name in os.listdir(ext_base):
+            dir_path = os.path.join(ext_base, dir_name)
+            if not os.path.isdir(dir_path):
+                continue
+            cmd_file = os.path.join(dir_path, "command.py")
+            if not os.path.exists(cmd_file):
+                continue
+            try:
+                spec = importlib.util.spec_from_file_location(dir_name, cmd_file)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                func_name = dir_name.lower().replace("-", "_")
+                if hasattr(module, func_name):
+                    STATE[dir_name] = getattr(module, func_name)
+                    print(f"[Python Runner] Loaded extension {dir_name}")
+                else:
+                    print(f"[Python Runner] Failed to load extension {dir_name}, expected {func_name}")
+            except Exception as e:
+                print(f"[Python Runner] Failed to load {cmd_file}: {e}")
 
 
-
-        func_name = mod_name.lower().replace("-", "_")
-
-
-        if hasattr(module, func_name):
-            STATE[mod_name] = getattr(module, func_name)
-            #print(f"[Python Runner] Loaded extension {mod_name}")
-        else:
-            print(f"[Python Runner] Failed Loaded extension {mod_name} with name {func_name}")
 
 load_extensions()
 

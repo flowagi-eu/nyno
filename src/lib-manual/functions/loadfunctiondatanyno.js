@@ -1,38 +1,48 @@
 import fs from 'fs';
 import path from 'path';
 
-export function loadStepCommandLangs(baseDir) {
+export function loadStepCommandLangs(...baseDirs) {
   const commands = {};
 
-  // Read all directories inside extensions/
-  const dirs = fs.readdirSync(baseDir, { withFileTypes: true })
-                 .filter(d => d.isDirectory())
-                 .map(d => d.name);
+  for (const baseDir of baseDirs) {
+    if (!fs.existsSync(baseDir)) continue;
 
-  for (const dir of dirs) {
-    const fullDir = path.join(baseDir, dir);
+    // Read all directories inside the current baseDir
+    const dirs = fs.readdirSync(baseDir, { withFileTypes: true })
+                   .filter(d => d.isDirectory())
+                   .map(d => d.name);
 
-    // Read files in each directory
-    const files = fs.readdirSync(fullDir);
+    for (const dir of dirs) {
+      const fullDir = path.join(baseDir, dir);
 
-    // Look for a file named command.<ext>
-    const commandFile = files.find(f => f.startsWith('command.'));
-    if (!commandFile) continue;
+      // Read files in each directory
+      const files = fs.readdirSync(fullDir);
 
-    // Extract extension (js, py, php, rb…)
-    const ext = path.extname(commandFile).replace('.', '');
+      // Look for a file named command.<ext>
+      const commandFile = files.find(f => f.startsWith('command.'));
+      if (!commandFile) continue;
 
-    commands[dir] = ext;
+      // Extract extension (js, py, php, rb…)
+      let ext = path.extname(commandFile).replace('.', '');
+
+      // Typescript support: treat TS as JS
+      if (ext === 'ts') ext = 'js';
+
+      commands[dir] = ext;
+    }
   }
 
   return commands;
 }
 
-
 //* ---------------------------
 // Direct Execution Demo
 // ---------------------------
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-    console.log(loadStepCommandLangs('/home/user/github/nyno/extensions'));
+  console.log(loadStepCommandLangs(
+    '/home/user/github/nyno/extensions',
+    '/home/user/github/nyno-private-extensions'
+  ));
 }
 //*/
+

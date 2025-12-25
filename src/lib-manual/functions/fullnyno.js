@@ -41,7 +41,7 @@ const requestFunction = function(data) {
 
 
 import { loadStepCommandLangs } from './loadfunctiondatanyno.js';
-const languageKeyValue = loadStepCommandLangs('/home/user/github/nyno/extensions');
+const languageKeyValue = loadStepCommandLangs(['/home/user/github/nyno/extensions']);
 console.log(languageKeyValue['hello']);
 
 

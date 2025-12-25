@@ -18,6 +18,11 @@ import ReactFlow, {
 import * as Dialog from "@radix-ui/react-dialog";
 import "reactflow/dist/style.css";
 
+export async function getServerSideProps(context) {
+  const pageTitle = "Nyno Workflow"; 
+  return { props: { title: pageTitle } };
+}
+
 export default function FlowPage() {
   const keywordEmojis = { route: "🌐" };
 
@@ -347,7 +352,7 @@ console.log('before sortedNodes workflow',workflow);
 
   return (
     <ReactFlowProvider>
-    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 21,margin:'-5px 3px -5px 0px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
+    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 18,margin:'-5px 3px -3px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
       <GitHubStarBadge />
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>

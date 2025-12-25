@@ -19,8 +19,9 @@ function debugLog(...args) {
 }
 
  
-const languageKeyValue = loadStepCommandLangs('./extensions');
+const languageKeyValue = loadStepCommandLangs('./extensions','./dist-ts/nyno/extensions','./dist-ts/nyno-private-extensions');
 debugLog('languageKeyValue length',Object.keys(languageKeyValue).length);
+debugLog('languageKeyValue',(languageKeyValue));
 /**
  * Run a workflow from a YAML string content.
  */
@@ -76,7 +77,7 @@ export async function runYamlString(text,customContext=null) {
 
  const endTime = Date.now();
   
-  if("NYNO_ONE_VAR" in flattenedObj.context) {
+  if(flattenedObj.context && "NYNO_ONE_VAR" in flattenedObj.context) {
      workflowResult = workflowResult.one_var;
   } else {
      workflowResult = workflowResult.result;
@@ -208,7 +209,7 @@ export async function runWorkflow(workflowData, startNodeId, context = {}) {
   }
 
   debugLog('Workflow finished');
-  if ('NYNO_ONE_VAR' in context) {
+  if (context && 'NYNO_ONE_VAR' in context) {
     return context[context.NYNO_ONE_VAR];
   }
   return { log, context };

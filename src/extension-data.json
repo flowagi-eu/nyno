@@ -3,6 +3,10 @@
     "yaml": "- step: ai-mistral-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n",
     "emoji": "🤖"
   },
+  "ai-mistral-embeddings": {
+    "yaml": "- step: ai-mistral-embeddings\n  args:\n    - '${prev}'\n",
+    "emoji": "🧮"
+  },
   "ai-mistral-text": {
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
     "emoji": "🤖"
@@ -10,6 +14,10 @@
   "ai-openai-classifier": {
     "yaml": "- step: ai-openai-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n\n",
     "emoji": "🤖"
+  },
+  "ai-openai-embeddings": {
+    "yaml": "- step: ai-openai-embeddings\n  args:\n    - '${prev}'\n",
+    "emoji": "🧮"
   },
   "ai-openai-image-edit": {
     "yaml": "- step: ai-openai-image-edit\n  args: \n    - ${IMAGE_FILE_PATH}\n    - ${PROMPT}",
@@ -23,26 +31,6 @@
     "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
-  "em-admin": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "em-core": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "em-frontend": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "em-get-routes": {
-    "yaml": "- step: em-get-routes\n",
-    "emoji": ""
-  },
-  "empowerd-call-api": {
-    "yaml": null,
-    "emoji": ""
-  },
   "hello": {
     "yaml": null,
     "emoji": ""
@@ -52,6 +40,10 @@
     "emoji": ""
   },
   "hello-py": {
+    "yaml": null,
+    "emoji": ""
+  },
+  "hello-ts": {
     "yaml": null,
     "emoji": ""
   },
@@ -187,28 +179,20 @@
     "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄"
   },
+  "nyno-trigger-and-save-file": {
+    "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
+    "emoji": "📄"
+  },
+  "nyno-uuidv4": {
+    "yaml": "- step: nyno-uuidv4\n",
+    "emoji": ""
+  },
+  "nyno-uuidv7": {
+    "yaml": "- step: nyno-uuidv7\n",
+    "emoji": ""
+  },
   "openai-tool-gateway": {
     "yaml": "- step: openai-tool-gateway\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n",
-    "emoji": ""
-  },
-  "pseudo-dsl-to-flat-ast": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-js": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-php": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-python": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "pseudo-flat-ast-to-ruby": {
-    "yaml": null,
     "emoji": ""
   },
   "serper-search": {

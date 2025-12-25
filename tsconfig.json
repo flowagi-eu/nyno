@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "allowJs": true,
+    "checkJs": false,
+
+    "strict": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "outDir": "dist-ts"
+  },
+  "include": ["extensions/**/*.ts","src/**/*", "../nyno-private-extensions/**/*.ts","scripts/*.ts"]
+}
+
