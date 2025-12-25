@@ -126,7 +126,7 @@ export async function traverseFullGraph(path, dynamicFunctions) {
       path.context = fullResult.c;
 
       // remove set_context special value after each
-      if('set_context' in path.context) delete path.context['set_context'];
+      if(path.context && 'set_context' in path.context) delete path.context['set_context'];
 
       let nextIndex = resultCode;
 
@@ -136,7 +136,7 @@ export async function traverseFullGraph(path, dynamicFunctions) {
       const log = {node,input:{args,context}, output:fullResult};
       if(looped) log.looped = true;
 
-      if("NYNO_ONE_VAR" in path.context) {
+      if(path.context && "NYNO_ONE_VAR" in path.context) {
         if(path.context["NYNO_ONE_VAR"] in path.context ) {
           one_var = path.context[path.context["NYNO_ONE_VAR"]];
         }

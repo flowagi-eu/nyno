@@ -45,30 +45,34 @@ VALID_API_KEY = ports["SECRET"] || "changeme"
 ############################################################
 
 def load_extensions
-  extensions_dir = File.expand_path("../../../extensions", __dir__)
-  return unless Dir.exist?(extensions_dir)
+  possible_dirs = [
+    File.expand_path("../../../extensions", __dir__),
+    File.expand_path("../../../../nyno-private-extensions", __dir__)
+  ]
 
-  Dir.each_child(extensions_dir) do |dir|
-    next unless Dir.exist?(File.join(extensions_dir, dir))
+  possible_dirs.each do |ext_base|
+    next unless Dir.exist?(ext_base)
 
-    cmd_file = File.join(extensions_dir, dir, "command.rb")
-    next unless File.exist?(cmd_file)
+    Dir.each_child(ext_base) do |folder|
+      dir_path = File.join(ext_base, folder)
+      next unless Dir.exist?(dir_path)
 
-    begin
-      # in load_extensions
-      require_relative cmd_file
+      cmd_file = File.join(dir_path, "command.rb")
+      next unless File.exist?(cmd_file)
 
-      folder = File.basename(dir)
-      func_name = folder.downcase.gsub("-", "_")
-      #if Object.private_methods.include?(func_name.to_sym)
-      #  puts "[Ruby Runner] Loaded extension #{func_name}"
-      #end
-
-    rescue => e
-      puts "[Ruby Runner] Failed to load #{cmd_file}: #{e.message}"
+      begin
+        require_relative cmd_file
+        func_name = folder.downcase.gsub("-", "_")
+        # optionally: verify method exists
+        puts "[Ruby Runner] Loaded extension #{func_name}"
+      rescue => e
+        puts "[Ruby Runner] Failed to load #{cmd_file}: #{e.message}"
+      end
     end
   end
 end
+
+
 
 ############################################################
 # Handle client request

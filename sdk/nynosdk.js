@@ -9,7 +9,11 @@ let nynoClient;
 export async function runWorkflow(path,data={}){
 	if(!nynoClient){
 		// todo load envs
-		nynoClient = await NynoClient.create("change_me");
+		const envVars = App.loadEnvVars('envs/ports.env');
+		console.log({envVars});
+		nynoClient = await NynoClient.create(envVars.SECRET ?? 'change_me');
+	} else {
+	   console.log('already if');
 	}
 
 	return nynoClient.runWorkflow(path,data);

@@ -28,5 +28,8 @@ check_port "$JS"
 check_port "$PE"
 check_port "$RB"
 
+# Typescript support
+npm run build:node
+
 bestjsserver --prod --tcp "$WF" --port "$GU" --host "$HOST"
 

@@ -1,6 +1,7 @@
 .ascend
 node_modules
 dist
+dist-ts
 bun.lock
 src/tcp/routes
 output
