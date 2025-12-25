@@ -1,6 +1,6 @@
 ![Nyno Workflow Example](/h/4cfe0ca5b3de0e521a80e4717b40d34bfebe937dc364e3d142af6455c17b149e/screenshot-from-2025-12-23-02-23-03.webp)
 
-> Founder Note: "Contrary to n8n, you and your clients will never have to ask us for a commercial license to run your workflows. This is the main reason why I started building Nyno." - MJ
+> Founder Note: "Unlike with n8n, you and your clients never have to request a commercial license to run Nyno workflows. This was the main reason I started building Nyno." – MJ
 
 ---
 
