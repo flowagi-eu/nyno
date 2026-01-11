@@ -43,10 +43,13 @@ Evaluate the input and estimate **how strongly it matches the above criterion**.
 
 #### **Output**
 
-* Return **only** a single JSON object:
+* Return **only** a single float number:
 
-```json
-{ "score": <number> }
+<number>
+
+* Don't return any markup
+```md
+<number>
 ```
 
 #### **Score Definition**
@@ -75,7 +78,7 @@ PROMPT;
 
     // Mistral API setup
     $endpoint = "https://api.mistral.ai/v1/chat/completions";
-    $model = "mistral-medium-latest";
+    $model = "mistral-large-latest";
 
     $messages = [
         ["role" => "system", "content" => $systemPrompt]
@@ -123,15 +126,14 @@ PROMPT;
     if (is_array($decoded)) {
         $content = $decoded['choices'][0]['message']['content'] ?? '';
 
-        if (is_string($content)) {
-            $json = json_decode(trim($content), true);
+        if (1) {
+            $score = $content;
 
             if (
-                is_array($json) &&
-                array_key_exists('score', $json) &&
-                is_numeric($json['score'])
+                
+                is_numeric($score)
             ) {
-                $score = (float)$json['score'];
+                $score = (float)$score;
             }
         }
     }

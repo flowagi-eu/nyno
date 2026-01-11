@@ -7,7 +7,6 @@
     "nyno": "./cli/cli.js"
   },
   "scripts": {
-	
     "build:node": "node scripts/init-private-folder.js && tsc && node dist-ts/nyno/scripts/copy-private-extensions.js",
     "dev": "node server-dev.js",
     "build:client": "vite build --outDir dist/client",
@@ -18,6 +17,7 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
     "@types/node": "^25.0.3",
+    "@vultr/vultr-node": "^2.8.0",
     "express": "^5.1.0",
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
@@ -27,6 +27,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "reactflow": "^11.11.4",
+    "ssh2": "^1.17.0",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"
   },

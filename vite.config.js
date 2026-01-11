@@ -6,15 +6,19 @@ import path from 'path';
 const isProd = process.env.RUN_PROD === '1';
 
 export default defineConfig({
-  server: (!isProd)
-      ?  { watch: {
-    ignored: ['**/node_modules/**', '**/dist/**','**/.venv/**','**/.git/**','**/extensions/**']
-  }} : { watch: {} },
+	server: {
+		watch: {
+    usePolling: true,
+    interval: 10000,
+  },
+    hmr: false,     // disables hot module reload
+  },
   plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-	           '@app': fileURLToPath(new URL('./src/App.js', import.meta.url)),
+      '@app': fileURLToPath(new URL('./src/App.js', import.meta.url)),
     },
   },
 });
+

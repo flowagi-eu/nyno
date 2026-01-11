@@ -1,4 +1,0 @@
-- step: nyno-json-sql
-  args:
-    - ${JSON_FILE}
-    - ${JSON_SQL}

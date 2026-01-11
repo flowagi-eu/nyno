@@ -7,6 +7,10 @@
     "yaml": "- step: ai-mistral-embeddings\n  args:\n    - '${prev}'\n",
     "emoji": "🧮"
   },
+  "ai-mistral-image-gen": {
+    "yaml": "- step: ai-mistral-image-gen\n  args: \n    - ${PROMPT}\n",
+    "emoji": "🤖"
+  },
   "ai-mistral-text": {
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
     "emoji": "🤖"
@@ -31,22 +35,6 @@
     "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖"
   },
-  "hello": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "hello-php": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "hello-py": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "hello-ts": {
-    "yaml": null,
-    "emoji": ""
-  },
   "nyno-accumulator": {
     "yaml": null,
     "emoji": ""
@@ -54,10 +42,6 @@
   "nyno-array-to-item": {
     "yaml": "- step: nyno-array-to-item\n  args:\n    - ${prev}\n\n",
     "emoji": "🧼"
-  },
-  "nyno-bag-of-words": {
-    "yaml": "- step: nyno-bag-of-words\n  args:\n    - ${PROMPT}\n    - \n      - [\"revenue\", \"profit\"]\n      - [\"cost\", \"investment\"]\n\n",
-    "emoji": ""
   },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
@@ -87,14 +71,6 @@
     "yaml": "- step: nyno-filter-duplicates\n  args:\n    - ${OBJECTS}\n",
     "emoji": "🧼"
   },
-  "nyno-glob-v": {
-    "yaml": null,
-    "emoji": ""
-  },
-  "nyno-guardrails": {
-    "yaml": "- step: nyno-guardrails\n  args:\n    - [\"PROMPT\"] # keys to check/override\n",
-    "emoji": "🛡️"
-  },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
     "emoji": "🌐"
@@ -107,16 +83,16 @@
     "yaml": "- step: nyno-if\n  args:\n    - \"${prev} is lower than 0.5\"\n",
     "emoji": "🔀"
   },
-  "nyno-json-sql": {
-    "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
-    "emoji": "🛢️"
+  "nyno-image-paths-to-html": {
+    "yaml": "- step: nyno-image-paths-to-html\n  args:\n    - \"${prev}\"\n",
+    "emoji": ""
   },
   "nyno-list-count": {
     "yaml": null,
     "emoji": ""
   },
   "nyno-log": {
-    "yaml": "- step: nyno-log:\n  args:\n    - \"${JSON}\"\n",
+    "yaml": "- step: nyno-log\n  args:\n    - \"${JSON}\"\n",
     "emoji": "📝"
   },
   "nyno-markdown-to-data": {
@@ -127,29 +103,9 @@
     "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
     "emoji": "📄"
   },
-  "nyno-markdown-to-html-and-frontmatter": {
-    "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
+  "nyno-sftp-command": {
+    "yaml": null,
     "emoji": ""
-  },
-  "nyno-notify": {
-    "yaml": "- step: nyno-notify\n  args:\n    - \"Title Notification\"\n    - \"Sub title\"",
-    "emoji": "📄"
-  },
-  "nyno-push-update": {
-    "yaml": "- step: nyno-push-update\n  args:\n    - ${USERNAME}\n    - ${COMMIT_MSG}\n    - ${REPO_DIR}\n",
-    "emoji": "💻"
-  },
-  "nyno-scrape": {
-    "yaml": "- step: nyno-scrape:\n  args:\n    - \"${LOOP_URL_STRUCTURE}\" # ex http://localhost/blog/page/:index\n    - \"${QUERY_SELECTOR}\" # ex \".post_link a\"\n    - \"${START_PAGE}\" # ex 1\n    - \"${END_PAGE}\" # ex 10",
-    "emoji": "🌐"
-  },
-  "nyno-search-files": {
-    "yaml": "- step: nyno-search-files\n  args:\n    - [\".path/dir1/*.command\", \".path/dir1/template.yml\"]\n    - 'object' # remove to output text\n",
-    "emoji": "🔎"
-  },
-  "nyno-search-grep": {
-    "yaml": "- step: nyno-search-grep\n  args:\n    - ${SEARCH}\n    - ${DIR}\n\n",
-    "emoji": "🔎"
   },
   "nyno-sort-kv": {
     "yaml": null,
@@ -163,9 +119,21 @@
     "yaml": "- step: nyno-sql-insert\n  args:\n    - ${JSON}\n",
     "emoji": "🛢️"
   },
+  "nyno-sql-insert-embedding": {
+    "yaml": "- step: nyno-sql-insert-embedding\n  args:\n    - ${prev} # the vector generated from ai embedding node\n    - {\"optional\":\"meta\"}\n",
+    "emoji": ""
+  },
   "nyno-sql-read": {
     "yaml": "- step: nyno-sql-read\n  args:\n    - keys: [\"maps\"]\n      limit: 10\n\n",
     "emoji": "🛢️"
+  },
+  "nyno-sql-search-embedding": {
+    "yaml": "- step: nyno-sql-search-embedding\n  args:\n    - ${prev} # the vector generated from USER PROMPT using ai embeddings\n",
+    "emoji": ""
+  },
+  "nyno-ssh-command": {
+    "yaml": null,
+    "emoji": ""
   },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
@@ -185,18 +153,14 @@
   },
   "nyno-uuidv4": {
     "yaml": "- step: nyno-uuidv4\n",
-    "emoji": ""
+    "emoji": "🎲"
   },
   "nyno-uuidv7": {
     "yaml": "- step: nyno-uuidv7\n",
-    "emoji": ""
-  },
-  "openai-tool-gateway": {
-    "yaml": "- step: openai-tool-gateway\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n",
-    "emoji": ""
+    "emoji": "🎲"
   },
   "serper-search": {
-    "yaml": "- step: serper-search:\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",
+    "yaml": "- step: serper-search\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",
     "emoji": "🔗"
   }
 }

@@ -45,6 +45,8 @@ echo "✅ Database and user privileges configured."
 # === MIGRATION ===
 echo "Applying schema migration..."
 sudo -u $PG_SUPERUSER psql -d "$DB_NAME" <<EOSQL
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- Persistent logs table (JSONB)
 CREATE TABLE IF NOT EXISTS persistent_logs (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -58,6 +60,20 @@ CREATE UNLOGGED TABLE IF NOT EXISTS queue_logs (
     line JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE embeddings (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    embedding VECTOR(1024) NOT NULL,
+    meta JSONB
+);
+
+-- Low-RAM, medium-scale IVFFlat index
+CREATE INDEX embeddings_ivfflat_idx
+ON embeddings
+USING ivfflat (embedding vector_ip_ops)
+WITH (lists = 1024);  -- 1024 clusters → tiny RAM (~4 MB for centroids)
+
+
 
 -- Flush function
 CREATE OR REPLACE FUNCTION flush_queue()

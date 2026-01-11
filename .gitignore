@@ -13,79 +13,11 @@ private-extensions
 uv.lock
 pyproject.toml
 extensions-untested
-extensions
 
 # Ignore everything in the extensions/ directory
 # tmp commented extensions/*
 envs/*
 workflows-enabled/*
-
-# Except these extensions
-!extensions/ai-mistral-classifier/
-!extensions/ai-mistral-classifier/**
-!extensions/ai-openai-classifier/
-!extensions/ai-openai-classifier/**
-!extensions/nyno-if/
-!extensions/nyno-if/**
-!extensions/nyno-markdown-to-html/
-!extensions/nyno-markdown-to-html/**
-!extensions/ai-mistral-text/
-!extensions/ai-mistral-text/**
-!extensions/nyno-log/
-!extensions/nyno-log/**
-!extensions/nyno-echo/
-!extensions/nyno-echo/**
-!extensions/hello/
-!extensions/hello/**
-!extensions/hello-py/
-!extensions/hello-py/**
-!extensions/hello-php/
-!extensions/hello-php/**
-!extensions/hello-js/
-!extensions/hello-js/**
-
-
-# Include specific folders inside extensions
-!extensions/ai-openai-image-edit/
-!extensions/ai-openai-image-gen/
-!extensions/ai-openai-text/
-!extensions/hello/
-!extensions/hello-php/
-!extensions/hello-py/
-!extensions/hello-rb/
-!extensions/nyno-echo/
-!extensions/nyno-extract-file-paths/
-!extensions/nyno-extract-hrefs/
-!extensions/nyno-http-get/
-!extensions/nyno-http-post/
-!extensions/nyno-log/
-!extensions/nyno-read-file/
-!extensions/nyno-scrape/
-!extensions/nyno-sql/
-!extensions/nyno-transform/
-!extensions/nyno-transform-flatten/
-!extensions/nyno-write-file/
-!extensions/serper-search/
-!extensions/ai-openai-image-edit/**
-!extensions/ai-openai-image-gen/**
-!extensions/ai-openai-text/**
-!extensions/hello/**
-!extensions/hello-php/**
-!extensions/hello-py/**
-!extensions/hello-rb/**
-!extensions/nyno-echo/**
-!extensions/nyno-extract-file-paths/**
-!extensions/nyno-extract-hrefs/**
-!extensions/nyno-http-get/**
-!extensions/nyno-http-post/**
-!extensions/nyno-log/**
-!extensions/nyno-read-file/**
-!extensions/nyno-scrape/**
-!extensions/nyno-sql/**
-!extensions/nyno-transform/**
-!extensions/nyno-transform-flatten/**
-!extensions/nyno-write-file/**
-!extensions/serper-search/**
 
 
 

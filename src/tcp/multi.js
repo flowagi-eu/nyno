@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { runYamlString } from './../lib-manual/runYamlString.js';
 
+import { runWorkflowFn } from './../../sdk/nynosdk.js';
 
 function debugLog(...args) {
   if (process.env.NODE_ENV !== 'production') console.log('[DEBUG]', ...args);
@@ -24,7 +25,7 @@ export default function register(router) {
  
 	 console.log('got data',data);
     const startTime = Date.now();
-    const result = await runYamlString(yamlContent);
+    const result = await runYamlString(yamlContent,context);
 	 console.log('got result',result);
 	 console.log('got data 2',data);
     const endTime = Date.now();
@@ -60,9 +61,19 @@ export default function register(router) {
       router.on(routePath, async (socket, data) => {
         if (!socket.authenticated) return { error: 'Not authenticated' };
         const context = { ...data };
+        const path = context.path;
         delete context['path'];
+        
+        if(context && "NYNO_ASYNC" in context){
+            context['WORKFLOW_NAME'] = path.replace(/^\/+/, ""); // removes all leading slashes
+            context['NYNO_EXTRA_VAR_CONTEXT'] = 1;
+            // /home/user/github/nyno/drivers/nynoclient.js
+            
+            return await runWorkflowFn('mode/async',context);
+        } 
 
         const result = await runYamlString(workflowTextData,context); //  runWorkflow(workflowData, null, context);
+        //mode/async
 
         return result;
       }, systemName);

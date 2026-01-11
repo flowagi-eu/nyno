@@ -3,7 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
-import { runFunction,runFunctionSingle } from './runners.js';
+import { runFunctionSingle } from './runners.js';
 import { runYamlToolParser }  from './runYamlToolParser.js';
 import {loadNynoWorkflowFromText} from './functions/yaml-to-object-for-nyno1.js';
 import { flattenWorkflow } from './functions/nyno-flatten-function.js';
@@ -19,19 +19,35 @@ function debugLog(...args) {
 }
 
  
-const languageKeyValue = loadStepCommandLangs('./extensions','./dist-ts/nyno/extensions','./dist-ts/nyno-private-extensions');
+const languageKeyValue = loadStepCommandLangs('../nyno-private-extensions','./extensions','./dist-ts/nyno/extensions','./dist-ts/nyno-private-extensions');
 debugLog('languageKeyValue length',Object.keys(languageKeyValue).length);
 debugLog('languageKeyValue',(languageKeyValue));
 /**
  * Run a workflow from a YAML string content.
  */
 export async function runYamlString(text,customContext=null) {
+  
+
+
   // 1) text to object
   let obj = loadNynoWorkflowFromText(text);
   if(customContext) obj.context = customContext;
+  debugLog('obj.context',obj.context);
+  
+  // Extra var CONTEXT (rarely used: copy the workflow global context as variable to be used in steps)
+  if(obj.context && "NYNO_EXTRA_VAR_CONTEXT" in obj.context && obj.context.NYNO_EXTRA_VAR_CONTEXT){
+    obj.context.CONTEXT = JSON.parse(JSON.stringify(obj.context));
+    
+    // except special vars that might need to be set manually
+        delete obj.context.CONTEXT['NYNO_ASYNC'];
+    delete obj.context.CONTEXT['NYNO_ONE_VAR'];
+    delete obj.context.CONTEXT['NYNO_EXTRA_VAR_CONTEXT'];
+    
+  }
   
   // 2) object to flattened object
   let flattenedObj = flattenWorkflow(obj);
+  debugLog('flattenedObj',flattenedObj);
   const originalKeys = getOriginalKeys(obj);
 
   // 3) execute flatten object
@@ -89,6 +105,7 @@ export async function runYamlString(text,customContext=null) {
 /**
  * Run a single NYNO/YAML node
  */
+/*
 export async function runYamlTool(node, globalContext = {},options={}) {
 
   let parsed = runYamlToolParser(node,globalContext,options);
@@ -131,6 +148,8 @@ export async function runYamlTool(node, globalContext = {},options={}) {
     });
   });
 }
+*/
+
 
 /**
  * Run a NYNO workflow
@@ -213,85 +232,4 @@ export async function runWorkflow(workflowData, startNodeId, context = {}) {
     return context[context.NYNO_ONE_VAR];
   }
   return { log, context };
-}
-
-/**
- * Multi-tenant NYNO route registration
- */
-export default function register(router) {
-
-
-  router.on('/run-nyno', async (socket, data) => {
-    if (!socket.authenticated) return { error: 'Not authenticated' };
-
-    const { yamlContent,context={} } = data;
-    if (!yamlContent) return { error: 'No YAML content provided' };
-
- 
-	 console.log('got data',data);
-    const startTime = Date.now();
-    const result = await runYamlString(yamlContent);
-	 console.log('got result',result);
-	 console.log('got data 2',data);
-    const endTime = Date.now();
-
-		return result;
-
-
-    return {
-      route: '/run-nyno',
-      status: result.error ? 'error' : 'ok',
-      execution_time_seconds: (endTime - startTime) / 1000,
-      execution: result.log ?? [],
-      context: result.context ?? {},
-      error: result.error,
-      errorMessage: result.message,
-    };
-  });
-
-
-  // load dynamic routes
-  const routesDir = path.join(__dirname, '../../workflows-enabled');
-
-  const loadWorkflowsFromDir = (systemPath, systemName) => {
-    const workflows = {};
-    for (const file of fs.readdirSync(systemPath)) {
-      if (!file.endsWith('.nyno')) continue;
-
-      const workflowData = yaml.load(fs.readFileSync(path.join(systemPath, file), 'utf-8'));
-      workflows[file] = workflowData;
-
-      const routePath = workflowData.route || '/' + path.basename(file, '.nyno');
-      router.on(routePath, async (socket, data) => {
-        if (!socket.authenticated) return { error: 'Not authenticated' };
-        const context = { ...data };
-        delete context['path'];
-        if (systemName) socket.system = systemName;
-
-        const startTime = Date.now();
-        const result = await runWorkflow(workflowData, null, context);
-        const endTime = Date.now();
-
-        return {
-          route: routePath,
-          system: systemName || socket.system || 'default',
-          status: 'ok',
-          execution_time_seconds: (endTime - startTime) / 1000,
-          execution: result.log,
-          context: result.context,
-        };
-      }, systemName);
-    }
-    return workflows;
-  };
-
-  // Load tenant workflows
-  for (const system of fs.readdirSync(routesDir)) {
-    const systemPath = path.join(routesDir, system);
-    if (!fs.statSync(systemPath).isDirectory()) continue;
-    loadWorkflowsFromDir(systemPath, system);
-  }
-
-  // Load default workflows
-  loadWorkflowsFromDir(routesDir, 'default');
 }

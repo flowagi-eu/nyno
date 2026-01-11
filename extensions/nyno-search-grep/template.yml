@@ -1,5 +1,0 @@
-- step: nyno-search-grep
-  args:
-    - ${SEARCH}
-    - ${DIR}
-

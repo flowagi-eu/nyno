@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-
+import crypto from "crypto";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -101,7 +101,7 @@ const RUNNERS_DISABLED = {};
 
 const API_KEY = ports['SECRET'] ?? 'changeme';
 const connections = {};
-const pending = { rb:[],php: [], js: [], py: [], bash:[] };
+const pending = {};
 
 // --- Spawn a single runner ---
 function startRunner(type) {
@@ -153,7 +153,11 @@ function connectRunner(type) {
       buffer = buffer.slice(idx + 1);
       if (!msg) continue;
 
-      const resolver = pending[type].shift();
+      const resolvedData = JSON.parse(msg); // .c & .r in object, needs c.n_id for parralel
+
+      if(resolvedData && resolvedData.c) { 
+      const n_id = resolvedData['c']['n_id'];
+      const resolver = pending[n_id];
       if (resolver) {
         try {
           resolver(JSON.parse(msg));
@@ -161,7 +165,10 @@ function connectRunner(type) {
           console.error(`[RUNEXT] JSON parse error from ${type}:`, e, msg);
           resolver(null);
         }
-      } else {
+      } 
+
+      }
+	    else {
         console.warn(`[RUNEXT] No pending resolver for message from ${type}: ${msg}`);
       }
     }
@@ -183,8 +190,24 @@ function connectAllRunners() {
   }
 }
 
+// ---------------------------
+// UUIDv7 generator
+// ---------------------------
+function generateUUIDv7() {
+  const timestamp = BigInt(Date.now());
+  const rand = crypto.randomBytes(10); // 80 bits
+  const tsHex = timestamp.toString(16).padStart(12, "0"); // 48 bits
+  const randHex = rand.toString("hex"); // 80 bits
+  return tsHex + randHex;
+}
+
 // --- Run function on a single runner ---
 export function runFunctionSingle(language, functionName, args = [],context={}) {
+
+console.log('runFunctionSingle',language, functionName, args,context);
+
+let n_id = generateUUIDv7(); // nyno task id for parallel support
+context['n_id'] = n_id;
 	console.log('language',language);
   const client = connections[language];
   if (!client || client.destroyed) throw new Error(`${language} runner not connected`);
@@ -192,29 +215,14 @@ export function runFunctionSingle(language, functionName, args = [],context={}) 
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error(`runFunction timeout for ${language}:${functionName}`)), 9999999);
 
-    pending[language].push((msg) => {
+    pending[n_id] = (msg) => {
       clearTimeout(timeout);
       if (!msg) return reject(new Error("No response from runner"));
       resolve(msg);
-    });
+    };
 
     client.write('r'+JSON.stringify({functionName,args,context}) + '\n');
   });
-}
-
-// --- Run function across all runners, first success ---
-export async function runFunction(functionName, args = [],context={}) {
-  for (const type of Object.keys(RUNNERS)) {
-    try {
-      const result = await runFunctionSingle(type, functionName, args,context);
-      if (result.fnError === "not exist") continue;
-      return result;
-    } catch (err) {
-      console.warn(`[RUNEXT] Error contacting ${type}:`, err.message);
-    }
-  }
-
-  return {"fnError":`Function "${functionName}" not found on any runner`};
 }
 
 export async function initRunners() {

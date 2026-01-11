@@ -123,7 +123,8 @@ def handle_client(socket, valid_api_key)
         end
 
         unless fn
-          socket.write({ fnError: "not exist" }.to_json + "\n")
+          context = payload["context"] || {}
+          socket.write({ fnError: "not exist" , c: context}.to_json + "\n")
           next
         end
 

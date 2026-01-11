@@ -1,8 +1,9 @@
 export function nyno_echo(args,context){
+    let setName = context['set_context'] ?? 'prev';
     if(args.length == 1) {
-	    context['prev'] = args[0];
+	    context[setName] = args[0];
 	} else {
-	    context['prev'] = args;
+	    context[setName] = args;
 	}
 	
 	if (typeof args[0] === "number") return args[0];

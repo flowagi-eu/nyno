@@ -1,0 +1,7 @@
+- step: ai-mistral-text
+  args:
+    - ${PROMPT}
+    - "minimal"
+  context:
+    SYSTEM_PROMPT: ""
+

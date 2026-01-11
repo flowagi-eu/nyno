@@ -4,9 +4,11 @@ import { YamlFormToggle } from "@/components/YamlFormToggle";
 import { RunButton } from "@/components/RunButton";
 import { Position } from "reactflow";
 import GitHubStarBadge from "@/components/GitHubStarBadge";
+import { TemplateSelect } from "@/components/TemplateSelect";
+
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
-import nynoWhite from "./assets/nyno-9-white.png";
+import nynoWhite from "./assets/nyno-coin.png";
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   Background,
@@ -32,9 +34,20 @@ export default function FlowPage() {
 
   const initialEdges = [];
 
+
+  const [selectedNode, setSelectedNode] = useState(null);
+	const [selectedTemplate, setSelectedTemplate] = useState("");
+
+	useEffect(() => {
+  if (!selectedNode) return;
+
+  // Optional: infer template from node info
+  setSelectedTemplate("");
+}, [selectedNode]);
+
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   // --- Templates for textarea
@@ -150,8 +163,10 @@ const normalizeWorkflow = (workflow) => {
 };
 
 
+const [nodeCounter, setNodeCounter] = useState(1);
   const addNode = () => {
-    const id = (nodes.length + 1).toString();
+  const id = nodeCounter.toString();
+
     const newNode = {
       id,
       position: { x: 50 * nodes.length, y: 50 * nodes.length },
@@ -164,6 +179,7 @@ const normalizeWorkflow = (workflow) => {
     const newNodes = [...nodes, newNode];
     setNodes(newNodes);
     pushHistory(newNodes, edges);
+    setNodeCounter((c) => c + 1);
   };
 
   const removeNode = () => {
@@ -233,7 +249,8 @@ console.log('before sortedNodes workflow',workflow);
     if (firstNodeLabel.toLowerCase().startsWith("route")) firstNodeRoute = firstNodeLabel.replace(/^route\s*/i, "").trim();
 
 
-    const yamlObj = { workflow };
+
+    const yamlObj = { nyno: "5.1.0", workflow };
     if (firstNodeRoute) yamlObj.route = firstNodeRoute;
 
     let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: 3 });
@@ -246,7 +263,14 @@ console.log('before sortedNodes workflow',workflow);
 
     const blob = new Blob([yamlStr], { type: "application/x-yaml" });
     const a = document.createElement("a");
-    let obj = YAML.load(yamlStr);
+    let parsed = YAML.load(yamlStr);
+    
+    const obj = {
+  nyno: "5.1.0",
+  ...parsed
+};
+
+
     let firstNodeRoute = obj.route;
 
     let firstNodeCleanTitle = firstNodeRoute ? firstNodeRoute.replace(/[\/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_") : "flow";
@@ -272,7 +296,11 @@ console.log('before sortedNodes workflow',workflow);
   reader.onload = (evt) => {
     try {
       const yamlContent = YAML.load(evt.target.result);
+      
+
+
       if (!yamlContent?.workflow) return alert("Invalid YAML: missing workflow");
+      
       
       yamlContent.workflow = normalizeWorkflow(yamlContent.workflow);
 
@@ -318,6 +346,12 @@ console.log('before sortedNodes workflow',workflow);
       setNodes(importedNodes);
       setEdges(importedEdges);
       pushHistory(importedNodes, importedEdges);
+      
+      
+// Update nodeCounter to avoid duplicates
+const maxId = Math.max(...importedNodes.map(n => parseInt(n.id)));
+setNodeCounter(maxId + 1);
+
     } catch (err) {
       console.error(err);
       alert("Error parsing YAML");
@@ -330,11 +364,16 @@ console.log('before sortedNodes workflow',workflow);
 
 
   const handleDialogKeyDown = (e) => {
-    if (e.key === "Enter" && document.activeElement?.tagName !== "TEXTAREA") {
-      e.preventDefault();
-      setIsOpen(false);
-    }
-  };
+  if (e.key !== "Enter") return;
+
+  const active = document.activeElement;
+
+  // Only close when pressing Enter on the node title input
+  if (active?.classList?.contains("nodeTitle")) {
+    e.preventDefault();
+    setIsOpen(false);
+  }
+};
 
   const renderLabel = (rawLabel, node) => (
     <div style={{ textAlign: "center" }}>
@@ -352,7 +391,7 @@ console.log('before sortedNodes workflow',workflow);
 
   return (
     <ReactFlowProvider>
-    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 18,margin:'-5px 3px -3px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
+    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 24,margin:'0px 0px -6px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
       <GitHubStarBadge />
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
@@ -396,26 +435,36 @@ console.log('before sortedNodes workflow',workflow);
               {selectedNode && (
                 <>
                   <div style={{ marginTop: "1rem" }}>
-                    <input type="text" value={selectedNode.data.rawLabel} onChange={(e) => handleFieldChange("label", e.target.value)}
+                    <input className="nodeTitle" type="text" value={selectedNode.data.rawLabel} onChange={(e) => handleFieldChange("label", e.target.value)}
                       style={{ width: "100%", marginBottom: "0.5rem", fontSize: "24px", background: "none", color: "white", border: "none" }} />
-                    <label>Template</label>
-                    <select
-                      onChange={(e) => {
-                        const templateYaml = templates[e.target.value] || "";
-                        const templateEmoji = emojis[e.target.value] || "";
+		      <TemplateSelect
+  templates={templates}
+  emojis={emojis}
+  value={selectedTemplate}
+  onSelect={(templateKey) => {
+    setSelectedTemplate(templateKey);
 
-                        handleFieldChange("info", templateYaml);
+    const templateYaml = templates[templateKey] || "";
+    const templateEmoji = emojis[templateKey] || "";
 
-                        setNodes((nds) =>
-                          nds.map((n) => n.id !== selectedNode.id ? n : { ...n, data: { ...n.data, emoji: templateEmoji } })
-                        );
-                      }}
-                      style={{ background: "black", color: "white", border: "none", width: "100%", marginBottom: "0.5rem", padding: "9px", fontSize: "1rem" }}
-                    >
-                      {Object.keys(templates).map((t) => (
-                        <option key={t} value={t}>{emojis[t] || ""} {t || "None"}</option>
-                      ))}
-                    </select>
+    handleFieldChange("info", templateYaml);
+
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id !== selectedNode.id
+          ? n
+          : {
+              ...n,
+              data: {
+                ...n.data,
+                emoji: templateEmoji,
+              },
+            }
+      )
+    );
+  }}
+/>
+
 
                     <YamlFormToggle value={selectedNode.data.info} onChange={(val) => handleFieldChange("info", val)} />
                   </div>
