@@ -12,13 +12,12 @@ RUN apt-get update && \
  autoconf bison \
     libssl-dev libyaml-dev libreadline-dev zlib1g-dev libffi-dev \
     libgdbm-dev libncurses5-dev libgmp-dev \
-
         && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- PostgreSQL repo and 18 install ---
 RUN yes "" | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh && \
     apt-get update && \
-    apt-get install -y postgresql-18 postgresql-client-18 && \
+    apt-get install -y postgresql-18 postgresql-client-18 postgresql-server-dev-18 postgresql-18-pgvector && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- Node.js + npm ---

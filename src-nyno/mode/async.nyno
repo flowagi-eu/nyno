@@ -1,0 +1,8 @@
+context:
+  NYNO_ONE_VAR:"prev"
+workflow:
+  - step: nyno-uuidv4
+  - step: nyno-trigger-and-save-file
+    args: ["${WORKFLOW_NAME}", './output/async-${prev}.json']
+    context: {TRIGGER_CONTEXT: "${CONTEXT}"}
+

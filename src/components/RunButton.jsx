@@ -2,11 +2,47 @@ import React, { useState, useEffect } from "react";
 import { SimpleOutputToggle } from "@/components/SimpleOutputToggle";
 
 export function RunButton({ getText, onExecution }) {
+
+  const [needsMistralKey, setNeedsMistralKey] = useState(false);
+const [mistralKey, setMistralKey] = useState(() => {
+  try {
+    return localStorage.getItem("MISTRAL_API_KEY") || "";
+  } catch {
+    return "";
+  }
+});
+
+useEffect(() => {
+  if (mistralKey) {
+    try {
+      localStorage.setItem("MISTRAL_API_KEY", mistralKey);
+    } catch {}
+  }
+}, [mistralKey]);
+
+  const [needsOpenAIKey, setNeedsOpenAIKey] = useState(false);
+const [OpenAIKey, setOpenAIKey] = useState(() => {
+  try {
+    return localStorage.getItem("OPEN_AI_API_KEY") || "";
+  } catch {
+    return "";
+  }
+});
+
+useEffect(() => {
+  if (OpenAIKey) {
+    try {
+      localStorage.setItem("OPEN_AI_API_KEY", OpenAIKey);
+    } catch {}
+  }
+}, [OpenAIKey]);
+
+
   const [oneVarMode, setOneVarMode] = useState(false);
 const [oneVarText, setOneVarText] = useState(`context:
   NYNO_ONE_VAR: "prev"`);
 
-    const [simpleOutput, setSimpleOutput] = useState(false);
+    const [simpleOutput, setSimpleOutput] = useState(true);
   
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,15 +76,53 @@ const [oneVarText, setOneVarText] = useState(`context:
     setLoading(true);
     setResult(null);
     setUnauthorized(false);
+
+
+
+
+
     try {
 
 const baseText = getText ? getText() : "";
 const oneVarPrefix = oneVarMode ? oneVarText : "";
 
-const textToSend = [oneVarPrefix, baseText]
+let textToSend = [oneVarPrefix, baseText]
   .filter(Boolean)
   .join("\n\n")
   .trim();
+
+
+const usesMistral = textToSend.includes("mistral") && textToSend.includes("ai");
+const usesOpenAI = textToSend.includes("openai") && textToSend.includes("ai");
+
+if (usesMistral && !mistralKey) {
+  setNeedsMistralKey(true);
+  setLoading(false);
+  return;
+
+}
+if (usesMistral && mistralKey) {
+  const mistralContext = `context:\n  MISTRAL_API_KEY: "${mistralKey}"\n`;
+  if(textToSend.startsWith('context:')) {
+    textToSend = textToSend.replace('context:',mistralContext);
+  } else {
+    textToSend = [mistralContext, textToSend].join("\n\n");
+  }
+}
+if (usesOpenAI && !OpenAIKey) {
+  setNeedsOpenAIKey(true);
+  setLoading(false);
+  return;
+
+}
+if (usesOpenAI && OpenAIKey) {
+  const OpenAIContext = `context:\n  OPEN_AI_API_KEY: "${OpenAIKey}"\n`;
+  if(textToSend.startsWith('context:')) {
+    textToSend = textToSend.replace('context:',OpenAIContext);
+  } else {
+    textToSend = [OpenAIContext, textToSend].join("\n\n");
+  }
+}
 
       if(textToSend.includes('workflow: []')) {
         alert("Please use \"Add Node\" to add at least one node.")
@@ -90,6 +164,70 @@ const textToSend = [oneVarPrefix, baseText]
     }
   };
 
+	useEffect(() => {
+  if (!open) return;
+
+  const popup = document.querySelector('.rnh_popup');
+  if (!popup) return;
+
+  // set initial width
+  popup.style.width = '333px';
+
+  // avoid duplicating resizer
+  if (popup.querySelector('.rnh_resizer')) return;
+
+  const resizer = document.createElement('div');
+  resizer.className = 'rnh_resizer';
+
+  Object.assign(resizer.style, {
+    position: 'absolute',
+    left: '0',
+    top: '0',
+    width: '3px',
+    height: '100%',
+    cursor: 'ew-resize',
+    zIndex: '1000000',
+    background: 'transparent',
+  });
+
+  popup.appendChild(resizer);
+
+  let isResizing = false;
+  let startX = 0;
+  let startWidth = 0;
+
+  const onMouseMove = (e) => {
+    if (!isResizing) return;
+
+    const delta = startX - e.clientX;
+    const newWidth = Math.max(250, startWidth + delta);
+
+    popup.style.width = newWidth + 'px';
+  };
+
+  const onMouseUp = () => {
+    isResizing = false;
+    document.body.style.userSelect = '';
+  };
+
+  resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = popup.offsetWidth;
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+  return () => {
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    resizer.remove();
+  };
+}, [open]);
+
 
 const renderSimpleChat = () => {
   if (!result) return null;
@@ -98,38 +236,79 @@ const renderSimpleChat = () => {
   try {
     parsed = JSON.parse(result);
   } catch {
-    return <div className="chat-message error">Invalid response</div>;
+    const srcDoc = `
+      <html>
+        <head>
+          <style>
+            body { background-color: #2a2d33; color: white; padding: 16px; font-family: sans-serif; }
+          </style>
+        </head>
+        <body>Invalid response</body>
+      </html>
+    `;
+    return (
+      <iframe
+        sandbox="allow-scripts allow-same-origin"
+        style={{ width: "100%", border: "none", minHeight: "80dvh" }}
+        srcDoc={srcDoc}
+      />
+    );
   }
 
   const execution = parsed?.execution;
 
+  let content = "";
 
+  // Case 1: execution is a string
+  if (typeof execution === "string") {
+    content = execution;
+  }
+  // Case 2: execution is an array
+  else if (Array.isArray(execution) && execution.length > 0) {
+    const lastStep = execution[execution.length - 1];
+    const context = lastStep?.output?.c || {};
 
+    const error = context["prev.error"];
+    const prev = context["prev"];
 
-
-
-  if (!Array.isArray(execution) || execution.length === 0) {
-    return <div className="chat-message">No execution data</div>;
+    if (error) {
+      content = typeof error === "string" ? error : JSON.stringify(error);
+    } else if (prev) {
+      content = typeof prev === "string" ? prev : JSON.stringify(prev);
+    } else {
+      const fallbackContent = Object.values(context).find(val => typeof val === "string");
+      content = fallbackContent || "No output";
+    }
+  } else {
+    content = "No execution data";
   }
 
-  const lastStep = execution[execution.length - 1];
-  const context = lastStep?.output?.c || {};
+  const srcDoc = `
+    <html>
+      <head>
+        <style>
+          body {
+            background-color: #2a2d33;
+            color: white;
+            padding: 16px;
+            font-family: sans-serif;
+            white-space: pre-wrap;
+          }
+        </style>
+      </head>
+      <body>${content}</body>
+    </html>
+  `;
 
-  const error = context["prev.error"];
-  const prev = context["prev"];
-
-  if (error) {
-    const html = typeof error === "string" ? error : JSON.stringify(error);
-    return <div className="chat-message error" dangerouslySetInnerHTML={{ __html: html }} />;
-  }
-
-  if (prev) {
-    const html = typeof prev === "string" ? prev : JSON.stringify(prev);
-    return <div className="chat-message" dangerouslySetInnerHTML={{ __html: html }} />;
-  }
-
-  return <div className="chat-message">No output</div>;
+  return (
+    <iframe
+      sandbox="allow-scripts allow-same-origin"
+      style={{ width: "100%", border: "none", minHeight: "80dvh" , borderRadius: '9px','marginTop': '1rem'}}
+      srcDoc={srcDoc}
+    />
+  );
 };
+
 
 
 
@@ -173,6 +352,50 @@ const blob = new Blob([(result)], { type: "application/json" });
       {open && (
         <div className="rnh_popup fixed inset-0 flex items-center justify-center bg-black/50">
           <div className="rnh_popup_inner bg-white p-6 rounded-2xl shadow w-96">
+
+{needsMistralKey && (
+  <div className="mb-4">
+    <label className="block text-sm font-medium mb-1">
+      Mistral API Key required
+    </label>
+    <input
+      type="password"
+      value={mistralKey}
+      onChange={(e) => setMistralKey(e.target.value)}
+      placeholder="sk-..."
+      className="w-full px-3 py-2 border rounded mb-2"
+    />
+    <button
+      onClick={() => setNeedsMistralKey(false)}
+      disabled={!mistralKey}
+      className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
+    >
+      Save & Continue
+    </button>
+  </div>
+)}
+{needsOpenAIKey && (
+  <div className="mb-4">
+    <label className="block text-sm font-medium mb-1">
+      OpenAI API Key required
+    </label>
+    <input
+      type="password"
+      value={OpenAIKey}
+      onChange={(e) => setOpenAIKey(e.target.value)}
+      placeholder="sk-..."
+      className="w-full px-3 py-2 border rounded mb-2"
+    />
+    <button
+      onClick={() => setNeedsOpenAIKey(false)}
+      disabled={!OpenAIKey}
+      className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
+    >
+      Save & Continue
+    </button>
+  </div>
+)}
+
 
             {/* If unauthorized, show an input to change the token */}
             {unauthorized && (

@@ -150,7 +150,8 @@ def handle_client(conn, addr):
                         except Exception as e:
                             conn.sendall((json.dumps({"status": "ERR", "error": str(e)}) + "\n").encode())
                     else:
-                        conn.sendall(b'{"fnError":"not exist"}\n')
+                        #conn.sendall(b'{"fnError":"not exist"}\n')
+                        conn.sendall((json.dumps({"fnError": "not exist", "c":context}) + "\n").encode())
 
                 # ---- function exists ----
                 elif type_char == "e":

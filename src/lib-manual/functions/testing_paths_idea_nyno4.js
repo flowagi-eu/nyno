@@ -1,178 +1,152 @@
-
 // ---------------------------
 // Direct Execution
 // ---------------------------
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-// --- Demo ---
-let path = {
-  firstNode: 1,
-  loops: { 3: 2 }, // node 3 and its first subpath will loop max n times, stops early if any node returns -1
-  1: [2],
-  2: [3],
-  3: [4, 5],
-  4: [6],
-  5: [7],
-  6: [],
-  7: [],
-};
+  let path = {
+    firstNode: 1,
+    loops: { 3: 2 },
+    1: [2, 3, 10],
+    2: [4],
+    3: [4],
+    10: [4],
+    4: [],
+  };
 
-/*
-path = {
-  "1": [  2 ],
-  "2": [],
-  "firstNode": 1,
-  "loops": {
-    "1": 2
-  }, 
-  "steps": {
-    "1": "demo-step",
-    "2": "demo-2"
-  },
-}
-//*/
+  const dynamicFunctions = {
+    '1': async () => ({ r: 0, c: { LAST_STEP: 'nyno-parallel' } }),
+    '2': async () => ({ r: 0, c: { LAST_STEP: 'nyno-wait', prev: 'Waited 1000ms' } }),
+    '3': async () => ({ r: 0, c: { LAST_STEP: 'nyno-echo', prev: 'parallel:)' } }),
+    '10': async () => ({ r: 0, c: { LAST_STEP: 'nyno-echo', prev: 'parallel:)' } }),
+    '4': async () => ({ r: 0, c: { LAST_STEP: 'nyno-wait', prev: 'Waited 1000ms' } }),
+  };
 
-
-// these are the functions with requestFunction linked to each workflow step
-/// for example 1 could be requestFunction('nyno-http-get',data)
-/// so this is generated dynamically based on the steps
-const dynamicFunctions = {
-   '1': function() { return 0; },
-   '2': function() { return 0; },
-   '3': function() { return 0; },
-   '4': function() { return 0; },
-   '5': function() { return 0; },
-   '6': function() { return 0; },
-   '7': function() { return 0; },
-};
-
-const workflowResult = await traverseFullGraph(path, dynamicFunctions);
-console.log(workflowResult);
+  const workflowResult = await traverseFullGraph(path, dynamicFunctions);
+  console.log(workflowResult);
 }
 
 
-
-
-
-
-
-
-const MAX_TOTAL_STEPS = 300;
+const MAX_TOTAL_STEPS = 300; // protection for infinite loops
 
 export async function traverseFullGraph(path, dynamicFunctions) {
   let total_steps_executed = 0;
   const firstNode = path.firstNode;
   const result = [];
   let one_var = null;
-  let loopForceStops = false; // -1 status codes
-  if(!path.context) path.context = {};
+  let loopForceStops = false;
 
-  async function traverseGraph(firstNode,path, dynamicFunctions,looped=false) {
+  if (!path.context) path.context = {};
 
-   if(loopForceStops && looped) return;
+  const globalContexts = {}; // branch-specific contexts for parallel paths
+  const branchLogs = {}; // separate logs for each branch
 
-   async function visit(node) {
-    total_steps_executed++;
+  async function traverseGraph(node, path, dynamicFunctions, looped = false, branchId = null, visitContext = null) {
+    if (loopForceStops && looped) return;
 
-    // early return security infinite loop prevention
-    if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+    async function visit(node, visitContext, branchId = null) {
+      total_steps_executed++;
+      if (total_steps_executed > MAX_TOTAL_STEPS) return { result, one_var };
+      if (path[String(node)] === undefined) return;
 
+      const stepType = path.steps?.[node] || 'normal';
+      const children = path[String(node)] || [];
 
-    console.log({total_steps_executed,MAX_TOTAL_STEPS})
-    // early return if non existing node key id
-    if (path[String(node)] === undefined) return; 
+      // Use the provided visitContext
+      let context = visitContext;
 
-    const children = path[String(node)] || [];
-    console.log('children',children);
-
-    if(!looped && node in path.loops){
-        console.log("-------- START LOOP ------------");
-        for(let i =0;i < path.loops[node];i++) {
-
-            path.context['LOOP_I'] = i; // Special context key for loop i counter
-            await traverseGraph(node,path, dynamicFunctions,true);
-        }
-        console.log("-------- END LOOP ------------");  
-        loopForceStops = false; // reset
-
-        // after the loop we continue with[1] if defined    
-        if(children.length > 0) {
-            const nextChild = children[1];
-            console.log('next node (from loop):',nextChild);
-            await visit(nextChild);
-
-            // early return security infinite loop prevention
-            if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
-
-        }  
-    }
-    // Normal step: choose next child according to dynamic functions (default index 0)
-    else {
-
+      //console.log('context visitContext node',node);
+      //console.log('context visitContext',visitContext);
       
+      // Apply step-specific context if available
+      if (path.step_context?.[node]) {
+        context = { ...context, ...path.step_context[node] };
+      }
 
-      const step = path.steps[node];
-      const args = path.args[node];
-      const context = Object.assign(
-    {},
-    path.context,
-    path.step_context[node] || {}
-  );
-
+      // Execute step
+      let fullResult;
+      if (stepType === 'nyno-parallel') {
+        fullResult = { r: 0, c: { ...context, LAST_STEP: 'nyno-parallel' } };
+      } else {
+        console.log('calling dynamic function for node', node);
+        fullResult = await dynamicFunctions[node](stepType, path.args?.[node], context);
+      }
       
-      const fullResult = await dynamicFunctions[node](step,args,(context || {}));
-      const resultCode = fullResult.r;
+      console.log('node + fullResult',node, fullResult);
 
-      // also reset the global context
-      path.context = fullResult.c;
 
-      // remove set_context special value after each
-      if(path.context && 'set_context' in path.context) delete path.context['set_context'];
+      // Store the updated context
+      if (branchId) {
+        fullResult.c['branchId'] = branchId;
+      }
 
-      let nextIndex = resultCode;
+      // Clean up special keys
+      if ("set_context" in fullResult.c) delete fullResult.c.set_context;
 
-      console.log('result code',resultCode);
+      // Handle NYNO_ONE_VAR
+      if ("NYNO_ONE_VAR" in fullResult.c) {
+        const varName = fullResult.c.NYNO_ONE_VAR;
+        if (varName in fullResult.c) one_var = fullResult.c[varName];
+      }
 
-      // record this visit
-      const log = {node,input:{args,context}, output:fullResult};
-      if(looped) log.looped = true;
+      // Log the step
+      const log = { node, input: { args: path.args?.[node], context }, output: fullResult };
+      if (looped) log.looped = true;
 
-      if(path.context && "NYNO_ONE_VAR" in path.context) {
-        if(path.context["NYNO_ONE_VAR"] in path.context ) {
-          one_var = path.context[path.context["NYNO_ONE_VAR"]];
-        }
+      // Store the log
+      if (branchId) {
+        if (!branchLogs[branchId]) branchLogs[branchId] = [];
+        branchLogs[branchId].push(log);
       } else {
         result.push(log);
       }
 
-      if(nextIndex == -1) {
-        console.log('registered force stop loop');
-        loopForceStops = true;
+      if (fullResult.r === -1) loopForceStops = true;
+
+      // Handle loops
+      if (!looped && node in path.loops) {
+        for (let i = 0; i < path.loops[node]; i++) {
+          const loopBranchId = branchId ? `${branchId}_loop${i}` : `loop${i}`;
+          const loopContext = JSON.parse(JSON.stringify(fullResult.c));
+          loopContext['LOOP_I'] = i;
+          await traverseGraph(node, path, dynamicFunctions, true, loopBranchId, loopContext);
+        }
       }
 
+      // Handle children
+      if (children.length > 0) {
+        if (stepType === 'nyno-parallel') {
+          const promises = [];
+          for (const child of children) {
+            const childBranchId = `child_${child}`;
+            console.log('walking childBranchId',childBranchId);
 
-      if(children.length > 0) {
-
-        console.log('nextIndex',nextIndex);
-        const nextChild = children[nextIndex] ;
-        console.log('next node:',nextChild);
-        if (nextChild !== undefined) await visit(nextChild);
-
-        // early return security infinite loop prevention
-        if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+                const childContext = JSON.parse(JSON.stringify(fullResult.c));
+            console.log('walking childContext',childContext);
+            promises.push(visit(child, childContext, childBranchId));
+          }
+          await Promise.all(promises);
+        } else {
+          const nextChild = children[fullResult.r];
+          if (nextChild !== undefined) {
+            const nextContext = JSON.parse(JSON.stringify(fullResult.c));
+            await visit(nextChild, nextContext, branchId);
+          }
+        }
       }
-    } 
+    } // end of visit function
+    
+    // this is inside traverseGraph
+    const currentContext = JSON.parse(JSON.stringify(visitContext ?? path.context));
+    console.log('currentContext', currentContext);
+    await visit(node, currentContext, branchId);
   }
 
-  console.log('first node',firstNode,{looped});
-  await visit(firstNode,null);
+  await traverseGraph(firstNode, path, dynamicFunctions);
 
-  // early return security infinite loop prevention
-  if(total_steps_executed > MAX_TOTAL_STEPS) return {result,one_var}
+  // Merge branch logs into the main result
+  for (const branchId in branchLogs) {
+    result.push(...branchLogs[branchId]);
+  }
 
+  return { result, one_var };
 }
-
-await traverseGraph(firstNode,path, dynamicFunctions);
-return {result,one_var};
-}
-
 

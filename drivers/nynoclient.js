@@ -1,4 +1,7 @@
+#!/usr/bin/env node
 import net from 'net';
+import fs from 'fs';
+import path from 'path';
 
 export class NynoClient {
   constructor(
@@ -150,5 +153,66 @@ export class NynoClient {
       this.socket = null;
     }
   }
+
+  // -----------------------------
+  // Folder loader support
+  // -----------------------------
+  loadFolder(rootDir) {
+    this._workflowFolder = new Map();
+
+    function walk(dir, workflows) {
+      for (const file of fs.readdirSync(dir)) {
+        const full = path.join(dir, file);
+        const stat = fs.statSync(full);
+        if (stat.isDirectory()) {
+          walk(full, workflows);
+        } else if (file.endsWith(".nyno")) {
+          const key = path.relative(rootDir, full).replace(/\\/g, "/").replace(/\.nyno$/, "");
+          const text = fs.readFileSync(full, "utf8");
+          workflows.set(key, text);
+        }
+      }
+    }
+
+    walk(rootDir, this._workflowFolder);
+  }
+
+  async callFromFolder(name, context = {}) {
+    if (!this._workflowFolder.has(name)) {
+      throw new Error(`Workflow not found: ${name}`);
+    }
+    const yamlText = this._workflowFolder.get(name);
+    return await this.runNyno(yamlText, context);
+  }
+}
+
+// -----------------------------
+// Demo / test if called directly
+// -----------------------------
+if (process.argv[1] === new URL(import.meta.url).pathname) {
+  (async () => {
+    const API_KEY = "verylongiuu83947952398327gyudbsa7yiuIUGIASD987934234";
+    const client = await NynoClient.create(API_KEY);
+
+    // Load workflows
+    const WORKFLOW_DIR = path.join(process.cwd(), "test","nyno-src");
+    client.loadFolder(WORKFLOW_DIR);
+
+    console.log("\nLoaded workflows:");
+    for (const k of client._workflowFolder.keys()) {
+      console.log(" -", k);
+    }
+
+    // Test call functions/test1
+    console.log("\nCalling functions/test1...");
+    try {
+      const result1 = await client.callFromFolder("functions/test1", { foo: 123 });
+      console.log(result1);
+    } catch (e) {
+      console.error("Error:", e);
+    }
+
+    client.close();
+  })();
 }
 

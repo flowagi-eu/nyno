@@ -1,0 +1,3 @@
+- step: nyno-image-paths-to-html
+  args:
+    - "${prev}"

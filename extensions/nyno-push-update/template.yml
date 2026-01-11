@@ -1,5 +1,0 @@
-- step: nyno-push-update
-  args:
-    - ${USERNAME}
-    - ${COMMIT_MSG}
-    - ${REPO_DIR}

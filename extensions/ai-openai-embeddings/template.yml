@@ -1,0 +1,3 @@
+- step: ai-openai-embeddings
+  args:
+    - '${prev}'

@@ -1,0 +1,4 @@
+- step: nyno-sql-insert-embedding
+  args:
+    - ${prev} # the vector generated from ai embedding node
+    - {"optional":"meta"}

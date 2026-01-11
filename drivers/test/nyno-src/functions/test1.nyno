@@ -1,0 +1,6 @@
+workflow:
+  - id: 1
+    step: nyno-echo
+    args:
+      hello
+

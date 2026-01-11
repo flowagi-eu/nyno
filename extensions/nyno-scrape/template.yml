@@ -1,6 +1,0 @@
-- step: nyno-scrape:
-  args:
-    - "${LOOP_URL_STRUCTURE}" # ex http://localhost/blog/page/:index
-    - "${QUERY_SELECTOR}" # ex ".post_link a"
-    - "${START_PAGE}" # ex 1
-    - "${END_PAGE}" # ex 10

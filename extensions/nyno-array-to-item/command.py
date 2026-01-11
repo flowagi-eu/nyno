@@ -7,9 +7,9 @@ def nyno_array_to_item(args, context):
     # Check if args[0] exists
     if args and len(args) > 0:
         first_arg = args[0]
-        # If it's a list, take the first item or None
+        # If it's a list, take the last item or None
         if isinstance(first_arg, list):
-            value = first_arg[0] if first_arg else None
+            value = first_arg[-1] if first_arg else None
         else:
             value = first_arg
     else:

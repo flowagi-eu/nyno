@@ -1,0 +1,3 @@
+- step: nyno-sql-search-embedding
+  args:
+    - ${prev} # the vector generated from USER PROMPT using ai embeddings

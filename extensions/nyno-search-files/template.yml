@@ -1,4 +1,0 @@
-- step: nyno-search-files
-  args:
-    - [".path/dir1/*.command", ".path/dir1/template.yml"]
-    - 'object' # remove to output text

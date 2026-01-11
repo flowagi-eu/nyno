@@ -63,6 +63,7 @@ async function loadExtensions() {
     path.join(repoRoot, "extensions"),        // dev / uncompiled
     path.join(repoRoot, "dist-ts","nyno", "extensions"), // compiled TS output
     path.join(repoRoot, "dist-ts","nyno-private-extensions"), // compiled TS output
+    path.join(repoRoot, "../","nyno-private-extensions"), // private JS output
   ];
 
   let extensionsLoaded: string[] = [];
@@ -134,7 +135,8 @@ async function startWorker() {
         } else if (type === "r") {
           const fn = globalThis.state[payload.functionName];
           if (typeof fn !== 'function') {
-            socket.write(JSON.stringify({ fnError: "not exist" }) + "\n");
+            let context = payload.context ?? {};
+            socket.write(JSON.stringify({ fnError: "not exist", c:context }) + "\n");
           } else {
             try {
               let context = payload.context ?? {};
