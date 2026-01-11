@@ -36,17 +36,6 @@ COPY container/bin/swoole.so /usr/lib/php/20230831/swoole.so
 # Enable Swoole extension in PHP
 RUN echo "extension=/usr/lib/php/20230831/swoole.so" > /etc/php/8.4/cli/conf.d/20-swoole.ini
 
-# Install rbenv
-ENV RBENV_ROOT=/usr/local/rbenv
-ENV PATH="$RBENV_ROOT/bin:$RBENV_ROOT/shims:$PATH"
-
-RUN git clone https://github.com/rbenv/rbenv.git $RBENV_ROOT && \
-    mkdir -p "$RBENV_ROOT/plugins"
-
-# Install ruby-build plugin
-RUN git clone https://github.com/rbenv/ruby-build.git \
-    $RBENV_ROOT/plugins/ruby-build
-
 # Install Ruby via APT
 RUN apt update && apt-get install -y --no-install-recommends \
       ruby-full \
