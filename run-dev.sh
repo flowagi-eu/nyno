@@ -29,5 +29,5 @@ check_port "$RB"
 npm run build:node
 
 
-/home/user/.nvm/versions/node/v22.17.1/bin/bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"
+bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"
 #bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"

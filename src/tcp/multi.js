@@ -67,7 +67,6 @@ export default function register(router) {
         if(context && "NYNO_ASYNC" in context){
             context['WORKFLOW_NAME'] = path.replace(/^\/+/, ""); // removes all leading slashes
             context['NYNO_EXTRA_VAR_CONTEXT'] = 1;
-            // /home/user/github/nyno/drivers/nynoclient.js
             
             return await runWorkflowFn('mode/async',context);
         } 
