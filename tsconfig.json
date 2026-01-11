@@ -11,6 +11,10 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "rootDirs": [
+      ".",
+      "../nyno-private-extensions"
+    ],
 
     "outDir": "dist-ts"
   },
