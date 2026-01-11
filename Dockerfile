@@ -47,15 +47,15 @@ RUN git clone https://github.com/rbenv/rbenv.git $RBENV_ROOT && \
 RUN git clone https://github.com/rbenv/ruby-build.git \
     $RBENV_ROOT/plugins/ruby-build
 
-# Install latest Ruby automatically
-RUN set -ex && \
-    LATEST=$(rbenv install -l | grep -E "^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+$" | tr -d ' ' | tail -1) && \
-    rbenv install "$LATEST" && \
-    rbenv global "$LATEST" && \
-    rbenv rehash
+# Install Ruby via APT
+RUN apt-get install -y --no-install-recommends \
+      ruby-full \
+      build-essential \
+      git \
+      ca-certificates && \
+    gem install bundler && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Bundler
-RUN gem install bundler && rbenv rehash
 
 
 
