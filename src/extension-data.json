@@ -104,8 +104,8 @@
     "emoji": "📄"
   },
   "nyno-sftp-command": {
-    "yaml": null,
-    "emoji": ""
+    "yaml": "- step: nyno-sftp-command\n  args:\n    - \"root@yourdomain.com\"\n    - \"./localfile.txt\"\n    - \"/root/remote_uploaded.txt\"\n",
+    "emoji": "☁️"
   },
   "nyno-sort-kv": {
     "yaml": null,
@@ -132,8 +132,8 @@
     "emoji": ""
   },
   "nyno-ssh-command": {
-    "yaml": null,
-    "emoji": ""
+    "yaml": "- step: nyno-ssh-command\n  args:\n    - root@yourdomain.com\n    - ls\n",
+    "emoji": "☁️"
   },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
