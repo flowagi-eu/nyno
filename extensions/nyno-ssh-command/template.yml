@@ -1,0 +1,4 @@
+- step: nyno-ssh-command
+  args:
+    - root@yourdomain.com
+    - ls
