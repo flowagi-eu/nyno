@@ -48,7 +48,7 @@ RUN git clone https://github.com/rbenv/ruby-build.git \
     $RBENV_ROOT/plugins/ruby-build
 
 # Install Ruby via APT
-RUN apt-get install -y --no-install-recommends \
+RUN apt update && apt-get install -y --no-install-recommends \
       ruby-full \
       build-essential \
       git \
