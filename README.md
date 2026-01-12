@@ -1,11 +1,15 @@
-![Nyno Workflow Example](/h/4cfe0ca5b3de0e521a80e4717b40d34bfebe937dc364e3d142af6455c17b149e/screenshot-from-2025-12-23-02-23-03.webp)
+![Nyno Workflow Example](/h/3fec8199e52b6983079d4800694475a7c660ab26c1f0a831e16050dc340f24ec/screenshot-from-2026-01-12-00-04-09.webp)
+
 
 > Founder Note: "Unlike with n8n, you and your clients never have to request a commercial license to run Nyno workflows. This was the main reason I started building Nyno." – MJ
 
+![Nyno examples connecting multiple AI nodes](/h/c0f8c2c19f52c63ba139a25e5fa5fbc80a36a865c1368534bac204c3fc3d683f/screenshot-from-2026-01-12-13-26-24.webp)
+
 ---
 
-## Nyno 5.1: Open-Source Backend for Workflow-based AGI. Extend with Python, PHP, JS and Ruby. Route with YAML. Instantly Run.
-- Try the Live Free Minimal Version: [https://europe.nyno.dev](https://europe.nyno.dev)
+
+## Nyno 5.1: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
+- Try the Online Playground: [https://nyno.dev/online-playground](https://nyno.dev/online-playground)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
 
 
@@ -19,7 +23,19 @@
 Nyno is an **open-source multi-language workflow engine** and [language](https://github.com/empowerd-cms/nyno-lang) that lets you build, extend, and connect automation in the languages you already know — **Python, PHP, JavaScript, and Ruby**.
 
 
-Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in human-readable **YAML Workflows** (.nyno files).
+Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in short human-readable **YAML Workflows** (.nyno files).
+
+```yaml
+nyno: 5.1.0
+workflow:
+  - step: ai-openai-text
+    args: ['My idea: ${PROMPT}', minimal]
+    context: {SYSTEM_PROMPT: 'You''re a blog post writer. I will give you an idea, and you basically need to expand upon it, you can also correct me, but just give me the best possible article you can write about it to share my idea. Only output the new article, dont affirm.'}
+  - step: ai-openai-text
+    args: ['my article: ${prev}', minimal]
+    context: {SYSTEM_PROMPT: 'Make my article more heartfelt. Only output the new article, dont affirm.'}
+```
+
 
 ### Introducing "The Engine" that powers Nyno
 To achieve most requests/per second we're using multi-process worker engines where feasible. Nyno will spawns 2 light-weight workers for each language in `dev` mode or 3 workers for every language and CPU core in `prod` mode. This means that if you have 4 CPU cores, it will spawn 12 ready-to-run workers to run workflow steps.
