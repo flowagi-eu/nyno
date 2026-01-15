@@ -40,37 +40,44 @@ HOST = ports["HOST"] || "localhost"
 PORT = ports["RB"] || 9045
 VALID_API_KEY = ports["SECRET"] || "changeme"
 
+
 ############################################################
-# Load extensions
+# Load extensions (manifest)
 ############################################################
 
 def load_extensions
-  possible_dirs = [
-    File.expand_path("../../../extensions", __dir__),
-    File.expand_path("../../../../nyno-private-extensions", __dir__)
-  ]
+  manifest_path = File.expand_path("../../extension-data.json", __dir__)
 
-  possible_dirs.each do |ext_base|
-    next unless Dir.exist?(ext_base)
+  unless File.exist?(manifest_path)
+    puts "[Ruby Runner] No extension manifest found"
+    return
+  end
 
-    Dir.each_child(ext_base) do |folder|
-      dir_path = File.join(ext_base, folder)
-      next unless Dir.exist?(dir_path)
+  manifest = JSON.parse(File.read(manifest_path))
 
-      cmd_file = File.join(dir_path, "command.rb")
-      next unless File.exist?(cmd_file)
+  manifest.each do |ext_name, meta|
+    source_dir = meta["sourceDir"]
+    unless source_dir
+      puts "[Ruby Runner] No sourceDir for #{ext_name}"
+      next
+    end
 
-      begin
-        require_relative cmd_file
-        func_name = folder.downcase.gsub("-", "_")
-        # optionally: verify method exists
-        puts "[Ruby Runner] Loaded extension #{func_name}"
-      rescue => e
-        puts "[Ruby Runner] Failed to load #{cmd_file}: #{e.message}"
-      end
+    cmd_file = File.join(source_dir, "command.rb")
+    unless File.exist?(cmd_file)
+      puts "[Ruby Runner] Missing command.rb for #{ext_name}"
+      next
+    end
+
+    begin
+      require cmd_file
+      func_name = ext_name.downcase.gsub("-", "_")
+      puts "[Ruby Runner] Loaded extension #{func_name}"
+    rescue => e
+      puts "[Ruby Runner] Failed loading #{ext_name}: #{e.message}"
     end
   end
 end
+
 
 
 

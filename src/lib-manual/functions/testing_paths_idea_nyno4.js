@@ -1,5 +1,8 @@
+
+const MAX_TOTAL_STEPS = 300; // protection for infinite loops
+
 // ---------------------------
-// Direct Execution
+// Test if Direct Execution
 // ---------------------------
 if (process.argv[1] === new URL(import.meta.url).pathname) {
   let path = {
@@ -21,11 +24,10 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
   };
 
   const workflowResult = await traverseFullGraph(path, dynamicFunctions);
-  console.log(workflowResult);
+  //console.log(workflowResult);
 }
 
 
-const MAX_TOTAL_STEPS = 300; // protection for infinite loops
 
 export async function traverseFullGraph(path, dynamicFunctions) {
   let total_steps_executed = 0;
@@ -66,11 +68,11 @@ export async function traverseFullGraph(path, dynamicFunctions) {
       if (stepType === 'nyno-parallel') {
         fullResult = { r: 0, c: { ...context, LAST_STEP: 'nyno-parallel' } };
       } else {
-        console.log('calling dynamic function for node', node);
+        //console.log('calling dynamic function for node', node);
         fullResult = await dynamicFunctions[node](stepType, path.args?.[node], context);
       }
       
-      console.log('node + fullResult',node, fullResult);
+      //console.log('node + fullResult',node, fullResult);
 
 
       // Store the updated context
@@ -79,10 +81,10 @@ export async function traverseFullGraph(path, dynamicFunctions) {
       }
 
       // Clean up special keys
-      if ("set_context" in fullResult.c) delete fullResult.c.set_context;
+      if (fullResult.c && "set_context" in fullResult.c) delete fullResult.c.set_context;
 
       // Handle NYNO_ONE_VAR
-      if ("NYNO_ONE_VAR" in fullResult.c) {
+      if (fullResult.c && "NYNO_ONE_VAR" in fullResult.c) {
         const varName = fullResult.c.NYNO_ONE_VAR;
         if (varName in fullResult.c) one_var = fullResult.c[varName];
       }
@@ -117,10 +119,10 @@ export async function traverseFullGraph(path, dynamicFunctions) {
           const promises = [];
           for (const child of children) {
             const childBranchId = `child_${child}`;
-            console.log('walking childBranchId',childBranchId);
+            //console.log('walking childBranchId',childBranchId);
 
                 const childContext = JSON.parse(JSON.stringify(fullResult.c));
-            console.log('walking childContext',childContext);
+            //console.log('walking childContext',childContext);
             promises.push(visit(child, childContext, childBranchId));
           }
           await Promise.all(promises);
@@ -136,7 +138,7 @@ export async function traverseFullGraph(path, dynamicFunctions) {
     
     // this is inside traverseGraph
     const currentContext = JSON.parse(JSON.stringify(visitContext ?? path.context));
-    console.log('currentContext', currentContext);
+    //console.log('currentContext', currentContext);
     await visit(node, currentContext, branchId);
   }
 

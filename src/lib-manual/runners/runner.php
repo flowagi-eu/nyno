@@ -36,23 +36,39 @@ $num_workers = $isProd ? (int)shell_exec('nproc') * 3 : 2;
 
 $STATE = [];
 
-$possibleExtDirs = [
-    __DIR__ . "/../../../extensions",
-    __DIR__ . "/../../../../nyno-private-extensions",
-];
 
-foreach ($possibleExtDirs as $base) {
-    if (!is_dir($base)) continue;
-    foreach (glob($base . "/*/command.php") as $file) {
-        require_once $file;
-        $folder = basename(dirname($file));
-        $fn = strtolower(str_replace("-", "_", $folder));
+$manifestPath = realpath(__DIR__ . "/../../extension-data.json");
+
+if (!$manifestPath || !file_exists($manifestPath)) {
+    echo "[PHP Runner] No extension manifest found\n";
+} else {
+    $manifest = json_decode(file_get_contents($manifestPath), true);
+
+    foreach ($manifest as $extName => $meta) {
+        $sourceDir = $meta['sourceDir'] ?? null;
+        if (!$sourceDir) {
+            echo "[PHP Runner] No sourceDir for $extName\n";
+            continue;
+        }
+
+        $cmdFile = $sourceDir . "/command.php";
+        if (!file_exists($cmdFile)) {
+            echo "[PHP Runner] Missing command.php for $extName\n";
+            continue;
+        }
+
+        require_once $cmdFile;
+
+        $fn = strtolower(str_replace("-", "_", $extName));
         if (is_callable($fn)) {
-            $STATE[$folder] = $fn;
-            echo "[PHP Runner] Loaded $folder\n";
+            $STATE[$extName] = $fn;
+            echo "[PHP Runner] Loaded $extName\n";
+        } else {
+            echo "[PHP Runner] Function $fn not found for $extName\n";
         }
     }
 }
+
 
 /* ---------------- SWOOLE SERVER ---------------- */
 
@@ -115,6 +131,8 @@ $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, 
 
             if ($type === 'r') {
                 $fn = $payload['functionName'] ?? '';
+                $context = $payload['context'] ?? [];
+                $args    = $payload['args'] ?? [];
 
                 if (!isset($STATE[$fn])) {
                      $server->send($fd, json_encode([
@@ -124,8 +142,6 @@ $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, 
                     return;
                 }
 
-                $args    = $payload['args'] ?? [];
-                $context = $payload['context'] ?? [];
 
                 try {
                     $result = $STATE[$fn]($args, $context);

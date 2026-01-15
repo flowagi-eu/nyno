@@ -58,41 +58,55 @@ STATE = {
 }
 
 # ===========================================================
-#  Extension Loader (same as before)
+#  Extension Loader (from manifest)
 # ===========================================================
+
+EXTENSION_MANIFEST_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../extension-data.json")
+)
+
 def load_extensions():
-    possible_ext_dirs = [
-        os.path.join(os.path.dirname(__file__), "../../../extensions"),          # main
-        os.path.join(os.path.dirname(__file__), "../../../../nyno-private-extensions"),  # private
-    ]
+    if not os.path.exists(EXTENSION_MANIFEST_PATH):
+        print("[Python Runner] No extension manifest found:", EXTENSION_MANIFEST_PATH)
+        return
 
-    for ext_base in possible_ext_dirs:
-        if not os.path.exists(ext_base):
+    try:
+        with open(EXTENSION_MANIFEST_PATH, "r") as f:
+            manifest = json.load(f)
+    except Exception as e:
+        print("[Python Runner] Failed to read extension manifest:", e)
+        return
+
+    for ext_name, meta in manifest.items():
+        source_dir = meta.get("sourceDir")
+        if not source_dir:
+            print(f"[Python Runner] No sourceDir for extension {ext_name}")
             continue
-        for dir_name in os.listdir(ext_base):
-            dir_path = os.path.join(ext_base, dir_name)
-            if not os.path.isdir(dir_path):
-                continue
-            cmd_file = os.path.join(dir_path, "command.py")
-            if not os.path.exists(cmd_file):
-                continue
-            try:
-                spec = importlib.util.spec_from_file_location(dir_name, cmd_file)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
 
-                func_name = dir_name.lower().replace("-", "_")
-                if hasattr(module, func_name):
-                    STATE[dir_name] = getattr(module, func_name)
-                    print(f"[Python Runner] Loaded extension {dir_name}")
-                else:
-                    print(f"[Python Runner] Failed to load extension {dir_name}, expected {func_name}")
-            except Exception as e:
-                print(f"[Python Runner] Failed to load {cmd_file}: {e}")
+        cmd_file = os.path.join(source_dir, "command.py")
+        if not os.path.exists(cmd_file):
+            print(f"[Python Runner] Missing command.py for {ext_name}")
+            continue
 
+        try:
+            spec = importlib.util.spec_from_file_location(ext_name, cmd_file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            func_name = ext_name.lower().replace("-", "_")
+            if not hasattr(module, func_name):
+                print(f"[Python Runner] {ext_name} missing function {func_name}")
+                continue
+
+            STATE[ext_name] = getattr(module, func_name)
+            print(f"[Python Runner] Loaded extension {ext_name}")
+
+        except Exception as e:
+            print(f"[Python Runner] Failed loading {ext_name}: {e}")
 
 
 load_extensions()
+
 
 # ===========================================================
 #  Handle one client connection (persistent threads)

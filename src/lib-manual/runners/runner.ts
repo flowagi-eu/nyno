@@ -55,51 +55,53 @@ const VALID_API_KEY = ports['SECRET'] ?? "changeme";
 globalThis.state = {
 
 };
-
 async function loadExtensions() {
-  const repoRoot = process.cwd();
+  const manifestPath = path.join(process.cwd(), "src", "extension-data.json");
 
-  const possibleExtDirs = [
-    path.join(repoRoot, "extensions"),        // dev / uncompiled
-    path.join(repoRoot, "dist-ts","nyno", "extensions"), // compiled TS output
-    path.join(repoRoot, "dist-ts","nyno-private-extensions"), // compiled TS output
-    path.join(repoRoot, "../","nyno-private-extensions"), // private JS output
-  ];
+  if (!fs.existsSync(manifestPath)) {
+    console.warn("[JS Runner] No extension manifest found");
+    return;
+  }
 
-  let extensionsLoaded: string[] = [];
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
 
-  for (const extBase of possibleExtDirs) {
-    if (!fs.existsSync(extBase)) continue;
+  const extensionsLoaded: string[] = [];
 
-    const dirs = fs.readdirSync(extBase, { withFileTypes: true })
-      .filter(d => d.isDirectory())
-      .map(d => path.join(extBase, d.name));
+  for (const [extName, meta] of Object.entries<any>(manifest)) {
+    const sourceDir = meta.sourceDir;
+    if (!sourceDir) {
+      console.warn(`[JS Runner] No sourceDir for ${extName}`);
+      continue;
+    }
 
-    for (const dir of dirs) {
-      const cmdFile = path.join(dir, "command.js");
-      if (!fs.existsSync(cmdFile)) continue;
+    const cmdFile = path.join(sourceDir, "command.js");
+    if (!fs.existsSync(cmdFile)) {
+      console.warn(`[JS Runner] Missing command.js for ${extName}`);
+      continue;
+    }
 
-      try {
-        const module = await import(cmdFile);
+    try {
+      // === Plain import from path, as you requested ===
+      const module = await import(cmdFile);
 
-        // derive function name from folder: lowercase, - → _
-        const folder = path.basename(dir);
-        const funcName = folder.toLowerCase().replaceAll("-", "_");
+      // derive function name from folder: lowercase, - → _
+      const folder = path.basename(sourceDir);
+      const funcName = folder.toLowerCase().replaceAll("-", "_");
 
-        if (module[funcName]) {
-          globalThis.state[folder] = module[funcName]; // assign function
-          extensionsLoaded.push(funcName);
-        } else {
-          console.warn(`[JS Runner] Failed to load extension ${dir} does not export ${funcName}`);
-        }
-      } catch (err) {
-        console.error(`[JS Runner] Failed to load extension ${cmdFile}`, err);
+      if (module[funcName]) {
+        globalThis.state[folder] = module[funcName];
+        extensionsLoaded.push(funcName);
+      } else {
+        console.warn(`[JS Runner] ${folder} does not export function ${funcName}`);
       }
+    } catch (err) {
+      console.error(`[JS Runner] Failed loading ${extName}`, err);
     }
   }
 
   console.log(`[JS Runner] Loaded ${extensionsLoaded.length} extensions: ${extensionsLoaded.join(", ")}`);
 }
+
 
 
 async function startWorker() {
