@@ -50,17 +50,41 @@ const host = ports['host'] ?? 'localhost';
 const extensionDirs = [
   path.resolve(__dirname, '../../extensions'),
   path.resolve(__dirname, '../../../nyno-private-extensions'), // example of another dir
-  // add more directories as needed
+path.resolve(__dirname, '../../dist-ts/nyno/extensions'),
+  path.resolve(__dirname, '../../dist-ts/nyno-private-extensions'), // example of another dir
 ];
 
-// Factory function for checkFunction
+const EXTENSION_NAME_WHITELIST = ports['EXTENSION_NAME_WHITELIST']
+  ? ports['EXTENSION_NAME_WHITELIST']
+      .split(',')
+      .map(n => n.trim())
+      .filter(Boolean)
+  : null; // null = allow all
+
+  console.log('EXTENSION_NAME_WHITELIST',EXTENSION_NAME_WHITELIST);
+function isExtensionNameAllowed(dirName) {
+  if (!EXTENSION_NAME_WHITELIST) return true;
+  return EXTENSION_NAME_WHITELIST.includes(dirName);
+}
+
+
 const makeCheckFunction = (files) => () => {
   return extensionDirs.some(dir => {
     if (!fs.existsSync(dir)) return false;
 
     return fs.readdirSync(dir, { withFileTypes: true })
-      .filter(d => d.isDirectory())
-      .some(subDir => files.some(file => fs.existsSync(path.join(dir, subDir.name, file))));
+      .filter(d => {
+        if (!d.isDirectory()) return false;
+
+        const allowed = isExtensionNameAllowed(d.name);
+        console.log('[EXT CHECK]', d.name, 'allowed:', allowed);
+        return allowed;
+      })
+      .some(subDir =>
+        files.some(file =>
+          fs.existsSync(path.join(dir, subDir.name, file))
+        )
+      );
   });
 };
 

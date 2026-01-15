@@ -82,6 +82,7 @@ export async function runYamlString(text,customContext=null) {
   
   console.log('flattenedObj',flattenedObj);
 
+  // 4. actually run the graph
   let workflowResult;
   const startTime = Date.now();
    
@@ -93,6 +94,7 @@ export async function runYamlString(text,customContext=null) {
 
  const endTime = Date.now();
   
+ // 5. determine result format
   if(flattenedObj.context && "NYNO_ONE_VAR" in flattenedObj.context) {
      workflowResult = workflowResult.one_var;
   } else {

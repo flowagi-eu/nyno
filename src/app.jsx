@@ -391,7 +391,7 @@ setNodeCounter(maxId + 1);
 
   return (
     <ReactFlowProvider>
-    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 24,margin:'0px 0px -6px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':0.6}}>Nyno</span></div>
+    <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 24,margin:'0px 0px -6px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':1}}>Nyno <span style={{color:'cyan'}}>Pro</span></span></div>
       <GitHubStarBadge />
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
