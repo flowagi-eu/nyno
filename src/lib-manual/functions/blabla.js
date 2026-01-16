@@ -5,7 +5,7 @@ export function generateDF(isTesting=false) {
   return async function(step,rawArgs,prevContext={}) {
 
 
-    const { error, args, context } = replaceNynoVariables({ step, args: rawArgs }, prevContext);
+    const [error, args, context] = replaceNynoVariables({ step, args: rawArgs }, prevContext);
 	//  if(error) console.log("ERRROR!!!!",error,args,context);
 
     context.LAST_STEP = step;
@@ -47,74 +47,84 @@ export function generateDF(isTesting=false) {
  * Single-pass rendering: replaces ${key} with ctx[key]
  * - leaves unknown keys intact
  */
-export function renderOnce(str, ctx) {
+export function renderOnce(str, ctx, missing) {
   if (typeof str !== 'string') return str;
+
   return str.replace(/\$\{(\w+)\}/g, (_, key) => {
-    if (!(key in ctx)) return `\${${key}}`;
+    if (!(key in ctx)) {
+      missing.add(key);
+      return `\${${key}}`;
+    }
     return String(ctx[key]);
   });
 }
+
 
 /**
  * Safely get a context value:
  * - render only once
  * - mark rendered keys inside ctx.__renderedKeys
  */
-export function getContextValue(key, ctx) {
-  if (!(key in ctx)) return undefined;
+export function getContextValue(key, ctx, missing) {
+  if (!(key in ctx)) {
+    missing.add(key);
+    return `\${${key}}`;
+  }
+
   if (!ctx.__renderedKeys) ctx.__renderedKeys = [];
 
   if (ctx.__renderedKeys.includes(key)) {
-    return ctx[key]; // already rendered
+    return ctx[key];
   }
 
-  const rendered = renderOnce(ctx[key], ctx);
+  const rendered = renderOnce(ctx[key], ctx, missing);
   ctx[key] = rendered;
   ctx.__renderedKeys.push(key);
 
   return rendered;
 }
 
+
+
 /**
  * Render args using render-once context
  */
-export function renderArgs(args, ctx) {
+export function renderArgs(args, ctx, missing) {
   return args.map(arg => {
     if (typeof arg !== 'string') return arg;
+
     return arg.replace(/\$\{(\w+)\}/g, (_, key) => {
-      return key in ctx ? getContextValue(key, ctx) : `\${${key}}`;
+      return key in ctx
+        ? getContextValue(key, ctx, missing)
+        : (missing.add(key), `\${${key}}`);
     });
   });
 }
 
+
 /** ---------------- replaceNynoVariables ---------------- */
 
 export function replaceNynoVariables(node, prevContext = {}) {
-//	console.log('replaceNynoVariables',node);
-//	console.log('replaceNynoVariables object',typeof node !== 'object');
-  if (!node || typeof node !== 'object' || !node.step) {
-    return { error: true, context:prevContext, missing: ['.step'] };
-  }
-
   const context = { ...prevContext };
   if (!context.__renderedKeys) context.__renderedKeys = [];
+
+  const missing = new Set();
 
   // Step-specific context additions
   const nodeContext = node.set_context || {};
   for (const k in nodeContext) {
     if (!context.__renderedKeys.includes(k)) {
-      context[k] = renderOnce(nodeContext[k], context);
+      context[k] = renderOnce(nodeContext[k], context,missing);
       context.__renderedKeys.push(k);
     }
   }
 
   // Render args
-  const args = renderArgs(node.args || [], context);
+  const args = renderArgs(node.args || [], context, missing);
 
-  return {
-    error: false,
-    step: node.step,
-    context,
-    args
-  };
+if (missing.size > 0) {
+    return [true, [], { missing: [...missing] }];
+  }
+
+  return [ false, args, context ]; // error false
 }

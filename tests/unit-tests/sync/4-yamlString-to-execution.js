@@ -4,7 +4,6 @@ import { flattenWorkflow } from '../../../src/lib-manual/functions/nyno-flatten-
 
 import { traverseFullGraph } from '../../../src/lib-manual/functions/testing_paths_idea_nyno4.js';
 
-import { generateDF, renderOnce, getContextValue, renderArgs, replaceNynoVariables } from '../../../src/lib-manual/functions/blabla.js';
 
 /** ---------------- Full nyno workflow ---------------- */
 
@@ -44,11 +43,29 @@ if (!ctx.__renderedKeys) ctx.__renderedKeys = [];
 
 /** ---------------- Dynamic functions ---------------- */
 
-const IS_TESTING = true;
+const isTesting = true;
 const dynamicFunctions = {};
 for (const node of obj.workflow) {
   const stepId = node.id;
-  dynamicFunctions[stepId] = generateDF(IS_TESTING);
+  dynamicFunctions[stepId] = async function(step,args,prevContext={}) {
+
+    const context = prevContext;
+    let returnCode = 0;
+    if(isTesting) {
+        // for testing
+        context.prev = { args, step };
+    } else {
+	
+	// todo
+    }
+
+
+    return {
+      c: context,
+      r: returnCode,
+    };
+
+  };
 }
 
 /** ---------------- Example usage ---------------- */
@@ -81,9 +98,11 @@ const customContext = {}; // for fn
   try {
     workflowResult = await traverseFullGraph(flattenedObj,dynamicFunctions);
   } catch(err){
+	  console.log('err',err);
     result = { status:"error", execution: {err:String(err)} };
   }
 
+	  let testResultWf = JSON.parse(JSON.stringify(workflowResult));
   if(!result) {
  const endTime = Date.now();
   
@@ -101,7 +120,7 @@ const customContext = {}; // for fn
     {
       expect: 'Dynamic function 1 uses ${vars} that get replaced',
       input: { text },
-      output: { result }
+      output: { testResultWf }
     }
   ], null, 2));
 
