@@ -1,5 +1,12 @@
 #!/bin/bash
 source envs/ports.env
+
+# Possibly override with custom .local.env 
+if [ -f envs/ports.local.env ]; then
+  echo "Loading .local env: envs/ports.local.env"
+  source envs/ports.local.env
+fi
+
 source .venv/bin/activate
 
 bash scripts/check_host.sh
@@ -28,6 +35,8 @@ check_port "$RB"
 # Typescript support
 npm run build:node
 
+
+export VITE_NYNO_IS_PRO_VERSION
 
 bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"
 #bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"

@@ -15,6 +15,11 @@ mkdir -p output
 
 source "$(pwd)/envs/ports.env"
 
+# Possibly override with custom .local.env
+if [ -f envs/ports.local.env ]; then
+  source envs/ports.local.env
+fi
+
 echo "WF:$WF"
 echo "GU:$GU"
 echo "RB:$RB"
