@@ -1,4 +1,7 @@
 
+import { generateDF, renderOnce, getContextValue, renderArgs, replaceNynoVariables } from './blabla.js';
+
+
 const MAX_TOTAL_STEPS = 300; // protection for infinite loops
 
 // ---------------------------
@@ -34,7 +37,8 @@ export async function traverseFullGraph(path, dynamicFunctions) {
   const firstNode = path.firstNode;
   const result = [];
   let one_var = null;
-  let loopForceStops = false;
+  let forceStop = false;
+  //let stLog = []; // simple testing log
 
   if (!path.context) path.context = {};
 
@@ -42,10 +46,15 @@ export async function traverseFullGraph(path, dynamicFunctions) {
   const branchLogs = {}; // separate logs for each branch
 
   async function traverseGraph(node, path, dynamicFunctions, looped = false, branchId = null, visitContext = null) {
-    if (loopForceStops && looped) return;
+   // if (forceStop && looped) return;
+    if(forceStop) return;
 
     async function visit(node, visitContext, branchId = null) {
       total_steps_executed++;
+      if(forceStop){
+	//stLog.push('forceStop detected in visit()');
+	 return;
+      }
       if (total_steps_executed > MAX_TOTAL_STEPS) return { result, one_var };
       if (path[String(node)] === undefined) return;
 
@@ -65,11 +74,25 @@ export async function traverseFullGraph(path, dynamicFunctions) {
 
       // Execute step
       let fullResult;
+      let error,argsRep,contextRep;
       if (stepType === 'nyno-parallel') {
         fullResult = { r: 0, c: { ...context, LAST_STEP: 'nyno-parallel' } };
+        [ error, argsRep, contextRep ] = [false, [], context];
       } else {
         //console.log('calling dynamic function for node', node);
-        fullResult = await dynamicFunctions[node](stepType, path.args?.[node], context);
+	const rawArgs = path.args?.[node];
+        [ error, argsRep, contextRep ] = replaceNynoVariables({ step:stepType, args: rawArgs }, context);
+		      //stLog.push({error,argsRep,contextRep});
+	      if(error){
+		      //stLog.push('error is detected, forceStop');
+		// early exit
+      		forceStop = true;
+		fullResult = { c:contextRep, r:-1};
+	      } else {
+			//stLog.push('executing dfunction',stepType);
+			//stLog.push('executing dfunction argsRep',argsRep);
+        		fullResult = await dynamicFunctions[node](stepType, argsRep, contextRep);
+	      }
       }
       
       //console.log('node + fullResult',node, fullResult);
@@ -90,18 +113,22 @@ export async function traverseFullGraph(path, dynamicFunctions) {
       }
 
       // Log the step
-      const log = { node, input: { args: path.args?.[node], context }, output: fullResult };
+      const rawArgs = path.args?.[node];
+      const log = { node, input: { args: argsRep, context }, output: fullResult };
+	    if(error){
+		log.error = error;
+	    }
+
       if (looped) log.looped = true;
 
-      // Store the log
-      if (branchId) {
-        if (!branchLogs[branchId]) branchLogs[branchId] = [];
-        branchLogs[branchId].push(log);
-      } else {
-        result.push(log);
+      result.push(log);
+
+      if(error) {
+
+      		return { result, one_var, error, errorMsg:'missing' };
       }
 
-      if (fullResult.r === -1) loopForceStops = true;
+      if (fullResult.r === -1) forceStop = true;
 
       // Handle loops
       if (!looped && node in path.loops) {
@@ -144,11 +171,8 @@ export async function traverseFullGraph(path, dynamicFunctions) {
 
   await traverseGraph(firstNode, path, dynamicFunctions);
 
-  // Merge branch logs into the main result
-  for (const branchId in branchLogs) {
-    result.push(...branchLogs[branchId]);
-  }
 
+  //return { result, one_var, stLog };
   return { result, one_var };
 }
 

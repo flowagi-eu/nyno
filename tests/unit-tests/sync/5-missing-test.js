@@ -9,7 +9,6 @@ import { traverseFullGraph } from '../../../src/lib-manual/functions/testing_pat
 
 const text = `
 context:
-  URL: https://empowerd.dev
   TOKEN: ABC123
 
 workflow:
