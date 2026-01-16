@@ -80,18 +80,20 @@ console.log({isPro});
 	const handleExecution = useCallback((execution) => {
   if (!Array.isArray(execution)) return;
 
-  const executedIds = new Set(
-    execution.map((e) => String(e.node))
-  );
-
   setNodes((nds) =>
-    nds.map((n) => ({
-      ...n,
-      data: {
-        ...n.data,
-        executed: executedIds.has(n.id),
-      },
-    }))
+    nds.map((n) => {
+      const exec = execution.find((e) => String(e.node) === n.id);
+
+      return {
+        ...n,
+        data: {
+          ...n.data,
+          executed: !!exec,
+          error: exec?.error || false,
+          missing: exec?.output?.c?.missing || [],
+        },
+      };
+    })
   );
 }, [setNodes]);
 
@@ -381,11 +383,22 @@ setNodeCounter(maxId + 1);
 };
 
   const renderLabel = (rawLabel, node) => (
-    <div style={{ textAlign: "center" }}>
-      {node?.data?.emoji && <span className="node-emoji">{node.data.emoji}</span>}
-      {rawLabel}
-    </div>
-  );
+  <div style={{ textAlign: "center" }}>
+    {node?.data?.emoji && <span className="node-emoji">{node.data.emoji}</span>}
+    <div>{rawLabel}</div>
+
+    {node?.data?.missing?.length > 0 && (
+      <div style={{
+        marginTop: 4,
+        fontSize: 11,
+        color: "#ff6b6b"
+      }}>
+        Missing: {node.data.missing.map(k => `\${${k}}`).join(", ")}
+      </div>
+    )}
+  </div>
+);
+
 
   const renderedNodes = nodes.map((n) => ({
     ...n,
