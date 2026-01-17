@@ -304,6 +304,11 @@
     "emoji": "🔎",
     "sourceDir": "/home/user/github/nyno-private-extensions/nyno-search-grep"
   },
+  "nyno-string-to-camelcase": {
+    "yaml": "- step: nyno-string-to-camelcase\n  args:\n    - ${prev}\n  context:\n    STC_PREPEND:\"\"\n    STC_APPEND:\"\"\n",
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-string-to-camelcase"
+  },
   "nyno-wait": {
     "yaml": null,
     "emoji": "",

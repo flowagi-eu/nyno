@@ -55,7 +55,12 @@ export function renderOnce(str, ctx, missing) {
       missing.add(key);
       return `\${${key}}`;
     }
-    return String(ctx[key]);
+
+    return typeof ctx[key] === 'string'
+  ? ctx[key]
+  : JSON.stringify(ctx[key]);
+
+
   });
 }
 
@@ -86,17 +91,28 @@ export function getContextValue(key, ctx, missing) {
 
 
 
-/**
- * Render args using render-once context
- */
 export function renderArgs(args, ctx, missing) {
   return args.map(arg => {
     if (typeof arg !== 'string') return arg;
 
+    // FULL replacement: "${key}" → raw value (object-safe)
+    const fullMatch = arg.match(/^\$\{(\w+)\}$/);
+    if (fullMatch) {
+      const key = fullMatch[1];
+      if (!(key in ctx)) {
+        missing.add(key);
+        return arg;
+      }
+      return ctx[key];
+    }
+
+    // PARTIAL replacement → string
     return arg.replace(/\$\{(\w+)\}/g, (_, key) => {
-      return key in ctx
-        ? getContextValue(key, ctx, missing)
-        : (missing.add(key), `\${${key}}`);
+      if (!(key in ctx)) {
+        missing.add(key);
+        return `\${${key}}`;
+      }
+      return String(getContextValue(key, ctx, missing));
     });
   });
 }
@@ -105,10 +121,11 @@ export function renderArgs(args, ctx, missing) {
 /** ---------------- replaceNynoVariables ---------------- */
 
 export function replaceNynoVariables(node, prevContext = {}) {
+ const missing = new Set();
   const context = { ...prevContext };
   if (!context.__renderedKeys) context.__renderedKeys = [];
 
-  const missing = new Set();
+
 
   // Step-specific context additions
   const nodeContext = node.set_context || {};
