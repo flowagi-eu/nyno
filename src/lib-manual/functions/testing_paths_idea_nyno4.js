@@ -38,6 +38,7 @@ export async function traverseFullGraph(path, dynamicFunctions) {
   const result = [];
   let one_var = null;
   let forceStop = false;
+   
   //let stLog = []; // simple testing log
 
   if (!path.context) path.context = {};
@@ -92,6 +93,14 @@ export async function traverseFullGraph(path, dynamicFunctions) {
 			//stLog.push('executing dfunction',stepType);
 			//stLog.push('executing dfunction argsRep',argsRep);
         		fullResult = await dynamicFunctions[node](stepType, argsRep, contextRep);
+        		if(fullResult.c && !("__renderedKeys" in fullResult.c)){
+        		    fullResult.c.__renderedKeys = [];
+        		}
+        		for(const key of Object.keys(fullResult.c)){
+        		    if(!fullResult.c.__renderedKeys.includes(key)) {
+        		        fullResult.c.__renderedKeys.push(key); // add new keys 
+        		    }
+        		}
 	      }
       }
       
