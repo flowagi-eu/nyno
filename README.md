@@ -8,7 +8,7 @@
 ---
 
 
-## Nyno 5.1: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
+## Nyno 5.2: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
 - Try the Online Playground: [https://nyno.dev/online-playground](https://nyno.dev/online-playground)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
 
@@ -26,7 +26,7 @@ Nyno is an **open-source multi-language workflow engine** and [language](https:/
 Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in short human-readable **YAML Workflows** (.nyno files).
 
 ```yaml
-nyno: 5.1.0
+nyno: 5.2.0
 workflow:
   - step: ai-openai-text
     args: ['My idea: ${PROMPT}', minimal]
