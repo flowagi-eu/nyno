@@ -1,6 +1,6 @@
 FROM debian:13-slim
 
-WORKDIR /app
+WORKDIR /nyno
 
 # --- Base system setup ---
 RUN apt-get update && \
@@ -57,10 +57,10 @@ RUN git clone https://github.com/empowerd-cms/best.js /opt/best.js && \
     cd /opt/best.js && bun install && npm link
 
 # --- Copy Nyno source ---
-COPY . /app
+COPY . /nyno
 
 # --- Install Nyno dependencies ---
-RUN cd /app && bun install
+RUN cd /nyno && bun install
 
 
 # --- Install Astral UV via curl/sh ---
@@ -69,13 +69,13 @@ ENV PATH="/root/.local/bin:$PATH"
 
 
 # Create Python venv
-RUN python3 -m venv /app/.venv
+RUN python3 -m venv /nyno/.venv
 
 # Add both uv and venv binaries to PATH
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/nyno/.venv/bin:$PATH"
 
 # --- Install dependencies using uv ---
-RUN uv sync --project /app || echo "[WARN] uv sync may fail if requirements missing"
+RUN uv sync --project /nyno || echo "[WARN] uv sync may fail if requirements missing"
 
 
 # --- Expose ports ---

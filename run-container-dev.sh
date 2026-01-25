@@ -30,10 +30,10 @@ echo "RB:$RB"
 
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
--v $(pwd)/workflows-enabled:/app/workflows-enabled \
--v $(pwd)/envs:/app/envs \
--v $(pwd)/output:/app/output \
--v $(pwd)/extensions:/app/extensions \
+-v $(pwd)/workflows-enabled:/nyno/workflows-enabled \
+-v $(pwd)/envs:/nyno/envs \
+-v $(pwd)/output:/nyno/output \
+-v $(pwd)/extensions:/nyno/extensions \
 -p "$PY:$PY" -p "$JS:$JS" -p "$PE:$PE" \
 -p "$RB:$RB" \
 -p "$WF:$WF" -p "$GU:$GU" $IMAGE_NAME bash
