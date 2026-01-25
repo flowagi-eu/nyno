@@ -77,7 +77,7 @@ const makeCheckFunction = (files) => () => {
         if (!d.isDirectory()) return false;
 
         const allowed = isExtensionNameAllowed(d.name);
-        console.log('[EXT CHECK]', d.name, 'allowed:', allowed);
+        //console.log('[EXT CHECK]', d.name, 'allowed:', allowed);
         return allowed;
       })
       .some(subDir =>
