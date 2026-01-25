@@ -12,6 +12,8 @@ IMAGE_NAME="nyno:latest"
 mkdir -p envs
 mkdir -p output
 
+rm envs/.nyno_log_db.env -f
+
 source "$(pwd)/envs/ports.env"
 
 # Possibly override with custom .local.env
