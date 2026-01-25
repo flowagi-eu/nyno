@@ -42,7 +42,7 @@ useEffect(() => {
 const [oneVarText, setOneVarText] = useState(`context:
   key1: "value1"`);
 
-    const [simpleOutput, setSimpleOutput] = useState(true);
+    const [simpleOutput, setSimpleOutput] = useState(false);
   
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

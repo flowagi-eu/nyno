@@ -193,7 +193,9 @@ const hasAgentConfigUpstream = (targetNodeId, allNodes, allEdges) => {
       const parsedYaml = YAML.load(node.data.info);
       if (Array.isArray(parsedYaml)) {
         parsedTools = parsedYaml[0]?.tools || [];
+        setContextVars(parsedYaml[0].context || {});  // ✅ Populate editor with existing context
       }
+
     } catch {}
     node = {
       ...node,
@@ -215,19 +217,24 @@ const hasAgentConfigUpstream = (targetNodeId, allNodes, allEdges) => {
     pushHistory(nodes, newEdges);
   };
 
-  const handleFieldChange = (field, value) => {
-    const updatedNodes = nodes.map((n) =>
-      n.id === selectedNode.id
-        ? { ...n, data: { ...n.data, [field]: value, ...(field === "label" ? { rawLabel: value } : {}) } }
-        : n
-    );
-    setNodes(updatedNodes);
-    setSelectedNode((prev) => ({
-      ...prev,
-      data: { ...prev.data, [field]: value, ...(field === "label" ? { rawLabel: value } : {}) },
-    }));
-    pushHistory(updatedNodes, edges);
-  };
+ const handleFieldChange = (updates) => {
+  if (!selectedNode) return;
+
+  const updatedNodes = nodes.map((n) =>
+    n.id === selectedNode.id
+      ? { ...n, data: { ...n.data, ...updates, ...(updates.label ? { rawLabel: updates.label } : {}) } }
+      : n
+  );
+
+  setNodes(updatedNodes);
+  setSelectedNode((prev) => ({
+    ...prev,
+    data: { ...prev.data, ...updates, ...(updates.label ? { rawLabel: updates.label } : {}) },
+  }));
+
+  pushHistory(updatedNodes, edges);
+};
+
   
   // --- Normalize workflow: ensure ids + next exist
 const normalizeWorkflow = (workflow) => {
@@ -507,8 +514,14 @@ setNodeCounter(maxId + 1);
         <ReactFlow
           nodes={renderedNodes}
           edges={edges}
-          onNodesChange={(changes) => { onNodesChange(changes); pushHistory(nodes, edges); }}
-          onEdgesChange={(changes) => { onEdgesChange(changes); pushHistory(nodes, edges); }}
+          onNodesChange={(changes) => { 
+            onNodesChange(changes); 
+            //pushHistory(nodes, edges);
+           }}
+          onEdgesChange={(changes) => { 
+            onEdgesChange(changes); 
+            //pushHistory(nodes, edges);
+           }}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onEdgeDoubleClick={onEdgeDoubleClick}
@@ -557,7 +570,7 @@ setNodeCounter(maxId + 1);
               selectedNode.data.info,
               contextVars
             );
-            handleFieldChange("info", newInfo);
+            handleFieldChange({"info": newInfo});
             setContextOpen(false);
           }}
         >
@@ -580,7 +593,7 @@ setNodeCounter(maxId + 1);
               {selectedNode && (
                 <>
                   <div style={{ marginTop: "1rem" }}>
-                    <input className="nodeTitle" type="text" value={selectedNode.data.rawLabel} onChange={(e) => handleFieldChange("label", e.target.value)}
+                    <input className="nodeTitle" type="text" value={selectedNode.data.rawLabel} onChange={(e) => handleFieldChange({"label": e.target.value})}
                       style={{ width: "100%", marginBottom: "0.5rem", fontSize: "24px", background: "none", color: "white", border: "none" }} />
 
                       {isAgentConfigStep(selectedNode?.data?.info) ? (
@@ -592,7 +605,7 @@ setNodeCounter(maxId + 1);
   if (JSON.stringify(oldTools) === JSON.stringify(newTools)) return;
 
   // persist tools
-  handleFieldChange("tools", newTools);
+  handleFieldChange({"tools": newTools});
 
   // persist yaml
   const yamlObj = [
@@ -601,7 +614,7 @@ setNodeCounter(maxId + 1);
       tools: newTools,
     },
   ];
-  handleFieldChange("info", YAML.dump(yamlObj, { flowLevel: 3 }));
+  handleFieldChange({"info": YAML.dump(yamlObj, { flowLevel: 3 })});
 }}
 
 />
@@ -621,8 +634,9 @@ setNodeCounter(maxId + 1);
     const templateYaml = templates[templateKey] || "";
     const templateEmoji = emojis[templateKey] || "";
 
-    handleFieldChange("info", templateYaml);
+    handleFieldChange({"info": templateYaml, "emoji": templateEmoji});
 
+/*
     setNodes((nds) =>
       nds.map((n) =>
         n.id !== selectedNode.id
@@ -635,7 +649,7 @@ setNodeCounter(maxId + 1);
               },
             }
       )
-    );
+    );*/
 
 
 
@@ -673,9 +687,21 @@ setNodeCounter(maxId + 1);
       };
       const newEdges = [...edges, newEdge];
 
-      setNodes(newNodes);
-      setEdges(newEdges);
-      pushHistory(newNodes, newEdges);
+      //setNodes(newNodes);
+      //setEdges(newEdges);
+      //pushHistory(newNodes, newEdges);
+
+
+    handleFieldChange({"info": templateYaml,"emoji": templateEmoji});
+
+      setNodes((nds) => {
+        const updated = [...nds, configNode];
+        pushHistory(updated, [...edges, newEdge]);
+        return updated;
+      });
+
+      setEdges((eds) => [...eds, newEdge]);
+
       setNodeCounter((c) => c + 1);
     }
 
@@ -684,7 +710,7 @@ setNodeCounter(maxId + 1);
   
 />
 
-<YamlFormToggle value={selectedNode.data.info} onChange={(val) => handleFieldChange("info", val)} />
+<YamlFormToggle value={selectedNode.data.info} onChange={(val) => handleFieldChange({"info": val})} />
                     
                     <button
   onClick={() => setContextOpen(true)}

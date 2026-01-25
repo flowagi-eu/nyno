@@ -41,7 +41,7 @@ export default function DynamicKeyValueEditor({ value = {}, onChange }) {
   };
 
   return (
-    <div>
+    <div className="contextEditForm">
       {rows.map((row, index) => (
         <div key={index}>
           <input
