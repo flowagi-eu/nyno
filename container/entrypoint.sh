@@ -2,7 +2,7 @@
 set -e
 
 PG_BIN=/usr/lib/postgresql/18/bin
-PG_DATA=/app/pgdata   # writable in rootless Podman
+PG_DATA=/nyno/pgdata   # writable in rootless Podman
 PG_PORT=5432
 
 
