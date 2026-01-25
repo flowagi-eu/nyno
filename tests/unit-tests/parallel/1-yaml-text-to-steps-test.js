@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+// -----------------------------
+// The Purpose of this test is to proof that we can run the loadNynoWorkflowFromText function
+// in order to convert YAML to an Object
+//
+// No specific assertions, just a light test to see if the basics work.
+// -----------------------------
+
 import { loadNynoWorkflowFromText } from '../../../src/lib-manual/functions/yaml-to-object-for-nyno1.js';
-
-import * as jsYaml from 'js-yaml';
-import fs from 'fs';
-import path from 'path';
-
-/** ---------------- Full nyno workflow ---------------- */
 
   // 1) Text to object
   let text = `
@@ -36,6 +37,7 @@ let steps = [];
 for(const step of obj.workflow){
 	steps.push(step.step);
 }
+
 console.log(JSON.stringify({
 	expect: "Input YAML text turns into steps", 
 	input: {text}, 

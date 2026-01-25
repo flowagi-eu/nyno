@@ -9,6 +9,7 @@ export function flattenWorkflow(obj) {
     loops: {},
     steps: {},          // stepId -> step name string
     args: {},           // stepId -> args array
+    tools: {},           // stepId -> tools array (from agent-tools-config)
     step_context: {},   // stepId -> context object
     context: obj.context || {}
   };
@@ -32,6 +33,11 @@ export function flattenWorkflow(obj) {
     // Args (if defined)
     if (step.args !== undefined) {
       result.args[id] = step.args;
+    }
+
+    // Tools (if defined)
+    if (step.tools !== undefined) {
+      result.tools[id] = step.tools;
     }
 
     // Step context (if defined)

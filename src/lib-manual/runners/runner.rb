@@ -64,7 +64,6 @@ def load_extensions
 
     cmd_file = File.join(source_dir, "command.rb")
     unless File.exist?(cmd_file)
-      puts "[Ruby Runner] Missing command.rb for #{ext_name}"
       next
     end
 

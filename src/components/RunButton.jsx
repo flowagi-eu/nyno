@@ -40,7 +40,7 @@ useEffect(() => {
 
   const [oneVarMode, setOneVarMode] = useState(false);
 const [oneVarText, setOneVarText] = useState(`context:
-  NYNO_ONE_VAR: "prev"`);
+  key1: "value1"`);
 
     const [simpleOutput, setSimpleOutput] = useState(true);
   
@@ -171,7 +171,7 @@ if (usesOpenAI && OpenAIKey) {
   if (!popup) return;
 
   // set initial width
-  popup.style.width = '333px';
+  popup.style.width = '432px';
 
   // avoid duplicating resizer
   if (popup.querySelector('.rnh_resizer')) return;
@@ -276,8 +276,7 @@ const renderSimpleChat = () => {
     } else if (prev) {
       content = typeof prev === "string" ? prev : JSON.stringify(prev);
     } else {
-      const fallbackContent = Object.values(context).find(val => typeof val === "string");
-      content = fallbackContent || "No output";
+      content = JSON.stringify(context);
     }
   } else {
     content = "No execution data";
@@ -491,9 +490,9 @@ Custom Context
 
                 <button 
                   onClick={handleSaveFile}
-                  className="rnh_btn_save px-4 py-2 bg-blue-600 text-white rounded-2xl shadow hover:bg-blue-700"
+
                 >
-                  Save as File
+                  Save Output as File
                 </button>
                 </div>
               )}

@@ -138,6 +138,7 @@ export function TemplateSelect({
             border: "none",
             padding: "0 10px",
             cursor: "pointer",
+            margin: 0,
           }}
         >
           ▾

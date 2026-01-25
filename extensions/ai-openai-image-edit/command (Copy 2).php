@@ -30,8 +30,6 @@ function ai_openai_image_edit($args, &$context) {
 
     // Extract arguments
     $imagePaths = is_array($args[0]) ? $args[0] : [$args[0]];
-   
-        
     $prompt = $args[1];
     $size = $args[2] ?? "1024x1024";
 
@@ -107,6 +105,7 @@ function ai_openai_image_edit($args, &$context) {
         $context[$setName] = $savedFiles;
         return 0;
     } else {
+        $context['error'] = "No images were saved.\n";
         return 1;
     }
 }

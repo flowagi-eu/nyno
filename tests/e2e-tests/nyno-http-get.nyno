@@ -1,5 +1,5 @@
 context:
-  URL: "http://localhost:9057" # example
+  URL: "https://nyno.dev" # example
 workflow:
   - step: nyno-http-get
     args:

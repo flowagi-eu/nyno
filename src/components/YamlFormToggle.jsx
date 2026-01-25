@@ -104,7 +104,7 @@ export function YamlFormToggle({ value, onChange }) {
           value={value}
           spellCheck={false}
           onChange={(e) => onChange(e.target.value)}
-          style={{ width: "100%", height: 120 }}
+          style={{ width: "100%", height: 240 }}
         />
      
     </div>

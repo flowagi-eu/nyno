@@ -1,0 +1,6 @@
+- step: ai-mistral-agent
+  args:
+    - set a meeting called "My meeting 1" for tomorrow
+    - ${TOOL_SETTINGS}
+  context:
+    set_context: "agent"

@@ -21,9 +21,9 @@ export default function App() {
   // --- Build YAML live
   useEffect(() => {
     const yamlObj = {
-      version: 1,
+      nyno: "5.3",
       tools: tools.map((t) => ({
-        name: t.name,
+        name: t.name.toLowerCase().replaceAll(' ','-'),
         description: t.description,
         input_schema: Object.fromEntries(
           t.fields
@@ -78,22 +78,22 @@ export default function App() {
     const blob = new Blob([yamlText], { type: "application/x-yaml" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "tools.yaml";
+    a.download = "data.nynoagent";
     a.click();
   };
 
   return (
-    <div style={styles.page}>
-      <h2>Create Intentions File for AI Agents</h2>
+    <div className="page-nynoagent" style={styles.page}>
+      <h2>Create Your .nynoagent</h2>
 
       <div style={styles.actions}>
         <button onClick={() => setTools([...tools, emptyTool()])}>
-          ➕ Add Intention
+          ➕ Add Tool
         </button>
         <button onClick={download}>⬇️ Download</button>
         <input
           type="file"
-          accept=".yaml,.yml,.txt"
+          accept=".nynoagent"
           onChange={(e) => importYaml(e.target.files[0])}
         />
       </div>
@@ -114,7 +114,7 @@ export default function App() {
                 }
               />
               <input
-                placeholder="Intent description"
+                placeholder="intent description"
                 value={tool.description}
                 onChange={(e) =>
                   setTools(
@@ -129,7 +129,7 @@ export default function App() {
                 {tool.fields.map((f, fi) => (
                   <div key={fi} style={styles.field}>
                     <input
-                      placeholder="field name"
+                      placeholder="variable name"
                       value={f.name}
                       onChange={(e) => {
                         const next = [...tools];
@@ -138,7 +138,7 @@ export default function App() {
                       }}
                     />
                     <input
-                      placeholder="field description"
+                      placeholder="describe value to generate"
                       value={f.description}
                       onChange={(e) => {
                         const next = [...tools];
@@ -186,7 +186,7 @@ export default function App() {
                     setTools(next);
                   }}
                 >
-                  ➕ Add Field
+                  ➕ Add Variable
                 </button>
               </div>
 
@@ -195,7 +195,7 @@ export default function App() {
                   setTools(tools.filter((_, i) => i !== ti))
                 }
               >
-                Remove Intention
+                Remove Tool
               </button>
             </div>
           ))}
@@ -247,6 +247,8 @@ const styles = {
     flex: 1,
     height: "80vh",
     fontFamily: "monospace",
+        display: "none",
+
   },
 };
 
