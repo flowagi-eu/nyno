@@ -61,7 +61,7 @@ body .react-flow__node-default
 }
 
 
-.rnh_button {   background: black;   background: #01b3f7;   border: 1px solid #0c9af8;   padding: 6px 15px;   border-radius: 9px;   margin: 9px;   font-size: 1.2rem; cursor:pointer;}
+.rnh_button {     background: #01b3f7;   border: 1px solid #0c9af8;   padding: 6px 15px;   border-radius: 9px;   margin: 9px;   font-size: 1.2rem; cursor:pointer; color:black;}
 .rnh_popup {   position: fixed;   right: 0;   top: 0;   bottom: 0;   background: #03060b !important;   width: 333px;   z-index: 9999;   overflow: scroll;   padding-top: 4rem;   
   padding: 4rem 2rem;   box-sizing: border-box;
   padding: 5rem 2rem;
@@ -113,3 +113,45 @@ background:linear-gradient(to right, rgb(0, 27, 70),rgb(0, 0, 0));
 } 
 .chat-message {} 
 .rnh_close {position: fixed;top: 1.1rem;right: 187px;background: #000f25; }
+
+button {
+  background: #191f2a;
+  color: #fff;
+  border: 1px solid #3c3c3c;
+  padding: 8.1px 15px;
+  border-radius: 9px;
+  margin: 6px;
+    margin-right: 9px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.rnh_close {
+  position: fixed;
+  top: 0;
+  right: 187px;
+  background: #00050d;
+  opacity: 0.5;
+}
+
+@media(max-width:700px) {
+.ghh_badge{
+	display:none!important;
+}
+}
+
+.page-nynoagent input {
+  background: black;
+  border: none;
+  color: white;
+  padding: 9px;
+  margin-right:6px;
+}
+
+.dialog_content{
+  max-height:81dvh;
+  overflow-y:scroll;
+}
+label{
+  display:block;
+}

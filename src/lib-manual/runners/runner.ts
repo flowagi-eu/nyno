@@ -37,7 +37,7 @@ function load_nyno_ports(path = "envs/ports.env") {
   return env;
 }
 
-// Example usage
+
 
 const repoRoot = process.cwd(); 
 const portsFile = path.join(repoRoot, "envs/ports.env"); 
@@ -76,12 +76,10 @@ async function loadExtensions() {
 
     const cmdFile = path.join(sourceDir, "command.js");
     if (!fs.existsSync(cmdFile)) {
-      console.warn(`[JS Runner] Missing command.js for ${extName}`);
       continue;
     }
 
     try {
-      // === Plain import from path, as you requested ===
       const module = await import(cmdFile);
 
       // derive function name from folder: lowercase, - → _
@@ -136,16 +134,15 @@ async function startWorker() {
           socket.destroy();
         } else if (type === "r") {
           const fn = globalThis.state[payload.functionName];
+          let context = payload.context ?? {};
           if (typeof fn !== 'function') {
-            let context = payload.context ?? {};
             socket.write(JSON.stringify({ fnError: "not exist", c:context }) + "\n");
           } else {
             try {
-              let context = payload.context ?? {};
               const result = await fn(payload.args,context); //...(payload.args || []));
               socket.write(JSON.stringify({ r:result, c:context}) + "\n");
             } catch (err) {
-              socket.write(JSON.stringify({ error: err.message }) + "\n");
+              socket.write(JSON.stringify({ error: err.message,c:context }) + "\n");
             }
           }
         }

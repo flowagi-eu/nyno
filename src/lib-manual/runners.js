@@ -177,11 +177,11 @@ function connectRunner(type) {
       buffer = buffer.slice(idx + 1);
       if (!msg) continue;
 
-      const resolvedData = JSON.parse(msg); // .c & .r in object, needs c.n_id for parralel
+      const resolvedData = JSON.parse(msg); // .c & .r in object, needs c.__n_id for parralel
 
       if(resolvedData && resolvedData.c) { 
-      const n_id = resolvedData['c']['n_id'];
-      const resolver = pending[n_id];
+      const __n_id = resolvedData['c']['__n_id'];
+      const resolver = pending[__n_id];
       if (resolver) {
         try {
           resolver(JSON.parse(msg));
@@ -230,8 +230,8 @@ export function runFunctionSingle(language, functionName, args = [],context={}) 
 
 console.log('runFunctionSingle',language, functionName, args,context);
 
-let n_id = generateUUIDv7(); // nyno task id for parallel support
-context['n_id'] = n_id;
+let __n_id = generateUUIDv7(); // nyno task id for parallel support
+context['__n_id'] = __n_id;
 	console.log('language',language);
   const client = connections[language];
   if (!client || client.destroyed) throw new Error(`${language} runner not connected`);
@@ -239,7 +239,7 @@ context['n_id'] = n_id;
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error(`runFunction timeout for ${language}:${functionName}`)), 9999999);
 
-    pending[n_id] = (msg) => {
+    pending[__n_id] = (msg) => {
       clearTimeout(timeout);
       if (!msg) return reject(new Error("No response from runner"));
       resolve(msg);

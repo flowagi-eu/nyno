@@ -85,7 +85,6 @@ def load_extensions():
 
         cmd_file = os.path.join(source_dir, "command.py")
         if not os.path.exists(cmd_file):
-            print(f"[Python Runner] Missing command.py for {ext_name}")
             continue
 
         try:

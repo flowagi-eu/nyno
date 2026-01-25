@@ -1,142 +1,134 @@
-
-
-// generate dynamic function both for production & testing
-export function generateDF(isTesting=false) {
-  return async function(step,rawArgs,prevContext={}) {
-
-
-    const [error, args, context] = replaceNynoVariables({ step, args: rawArgs }, prevContext);
-	//  if(error) console.log("ERRROR!!!!",error,args,context);
-
-    context.LAST_STEP = step;
-
-    if (error) return { c: context, r: -1 };
-
-    // Simulate function outputs
-    const returnCode = 0;
-
-    // Store prev values
-    // replace this with actual call based on step name (step)
-    if(isTesting) {
-	 // for testing
-    	context.prev = args[0];
-    	context.prev_ret = returnCode;
-    } else {
-	// todo
-    }
-
-    // Any new keys added dynamically are automatically added to renderedKeys
-    Object.keys(context).forEach(k => {
-      if (k !== '__renderedKeys' && !context.__renderedKeys.includes(k)) {
-        context.__renderedKeys.push(k);
-      }
-    });
-
-    return {
-      c: context,
-      r: returnCode,
-      args
-    };
-  }
-}
-		
-
-/** ---------------- Render-once helpers ---------------- */
-
 /**
  * Single-pass rendering: replaces ${key} with ctx[key]
  * - leaves unknown keys intact
  */
-export function renderOnce(str, ctx, missing) {
+export function renderOnce(str, ctx, missing = null) {
   if (typeof str !== 'string') return str;
 
-  return str.replace(/\$\{(\w+)\}/g, (_, key) => {
-    if (!(key in ctx)) {
-      missing.add(key);
-      return `\${${key}}`;
+  //console.log('renderOnce str', JSON.stringify(str));
+  //console.log('renderOnce ctx', JSON.stringify(ctx));
+
+  // FULL replacement
+  const fullMatch = str.match(/^\$\{([\w.]+)\}$/);
+  if (fullMatch) {
+    const path = fullMatch[1];
+    const value = resolvePath(ctx, path);
+
+    if (value === undefined) {
+      missing?.add(path);
+      return str;
     }
 
-    return typeof ctx[key] === 'string'
-  ? ctx[key]
-  : JSON.stringify(ctx[key]);
+    // return raw value (not stringified)
+    return value;
+  }
 
+  // PARTIAL replacement
+  return str.replace(/\$\{([\w.]+)\}/g, (_, path) => {
+    const value = resolvePath(ctx, path);
 
+    if (value === undefined) {
+      missing?.add(path);
+      return `\${${path}}`;
+    }
+
+    return typeof value === 'string'
+      ? value
+      : JSON.stringify(value);
   });
 }
 
 
-/**
- * Safely get a context value:
- * - render only once
- * - mark rendered keys inside ctx.__renderedKeys
- */
-export function getContextValue(key, ctx, missing) {
-  if (!(key in ctx)) {
-    missing.add(key);
-    return `\${${key}}`;
+
+function resolvePath(ctx, path) {
+  // Fast path: exact key exists
+  if (path in ctx) return ctx[path];
+
+  // No dot and not found → missing
+  if (!path.includes('.')) return undefined;
+
+  // Deep path
+  let current = ctx;
+  for (const key of path.split('.')) {
+    if (current && typeof current === 'object' && key in current) {
+      current = current[key];
+    } else {
+      return undefined;
+    }
   }
-
-  if (!ctx.__renderedKeys) ctx.__renderedKeys = [];
-
-  if (ctx.__renderedKeys.includes(key)) {
-    return ctx[key];
-  }
-
-  const rendered = renderOnce(ctx[key], ctx, missing);
-  ctx[key] = rendered;
-  ctx.__renderedKeys.push(key);
-
-  return rendered;
+  return current;
 }
 
-
-
 export function renderArgs(args, ctx, missing) {
+  //console.log('renderArgs args',args);
   return args.map(arg => {
     if (typeof arg !== 'string') return arg;
 
-    // FULL replacement: "${key}" → raw value (object-safe)
-    const fullMatch = arg.match(/^\$\{(\w+)\}$/);
+    // FULL replacement
+    const fullMatch = arg.match(/^\$\{([\w.]+)\}$/);
     if (fullMatch) {
-      const key = fullMatch[1];
-      if (!(key in ctx)) {
-        missing.add(key);
+      const path = fullMatch[1];
+      const value = resolvePath(ctx, path);
+
+      if (value === undefined) {
+        missing.add(path);
         return arg;
       }
-      return ctx[key];
+      return value;
     }
 
-    // PARTIAL replacement → string
-    return arg.replace(/\$\{(\w+)\}/g, (_, key) => {
-      if (!(key in ctx)) {
-        missing.add(key);
-        return `\${${key}}`;
+    // PARTIAL replacement
+    return arg.replace(/\$\{([\w.]+)\}/g, (_, path) => {
+      const value = resolvePath(ctx, path);
+
+      if (value === undefined) {
+        missing.add(path);
+        return `\${${path}}`;
       }
-      return String(getContextValue(key, ctx, missing));
+
+      return typeof value === 'string'
+  ? value
+  : JSON.stringify(value);
+  
     });
   });
 }
 
-
-/** ---------------- replaceNynoVariables ---------------- */
-
-export function replaceNynoVariables(node, prevContext = {}) {
+export function replaceNynoVariables(node, context = {}) {
  const missing = new Set();
-  const context = { ...prevContext };
+
+  // 1. Rendered keys exists to prevent 
   if (!context.__renderedKeys) context.__renderedKeys = [];
 
-
-
   // Step-specific context additions
-  const nodeContext = node.set_context || {};
-  for (const k in nodeContext) {
+  const nodeContext = node.context || {};
+  //console.log('nodeContext keys',Object.keys(nodeContext));
+  //console.log('full context keys',Object.keys(context));
+  const mergedContext = { ...context, ...nodeContext };
+  //console.log('full mergedContext keys',Object.keys(mergedContext));
+  for (const k of Object.keys(nodeContext)) {
     if (!context.__renderedKeys.includes(k)) {
-      context[k] = renderOnce(nodeContext[k], context,missing);
+      //console.log('PATH: renderOnce(k',k);
+      context[k] = renderOnce(nodeContext[k], mergedContext);
+      //console.log('PATH VAL',context[k]);
+    } else {
+      //console.log('PATH: nodeContext[k]',k);
+      context[k] = nodeContext[k]; 
+      //console.log('PATH VAL',context[k]);
+    }
+  }
+
+  // add all keys to already rendered
+  for (const k of Object.keys(context)) {
+    if (!context.__renderedKeys.includes(k)) {
       context.__renderedKeys.push(k);
     }
   }
 
+
   // Render args
+  //console.log('full Render args context keys',Object.keys(context));
+
   const args = renderArgs(node.args || [], context, missing);
 
 if (missing.size > 0) {

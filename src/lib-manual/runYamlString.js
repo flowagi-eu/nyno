@@ -9,7 +9,6 @@ import {loadNynoWorkflowFromText} from './functions/yaml-to-object-for-nyno1.js'
 import { flattenWorkflow } from './functions/nyno-flatten-function.js';
 import { traverseFullGraph } from './functions/testing_paths_idea_nyno4.js';
 import { loadStepCommandLangs } from './functions/loadfunctiondatanyno.js';
-import { getOriginalKeys,replaceNynoVariables } from './functions/replaceKeys.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,33 +47,16 @@ export async function runYamlString(text,customContext=null) {
   // 2) object to flattened object
   let flattenedObj = flattenWorkflow(obj);
   debugLog('flattenedObj',flattenedObj);
-  const originalKeys = getOriginalKeys(obj);
 
   // 3) execute flatten object
   const dynamicFunctions = {};
   for(const item of obj.workflow) {
-    dynamicFunctions[item.id] = async function(step,rawArgs,rawContext) {
-
-      // replace variables like ${prev} dynamically and safely
-      const { error, args,context={}, missing } = replaceNynoVariables({ step,args:rawArgs, context: rawContext }, {
-      originalKeys
-    });
-
+    dynamicFunctions[item.id] = async function(step,args,context) {
         context['LAST_STEP'] = step; // special context
-
-    // stop if any nyno ${variables} are missing
-    if(error){
-      context['missing'] = missing;
-      return {c: context, r:-1};
-    }
-
-
         const language = languageKeyValue[step];
-        if(language == 'php'){
-          console.log({step,args,context});
-        }
-        const resultCode = await runFunctionSingle(language, step, args,context);
+        console.log('[DEBUG] dynamicFunctions',JSON.stringify({step,args,context}));
 
+        const resultCode = await runFunctionSingle(language, step, args,context);
 
         return resultCode;
     };
@@ -85,14 +67,23 @@ export async function runYamlString(text,customContext=null) {
   // 4. actually run the graph
   let workflowResult;
   const startTime = Date.now();
-   
+  
+  const INSECURE_CORE_DEV_MODE = false; // todo process.args
+  let debugStepLog = [];
+
   try {
-    workflowResult = await traverseFullGraph(flattenedObj,dynamicFunctions);
+    workflowResult = await traverseFullGraph(flattenedObj,dynamicFunctions,debugStepLog,INSECURE_CORE_DEV_MODE);
   } catch(err){
-    return { status:"error", execution: {err:String(err)} };
+    console.log('critical error',err);
+    if(INSECURE_CORE_DEV_MODE){
+      return { status:"error_critical", flattenedObj, debugStepLog, execution: {err:String(err)} };
+    } else {
+      return { status:"error_critical"};
+    }
   }
 
  const endTime = Date.now();
+
   
  // 5. determine result format
   if(flattenedObj.context && "NYNO_ONE_VAR" in flattenedObj.context) {
@@ -101,7 +92,12 @@ export async function runYamlString(text,customContext=null) {
      workflowResult = workflowResult.result;
   }
   
-  return { status:"ok", execution: workflowResult,execution_time_seconds: (endTime - startTime) / 1000 };
+  const retObj = { status:"ok", execution: workflowResult,execution_time_seconds: (endTime - startTime) / 1000 };
+  if(debugStepLog) {
+    retObj['debugStepLog'] = debugStepLog;
+  }
+
+  return retObj;
 }
 
 /**

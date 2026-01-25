@@ -5,6 +5,9 @@ import { RunButton } from "@/components/RunButton";
 import { Position } from "reactflow";
 import GitHubStarBadge from "@/components/GitHubStarBadge";
 import { TemplateSelect } from "@/components/TemplateSelect";
+import FileButton from "@/components/FileButton";
+import DynamicKeyValueEditor from "@/components/DynamicKeyValueEditor";
+import NynoAgentBuilder from "@/components/NynoAgentBuilder";
 
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
@@ -40,6 +43,10 @@ console.log({isPro});
   const initialEdges = [];
 
 
+const [contextVars, setContextVars] = useState({});
+const [contextOpen, setContextOpen] = useState(false);
+
+
   const [selectedNode, setSelectedNode] = useState(null);
 	const [selectedTemplate, setSelectedTemplate] = useState("");
 
@@ -69,6 +76,57 @@ console.log({isPro});
   // --- Undo history
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
   const [historyIndex, setHistoryIndex] = useState(0);
+
+  const isAgentConfigStep = (yamlStr) => {
+  if (!yamlStr || typeof yamlStr !== "string") return false;
+  return /(^|\n)\s*-\s*step:\s*tool-settings\b/i.test(yamlStr);
+};
+
+
+const applyContextToInfo = (infoYaml, contextObj) => {
+  let parsed = {};
+
+  try {
+    parsed = YAML.load(infoYaml) || {};
+  } catch {
+    parsed = {};
+  }
+
+  // If template is array-wrapped (your current pattern)
+  if (Array.isArray(parsed)) {
+    parsed = parsed[0] || {};
+  }
+
+  parsed.context = contextObj;
+
+  return YAML.dump([parsed], { flowLevel: 3 });
+};
+
+const isAgentTemplate = (yamlStr) => {
+  if (!yamlStr || typeof yamlStr !== "string") return false;
+  // Matches:
+  // - step: agent
+  // - step: my-agent
+  // - step: something-agent
+  const re = /(^|\n)\s*-\s*step:\s*[^\n#]*\bagent\b/i;
+  return re.test(yamlStr);
+};
+// Detect if selectedNode already has an upstream tool-settings node
+const hasAgentConfigUpstream = (targetNodeId, allNodes, allEdges) => {
+  const incoming = allEdges.filter(e => e.target === String(targetNodeId));
+  if (incoming.length === 0) return false;
+
+  const incomingSources = new Set(incoming.map(e => e.source));
+  for (const n of allNodes) {
+    if (!incomingSources.has(n.id)) continue;
+    const info = n?.data?.info || "";
+    if (typeof info === "string" && /(^|\n)\s*-\s*step:\s*tool-settings\b/i.test(info)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 
   const pushHistory = (newNodes, newEdges) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -128,9 +186,28 @@ console.log({isPro});
   );
 
   const onNodeClick = (_, node) => {
-    setSelectedNode(node);
-    setIsOpen(true);
-  };
+  // Parse tools from YAML if node is tool-settings
+  if (isAgentConfigStep(node?.data?.info)) {
+    let parsedTools = [];
+    try {
+      const parsedYaml = YAML.load(node.data.info);
+      if (Array.isArray(parsedYaml)) {
+        parsedTools = parsedYaml[0]?.tools || [];
+      }
+    } catch {}
+    node = {
+      ...node,
+      data: {
+        ...node.data,
+        tools: parsedTools,
+      },
+    };
+  }
+
+  setSelectedNode(node);
+  setIsOpen(true);
+};
+
 
   const onEdgeDoubleClick = (_, edge) => {
     const newEdges = edges.filter((e) => e.id !== edge.id);
@@ -257,7 +334,7 @@ console.log('before sortedNodes workflow',workflow);
 
 
 
-    const yamlObj = { nyno: "5.2", workflow };
+    const yamlObj = { nyno: "5.3", workflow };
     if (firstNodeRoute) yamlObj.route = firstNodeRoute;
 
     let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: 3 });
@@ -328,6 +405,7 @@ console.log('before sortedNodes workflow',workflow);
           info: YAML.dump([
   {
     step: step.step || "",
+          ...(step.tools ? { tools: step.tools } : {}),
     ...(step.args && step.args.length > 0 ? { args: step.args } : {}),
     ...(step.context && Object.keys(step.context).length > 0 ? { context: step.context } : {}),
 }
@@ -422,7 +500,8 @@ setNodeCounter(maxId + 1);
           <button onClick={addNode} style={{ marginRight: 5 }}>Add Node</button>
           <button onClick={exportYAML} style={{ marginRight: 5 }}>Export File</button>
           <button onClick={clearAll}>Clear All</button>
-          <input type="file" accept=".nyno" onChange={importYAML} />
+          
+          <FileButton onFile={importYAML} />
         </div>
 
         <ReactFlow
@@ -446,6 +525,49 @@ setNodeCounter(maxId + 1);
         >
           <Background variant="dots" gap={9} size={0.81} />
         </ReactFlow>
+        
+        <Dialog.Root open={contextOpen} onOpenChange={setContextOpen}>
+  <Dialog.Portal>
+    <Dialog.Overlay
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)" }}
+    />
+    <Dialog.Content
+      style={{
+        background: "#111",
+        padding: "1rem",
+        borderRadius: 6,
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: 360,
+      }}
+    >
+      <h3 style={{ color: "white", marginBottom: 8 }}>Context Variables</h3>
+
+      <DynamicKeyValueEditor
+        value={contextVars}
+        onChange={setContextVars}
+      />
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+        <button
+          onClick={() => {
+            const newInfo = applyContextToInfo(
+              selectedNode.data.info,
+              contextVars
+            );
+            handleFieldChange("info", newInfo);
+            setContextOpen(false);
+          }}
+        >
+          Save
+        </button>
+      </div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
+
 
         <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
           <Dialog.Portal>
@@ -453,13 +575,42 @@ setNodeCounter(maxId + 1);
             <Dialog.Content
               className="dialog_content"
               onKeyDown={handleDialogKeyDown}
-              style={{ background: "#171717", borderRadius: "8px", padding: "1rem 3rem", position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "300px", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}
+              style={{ background: "#171717", borderRadius: "8px", padding: "1rem 3rem", position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "402px", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}
             >
               {selectedNode && (
                 <>
                   <div style={{ marginTop: "1rem" }}>
                     <input className="nodeTitle" type="text" value={selectedNode.data.rawLabel} onChange={(e) => handleFieldChange("label", e.target.value)}
                       style={{ width: "100%", marginBottom: "0.5rem", fontSize: "24px", background: "none", color: "white", border: "none" }} />
+
+                      {isAgentConfigStep(selectedNode?.data?.info) ? (
+                        <div>
+<NynoAgentBuilder
+  value={selectedNode.data.tools || []}
+  onChange={(yaml, newTools) => {
+  const oldTools = selectedNode.data.tools || [];
+  if (JSON.stringify(oldTools) === JSON.stringify(newTools)) return;
+
+  // persist tools
+  handleFieldChange("tools", newTools);
+
+  // persist yaml
+  const yamlObj = [
+    {
+      step: "tool-settings",
+      tools: newTools,
+    },
+  ];
+  handleFieldChange("info", YAML.dump(yamlObj, { flowLevel: 3 }));
+}}
+
+/>
+
+  
+
+  </div>
+) : (
+  <div>
 		      <TemplateSelect
   templates={templates}
   emojis={emojis}
@@ -485,11 +636,71 @@ setNodeCounter(maxId + 1);
             }
       )
     );
+
+
+
+
+// If this template includes an agent step, insert an tool-settings node above it
+    if (isAgentTemplate(templateYaml)) {
+      // Avoid duplicates if a config already exists
+      if (hasAgentConfigUpstream(selectedNode.id, nodes, edges)) {
+        return;
+      }
+
+      // Create a new node id
+      const newId = String(nodeCounter);
+      const agentNode = nodes.find((n) => n.id === String(selectedNode.id));
+      const baseX = agentNode?.position?.x ?? 0;
+      const baseY = agentNode?.position?.y ?? 0;
+
+      const configNode = {
+        id: newId,
+        position: { x: baseX, y: baseY - 120 },
+        data: {
+              tools: [], // 
+          label: "tool-settings",
+          rawLabel: "tool-settings",
+          info: YAML.dump([{ step: "tool-settings" }], { flowLevel: 3 }),
+          emoji: "🧰",
+        },
+      };
+
+      const newNodes = [...nodes, configNode];
+      const newEdge = {
+        id: `e${newId}-${selectedNode.id}`,
+        source: newId,
+        target: String(selectedNode.id),
+      };
+      const newEdges = [...edges, newEdge];
+
+      setNodes(newNodes);
+      setEdges(newEdges);
+      pushHistory(newNodes, newEdges);
+      setNodeCounter((c) => c + 1);
+    }
+
   }}
+
+  
 />
 
+<YamlFormToggle value={selectedNode.data.info} onChange={(val) => handleFieldChange("info", val)} />
+                    
+                    <button
+  onClick={() => setContextOpen(true)}
+  style={{ marginTop: 8 }}
+>
+  Edit Variables
+</button>
 
-                    <YamlFormToggle value={selectedNode.data.info} onChange={(val) => handleFieldChange("info", val)} />
+</div>
+
+
+)}
+
+
+                    
+
                   </div>
 
                   <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>

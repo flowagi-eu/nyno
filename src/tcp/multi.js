@@ -26,8 +26,8 @@ export default function register(router) {
 	 console.log('got data',data);
     const startTime = Date.now();
     const result = await runYamlString(yamlContent,context);
-	 console.log('got result',result);
-	 console.log('got data 2',data);
+	 console.log('got result',JSON.stringify(result));
+	 console.log('got data 2',JSON.stringify(data));
     const endTime = Date.now();
 
 		return result;
@@ -64,6 +64,8 @@ export default function register(router) {
         const path = context.path;
         delete context['path'];
         
+
+	// We can load nyno-src/mode/async.nyno if NYNO_ASYNC=1 is specified from any workflow here (runWorkflowFn sdk)
         if(context && "NYNO_ASYNC" in context){
             context['WORKFLOW_NAME'] = path.replace(/^\/+/, ""); // removes all leading slashes
             context['NYNO_EXTRA_VAR_CONTEXT'] = 1;

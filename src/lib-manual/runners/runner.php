@@ -53,7 +53,6 @@ if (!$manifestPath || !file_exists($manifestPath)) {
 
         $cmdFile = $sourceDir . "/command.php";
         if (!file_exists($cmdFile)) {
-            echo "[PHP Runner] Missing command.php for $extName\n";
             continue;
         }
 

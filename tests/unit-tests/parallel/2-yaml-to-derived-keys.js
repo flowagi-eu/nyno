@@ -1,10 +1,14 @@
 #!/usr/bin/env node
+// -----------------------------
+// The Purpose of this test is to proof that we can run the flattenWorkflow function
+// in order to convert YAML=>Object=>Flattened Object
+//
+// No specific assertions, just a light test to see if the basics work.
+// -----------------------------
+
 import { loadNynoWorkflowFromText } from '../../../src/lib-manual/functions/yaml-to-object-for-nyno1.js';
 import { flattenWorkflow } from '../../../src/lib-manual/functions/nyno-flatten-function.js';
-import { traverseFullGraph } from '../../../src/lib-manual/functions/testing_paths_idea_nyno4.js';
-import * as jsYaml from 'js-yaml';
-import fs from 'fs';
-import path from 'path';
+
 
   // 1) Text to object
   let text = `

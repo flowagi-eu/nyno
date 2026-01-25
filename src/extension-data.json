@@ -1,4 +1,9 @@
 {
+  "ai-mistral-agent": {
+    "yaml": "- step: ai-mistral-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${TOOL_SETTINGS}\n  context:\n    set_context: \"agent\"\n",
+    "emoji": "🤖",
+    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-agent"
+  },
   "ai-mistral-classifier": {
     "yaml": "- step: ai-mistral-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n",
     "emoji": "🤖",
@@ -18,6 +23,11 @@
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
     "emoji": "🤖",
     "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-text"
+  },
+  "ai-openai-agent": {
+    "yaml": "- step: ai-openai-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${NYNOAGENT_CONFIG}\n\n",
+    "emoji": "🤖",
+    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-agent"
   },
   "ai-openai-classifier": {
     "yaml": "- step: ai-openai-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n\n",
@@ -209,15 +219,20 @@
     "emoji": "🔗",
     "sourceDir": "/home/user/github/nyno/extensions/serper-search"
   },
-  "ai-mistral-tool-gateway": {
-    "yaml": "- step: ai-mistral-tool-gateway\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - /home/user/github/nyno/input/tools3.yaml\n",
+  "tool-settings": {
+    "yaml": "- step: tool-settings\n",
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/ai-mistral-tool-gateway"
+    "sourceDir": "/home/user/github/nyno/extensions/tool-settings"
   },
-  "ai-openai-tool-gateway": {
-    "yaml": "- step: openai-tool-gateway\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n",
+  ".git": {
+    "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/ai-openai-tool-gateway"
+    "sourceDir": "/home/user/github/nyno-private-extensions/.git"
+  },
+  ".venv": {
+    "yaml": null,
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/.venv"
   },
   "empowerd-call-api": {
     "yaml": null,
@@ -228,6 +243,16 @@
     "yaml": null,
     "emoji": "",
     "sourceDir": "/home/user/github/nyno-private-extensions/hello-private-ts"
+  },
+  "hypothesis-boolean-filter": {
+    "yaml": "- step: hypothesis-boolean-filter\n  args:\n    - hypotheses:\n        H1:\n          target_customer_valid: true\n          problem_exists: true\n          willingness_to_pay: true\n        H2:\n          enterprise_only: true\n          long_sales_cycle: true\n      evidence:\n        target_customer_valid: false\n        problem_exists: true\n  context:\n    set_context: hbf_hypotheses\n\n",
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/hypothesis-boolean-filter"
+  },
+  "hypothesis-update": {
+    "yaml": "- step: hypothesis-update\n  args:\n    - hypotheses:\n        H1:\n          prior: 0.4\n        H2:\n          prior: 0.35\n        H3:\n          prior: 0.25\n      evidence:\n        H1: 0.7\n        H2: 0.4\n        H3: 0.2\n  context:\n    set_context: hu_beliefs\n\n",
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/hypothesis-update"
   },
   "node_modules": {
     "yaml": null,
@@ -254,6 +279,16 @@
     "emoji": "",
     "sourceDir": "/home/user/github/nyno-private-extensions/nyno-escape-html"
   },
+  "nyno-extract-text-by-selector": {
+    "yaml": "- step: nyno-extract-text-by-selector\n  args: \n    - ${prev} \n    - 'your .selector'\n",
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-extract-text-by-selector"
+  },
+  "nyno-falcon-keygen": {
+    "yaml": null,
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-falcon-keygen"
+  },
   "nyno-glob": {
     "yaml": "- step: nyno-glob\n  args:\n    - extensions/**/template.yml\n    - extensions/**/command.*\n\n",
     "emoji": "",
@@ -273,6 +308,11 @@
     "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
     "emoji": "🛢️",
     "sourceDir": "/home/user/github/nyno-private-extensions/nyno-json-sql"
+  },
+  "nyno-kyber": {
+    "yaml": null,
+    "emoji": "",
+    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-kyber"
   },
   "nyno-markdown-to-html-and-frontmatter": {
     "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
