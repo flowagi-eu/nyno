@@ -91,7 +91,7 @@ export async function traverseFullGraph(path, dynamicFunctions,debugLog=[],INSEC
         [ error, argsRep, contextRep ] = [false, [], context];
       } else if (stepType === 'tool-settings') {
         // 1.1.2 (uncommon) if tool-settings, only set TOOL_SETTINGS if defined, this node executes nothing
-        if(path.tools[node]) {
+        if(path.tools[node] && Array.isArray(path.tools[node]) && (path.tools[node]).length != 0) {
           context['TOOL_SETTINGS'] = path.tools[node];
         }
         

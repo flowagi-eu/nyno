@@ -1,5 +1,0 @@
-- step: ai-openai-agent
-  args:
-    - set a meeting called "My meeting 1" for tomorrow
-    - ${NYNOAGENT_CONFIG}
-

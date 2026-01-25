@@ -114,7 +114,7 @@ export default function NynoAgentBuilder({
                   <div key={key} style={styles.field}>
                     <label>variable</label>
                     <input
-                      placeholder="variable"
+                      placeholder="variable name"
                       value={key}
                       onChange={(e) => {
                         const nextKey = e.target.value;
@@ -128,7 +128,7 @@ export default function NynoAgentBuilder({
                       }}
                     />
 
-                    <label>gen description</label>
+                    <label>value to generate</label>
                     <input
                       placeholder="description"
                       value={f.description}

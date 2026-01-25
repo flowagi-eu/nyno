@@ -155,3 +155,12 @@ button {
 label{
   display:block;
 }
+.dialog_content input, .contextEditForm input {
+  
+  background: #111;
+  border: none;
+  color: white;
+  padding: 9px 12px;
+  border: 1px solid #4f4f4f;
+
+}
