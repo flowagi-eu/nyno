@@ -7,7 +7,7 @@
     "nyno": "./cli/cli.js"
   },
   "scripts": {
-    "build:node": "node scripts/init-private-folder.js && tsc && node dist-ts/nyno/scripts/copy-private-extensions.js",
+    "build:node": "node scripts/init-private-folder.js && tsc && node dist-ts/nyno/scripts/copy-private-extensions.js && node scripts/loadExtensions.js",
     "dev": "node server-dev.js",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.jsx --outDir dist/server",

@@ -216,7 +216,7 @@
   },
   "tool-settings": {
     "yaml": "- step: tool-settings\n",
-    "emoji": "",
+    "emoji": "🧰",
     "sourceDir": "/home/user/github/nyno/extensions/tool-settings"
   },
   ".git": {

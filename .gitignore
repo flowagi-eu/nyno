@@ -13,8 +13,6 @@ private-extensions
 uv.lock
 extensions-untested
 
-# Ignore everything in the extensions/ directory
-# tmp commented extensions/*
 envs/*
 workflows-enabled/*
 
