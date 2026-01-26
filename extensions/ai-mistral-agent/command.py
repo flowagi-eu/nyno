@@ -101,6 +101,15 @@ def load_tools_from_array(tools):
 
     return mistral_tools
 
+def remove_empty_enum(obj):
+    if isinstance(obj, dict):
+        return {k: remove_empty_enum(v) for k, v in obj.items() if not (k == "enum" and v == "")}
+    elif isinstance(obj, list):
+        return [remove_empty_enum(item) for item in obj]
+    else:
+        return obj
+
+
 
 def ai_mistral_agent(args, context):
     """
@@ -123,7 +132,12 @@ def ai_mistral_agent(args, context):
     tools = load_tools_from_array(tools_raw)
 
     print("tools_parsed", tools)
-    
+
+    tools = remove_empty_enum(tools)
+
+    print("tools_parsed remove_empty_enum", tools)
+
+
     api_key = context.get("MISTRAL_API_KEY")
     if not api_key:
         context["prev.error"] = {
