@@ -1,6 +1,6 @@
 {
   "ai-mistral-agent": {
-    "yaml": "- step: ai-mistral-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${TOOL_SETTINGS}\n  context:\n    set_context: \"agent\"\n",
+    "yaml": "- step: ai-mistral-agent\n  args:\n    - ${PROMPT}\n    - ${TOOL_SETTINGS}\n  context:\n    set_context: \"agent\"\n",
     "emoji": "🤖",
     "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-agent"
   },
@@ -23,11 +23,6 @@
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
     "emoji": "🤖",
     "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-text"
-  },
-  "ai-openai-agent": {
-    "yaml": "- step: ai-openai-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${NYNOAGENT_CONFIG}\n\n",
-    "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-agent"
   },
   "ai-openai-classifier": {
     "yaml": "- step: ai-openai-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n\n",
@@ -233,6 +228,11 @@
     "yaml": null,
     "emoji": "",
     "sourceDir": "/home/user/github/nyno-private-extensions/.venv"
+  },
+  "ai-openai-agent": {
+    "yaml": "- step: ai-openai-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${NYNOAGENT_CONFIG}\n\n",
+    "emoji": "🤖",
+    "sourceDir": "/home/user/github/nyno-private-extensions/ai-openai-agent"
   },
   "empowerd-call-api": {
     "yaml": null,

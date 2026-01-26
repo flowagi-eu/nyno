@@ -203,7 +203,9 @@ export async function traverseFullGraph(path, dynamicFunctions,debugLog=[],INSEC
           if(stepType.includes('-agent')) {
             // use ?prev.toolName for match
             if(INSECURE_CORE_DEV_MODE) debugLog.push('agent fullResult previous')
-            const toolName = fullResult.c.agent.toolName;
+
+	    const agent = fullResult.c.agent ?? {};
+            const toolName = agent.toolName ?? null;
             let matchingIndex = null;
 
             // read agents args and tools file
