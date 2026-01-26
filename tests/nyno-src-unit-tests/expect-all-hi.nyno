@@ -1,0 +1,27 @@
+nyno: '5.3'
+workflow:
+  - id: '1'
+    next: [2]
+    step: nyno-echo
+    args: [hi]
+    context: {set_context: echo1}
+  - id: '2'
+    next: [3]
+    step: nyno-echo
+    args: ['${SYSTEM_PROMPT}']
+    context: {SYSTEM_PROMPT: '${echo1}'}
+  - id: '3'
+    next: [4]
+    step: nyno-echo
+    args: ['${SYSTEM_PROMPT}']
+    context: {SYSTEM_PROMPT: '${echo1}'}
+  - id: '4'
+    next: [5, 6]
+    step: nyno-if
+    args: ['"${prev}" is "hi"']
+  - id: '6'
+    step: nyno-echo
+    args: [BAD]
+  - id: '5'
+    step: nyno-echo
+    args: [GOOD]

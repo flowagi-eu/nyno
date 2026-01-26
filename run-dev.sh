@@ -38,5 +38,7 @@ npm run build:node
 
 export VITE_NYNO_IS_PRO_VERSION
 
+node scripts/loadExtensions.js
+
 bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"
 #bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"
