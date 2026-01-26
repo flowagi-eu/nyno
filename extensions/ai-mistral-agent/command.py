@@ -137,14 +137,20 @@ def ai_mistral_agent(args, context):
         # Initialize Mistral client
         client = Mistral(api_key=api_key)
 
+        # Default system prompt
+        default_system_prompt = (
+            f"Today is {today}. "
+            "When providing dates, always use YYYY-MM-DD. "
+            "Use the provided schemas when appropriate."
+        )
+
+        # Use the context prompt if it exists, otherwise default
+        system_prompt = context.get("SYSTEM_PROMPT", default_system_prompt)
+
         messages = [
             {
                 "role": "system",
-                "content": (
-                    f"Today is {today}. "
-                    "When providing dates, always use YYYY-MM-DD. "
-                    "Use the provided schemas when appropriate."
-                )
+                "content": system_prompt
             },
             {
                 "role": "user",
