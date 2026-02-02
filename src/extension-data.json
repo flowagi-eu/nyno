@@ -219,6 +219,11 @@
     "emoji": "🧰",
     "sourceDir": "/home/user/nyno/extensions/tool-settings"
   },
+  "nyno-push-update": {
+    "yaml": "- step: nyno-push-update\n  args:\n    - ${USERNAME}\n    - ${COMMIT_MSG}\n    - ${REPO_DIR}\n",
+    "emoji": "💻",
+    "sourceDir": "/home/user/nyno-private-extensions/nyno-push-update"
+  },
   "placeholder": {
     "yaml": null,
     "emoji": "",
