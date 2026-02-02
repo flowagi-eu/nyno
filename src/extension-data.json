@@ -2,416 +2,226 @@
   "ai-mistral-agent": {
     "yaml": "- step: ai-mistral-agent\n  args:\n    - ${PROMPT}\n    - ${TOOL_SETTINGS}\n  context:\n    set_context: \"agent\"\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-agent"
+    "sourceDir": "/home/user/nyno/extensions/ai-mistral-agent"
   },
   "ai-mistral-classifier": {
     "yaml": "- step: ai-mistral-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-classifier"
+    "sourceDir": "/home/user/nyno/extensions/ai-mistral-classifier"
   },
   "ai-mistral-embeddings": {
     "yaml": "- step: ai-mistral-embeddings\n  args:\n    - '${prev}'\n",
     "emoji": "🧮",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-embeddings"
+    "sourceDir": "/home/user/nyno/extensions/ai-mistral-embeddings"
   },
   "ai-mistral-image-gen": {
     "yaml": "- step: ai-mistral-image-gen\n  args: \n    - ${PROMPT}\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-image-gen"
+    "sourceDir": "/home/user/nyno/extensions/ai-mistral-image-gen"
   },
   "ai-mistral-text": {
     "yaml": "- step: ai-mistral-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-mistral-text"
+    "sourceDir": "/home/user/nyno/extensions/ai-mistral-text"
   },
   "ai-openai-classifier": {
     "yaml": "- step: ai-openai-classifier\n  args:\n    - ${PROMPT}\n    - \"Title, ex. Prompt Guardrails Violation Detector\"\n    - \"Descripion, ex: Match for violations.\"\n    - \"minimal\"\n\n\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-classifier"
+    "sourceDir": "/home/user/nyno/extensions/ai-openai-classifier"
   },
   "ai-openai-embeddings": {
     "yaml": "- step: ai-openai-embeddings\n  args:\n    - '${prev}'\n",
     "emoji": "🧮",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-embeddings"
+    "sourceDir": "/home/user/nyno/extensions/ai-openai-embeddings"
   },
   "ai-openai-image-edit": {
     "yaml": "- step: ai-openai-image-edit\n  args: \n    - ${IMAGE_FILE_PATH}\n    - ${PROMPT}",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-image-edit"
+    "sourceDir": "/home/user/nyno/extensions/ai-openai-image-edit"
   },
   "ai-openai-image-gen": {
     "yaml": "- step: ai-openai-image-gen\n  args: \n    - ${PROMPT}",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-image-gen"
+    "sourceDir": "/home/user/nyno/extensions/ai-openai-image-gen"
   },
   "ai-openai-text": {
     "yaml": "- step: ai-openai-text\n  args:\n    - ${PROMPT}\n    - \"minimal\"\n  context:\n    SYSTEM_PROMPT: \"\"\n",
     "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno/extensions/ai-openai-text"
+    "sourceDir": "/home/user/nyno/extensions/ai-openai-text"
   },
   "nyno-accumulator": {
     "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-accumulator"
+    "sourceDir": "/home/user/nyno/extensions/nyno-accumulator"
   },
   "nyno-array-to-item": {
     "yaml": "- step: nyno-array-to-item\n  args:\n    - ${prev}\n\n",
     "emoji": "🧼",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-array-to-item"
+    "sourceDir": "/home/user/nyno/extensions/nyno-array-to-item"
   },
   "nyno-echo": {
     "yaml": "- step: nyno-echo\n  args:\n    - ${i}\n",
     "emoji": "🔢",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-echo"
+    "sourceDir": "/home/user/nyno/extensions/nyno-echo"
   },
   "nyno-extract-file-paths": {
     "yaml": "- step: nyno-extract-file-paths\n  args:\n    - [\"Message 1 with /file/path/abslute.png\", \"Message 2 ~/Workflows/test\"]",
     "emoji": "✂️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-extract-file-paths"
+    "sourceDir": "/home/user/nyno/extensions/nyno-extract-file-paths"
   },
   "nyno-extract-hrefs": {
     "yaml": "- step: nyno-extract-hrefs\n  args:\n    - \"<div><a href=\\\"/test-link\\\">test 1<a>\"\n",
     "emoji": "✂️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-extract-hrefs"
+    "sourceDir": "/home/user/nyno/extensions/nyno-extract-hrefs"
   },
   "nyno-extract-urls": {
     "yaml": "- step: nyno-extract-urls\n  args:\n    - ${TEXT}\n    - path/includes #optional\n",
     "emoji": "✂️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-extract-urls"
+    "sourceDir": "/home/user/nyno/extensions/nyno-extract-urls"
   },
   "nyno-file-read": {
     "yaml": "- step: nyno-file-read\n  args:\n    - ${FILE_PATH}\n",
     "emoji": "📁",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-file-read"
+    "sourceDir": "/home/user/nyno/extensions/nyno-file-read"
   },
   "nyno-file-write": {
     "yaml": "- step: nyno-file-write\n  args:\n    - ${OUTPUT_FILE_PATH}\n    - ${prev}\n",
     "emoji": "📁",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-file-write"
+    "sourceDir": "/home/user/nyno/extensions/nyno-file-write"
   },
   "nyno-filter-duplicates": {
     "yaml": "- step: nyno-filter-duplicates\n  args:\n    - ${OBJECTS}\n",
     "emoji": "🧼",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-filter-duplicates"
+    "sourceDir": "/home/user/nyno/extensions/nyno-filter-duplicates"
   },
   "nyno-html-to-markdown": {
     "yaml": "- step: nyno-html-to-markdown\n  args:\n    - ${prev}\n",
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-html-to-markdown"
+    "sourceDir": "/home/user/nyno/extensions/nyno-html-to-markdown"
   },
   "nyno-http-get": {
     "yaml": "- step: nyno-http-get\n  args:\n    - ${URL}",
     "emoji": "🌐",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-http-get"
+    "sourceDir": "/home/user/nyno/extensions/nyno-http-get"
   },
   "nyno-http-post": {
     "yaml": "- step: nyno-http-post\n  args:\n    - ${URL}\n    - ${POST_DATA}",
     "emoji": "🌐",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-http-post"
+    "sourceDir": "/home/user/nyno/extensions/nyno-http-post"
   },
   "nyno-if": {
     "yaml": "- step: nyno-if\n  args:\n    - \"${prev} is lower than 0.5\"\n",
     "emoji": "🔀",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-if"
+    "sourceDir": "/home/user/nyno/extensions/nyno-if"
   },
   "nyno-image-paths-to-html": {
     "yaml": "- step: nyno-image-paths-to-html\n  args:\n    - \"${prev}\"\n",
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-image-paths-to-html"
+    "sourceDir": "/home/user/nyno/extensions/nyno-image-paths-to-html"
   },
   "nyno-list-count": {
     "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-list-count"
+    "sourceDir": "/home/user/nyno/extensions/nyno-list-count"
   },
   "nyno-log": {
     "yaml": "- step: nyno-log\n  args:\n    - \"${JSON}\"\n",
     "emoji": "📝",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-log"
+    "sourceDir": "/home/user/nyno/extensions/nyno-log"
   },
   "nyno-markdown-to-data": {
     "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-markdown-to-data"
+    "sourceDir": "/home/user/nyno/extensions/nyno-markdown-to-data"
   },
   "nyno-markdown-to-html": {
     "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
     "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-markdown-to-html"
+    "sourceDir": "/home/user/nyno/extensions/nyno-markdown-to-html"
   },
   "nyno-sftp-command": {
     "yaml": "- step: nyno-sftp-command\n  args:\n    - \"root@yourdomain.com\"\n    - \"./localfile.txt\"\n    - \"/root/remote_uploaded.txt\"\n",
     "emoji": "☁️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sftp-command"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sftp-command"
   },
   "nyno-sort-kv": {
     "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sort-kv"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sort-kv"
   },
   "nyno-sql": {
     "yaml": "- step: nyno-sql\n  args:\n    - ${QUERY}\n    - ${PARAMS} # optional",
     "emoji": "🛢️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sql"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sql"
   },
   "nyno-sql-insert": {
     "yaml": "- step: nyno-sql-insert\n  args:\n    - ${JSON}\n",
     "emoji": "🛢️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sql-insert"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sql-insert"
   },
   "nyno-sql-insert-embedding": {
     "yaml": "- step: nyno-sql-insert-embedding\n  args:\n    - ${prev} # the vector generated from ai embedding node\n    - {\"optional\":\"meta\"}\n",
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sql-insert-embedding"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sql-insert-embedding"
   },
   "nyno-sql-read": {
     "yaml": "- step: nyno-sql-read\n  args:\n    - keys: [\"maps\"]\n      limit: 10\n\n",
     "emoji": "🛢️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sql-read"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sql-read"
   },
   "nyno-sql-search-embedding": {
     "yaml": "- step: nyno-sql-search-embedding\n  args:\n    - ${prev} # the vector generated from USER PROMPT using ai embeddings\n",
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-sql-search-embedding"
+    "sourceDir": "/home/user/nyno/extensions/nyno-sql-search-embedding"
   },
   "nyno-ssh-command": {
     "yaml": "- step: nyno-ssh-command\n  args:\n    - root@yourdomain.com\n    - ls\n",
     "emoji": "☁️",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-ssh-command"
+    "sourceDir": "/home/user/nyno/extensions/nyno-ssh-command"
   },
   "nyno-transform": {
     "yaml": "- step: nyno-transform\n  args:\n    - [{\"city\":\"Amsterdam\"},{\"city\":\"Madrid\"},{\"city\":\"Tokyo\"}]\n    - site:linkedin.com/in ceo %.city%\n",
     "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-transform"
+    "sourceDir": "/home/user/nyno/extensions/nyno-transform"
   },
   "nyno-transform-flatten": {
     "yaml": "- step: nyno-transform-flatten\n  args:\n    - ${OBJECTS}\n    - \"key\" # or \"key.subkey\" or \"key.subkey.subsubkey\"",
     "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-transform-flatten"
+    "sourceDir": "/home/user/nyno/extensions/nyno-transform-flatten"
   },
   "nyno-trigger": {
     "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-trigger"
+    "sourceDir": "/home/user/nyno/extensions/nyno-trigger"
   },
   "nyno-trigger-and-save-file": {
     "yaml": "- step: nyno-trigger\n  args:\n    - ${EVENT_NAME}\n",
     "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-trigger-and-save-file"
+    "sourceDir": "/home/user/nyno/extensions/nyno-trigger-and-save-file"
   },
   "nyno-uuidv4": {
     "yaml": "- step: nyno-uuidv4\n",
     "emoji": "🎲",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-uuidv4"
+    "sourceDir": "/home/user/nyno/extensions/nyno-uuidv4"
   },
   "nyno-uuidv7": {
     "yaml": "- step: nyno-uuidv7\n",
     "emoji": "🎲",
-    "sourceDir": "/home/user/github/nyno/extensions/nyno-uuidv7"
+    "sourceDir": "/home/user/nyno/extensions/nyno-uuidv7"
   },
   "serper-search": {
     "yaml": "- step: serper-search\n  args:\n    - ${QUERY} # ex. site:yoursite.com test keywords\n\n",
     "emoji": "🔗",
-    "sourceDir": "/home/user/github/nyno/extensions/serper-search"
+    "sourceDir": "/home/user/nyno/extensions/serper-search"
   },
   "tool-settings": {
     "yaml": "- step: tool-settings\n",
     "emoji": "🧰",
-    "sourceDir": "/home/user/github/nyno/extensions/tool-settings"
-  },
-  ".git": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/.git"
-  },
-  ".venv": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/.venv"
-  },
-  "ai-openai-agent": {
-    "yaml": "- step: ai-openai-agent\n  args:\n    - set a meeting called \"My meeting 1\" for tomorrow\n    - ${NYNOAGENT_CONFIG}\n\n",
-    "emoji": "🤖",
-    "sourceDir": "/home/user/github/nyno-private-extensions/ai-openai-agent"
-  },
-  "empowerd-call-api": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/empowerd-call-api"
-  },
-  "hello-private-ts": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/hello-private-ts"
-  },
-  "hypothesis-boolean-filter": {
-    "yaml": "- step: hypothesis-boolean-filter\n  args:\n    - hypotheses:\n        H1:\n          target_customer_valid: true\n          problem_exists: true\n          willingness_to_pay: true\n        H2:\n          enterprise_only: true\n          long_sales_cycle: true\n      evidence:\n        target_customer_valid: false\n        problem_exists: true\n  context:\n    set_context: hbf_hypotheses\n\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/hypothesis-boolean-filter"
-  },
-  "hypothesis-update": {
-    "yaml": "- step: hypothesis-update\n  args:\n    - hypotheses:\n        H1:\n          prior: 0.4\n        H2:\n          prior: 0.35\n        H3:\n          prior: 0.25\n      evidence:\n        H1: 0.7\n        H2: 0.4\n        H3: 0.2\n  context:\n    set_context: hu_beliefs\n\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/hypothesis-update"
-  },
-  "node_modules": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/node_modules"
-  },
-  "nyno-ascend": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-ascend"
-  },
-  "nyno-assert-json-contains": {
-    "yaml": "- step: nyno-assert-json-contains\n  args:\n    - \n      name: \"John\"\n      age: 30\n      tags:\n        - \"vip\"\n        - \"new\"\n    - \n      path: \"tags\"\n      value: \"vip\"\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-assert-json-contains"
-  },
-  "nyno-bag-of-words": {
-    "yaml": "- step: nyno-bag-of-words\n  args:\n    - ${PROMPT}\n    - \n      - [\"revenue\", \"profit\"]\n      - [\"cost\", \"investment\"]\n\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-bag-of-words"
-  },
-  "nyno-escape-html": {
-    "yaml": "- step: nyno-escape-html\n  args: [\"${prev}\"]\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-escape-html"
-  },
-  "nyno-extract-text-by-selector": {
-    "yaml": "- step: nyno-extract-text-by-selector\n  args: \n    - ${prev} \n    - 'your .selector'\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-extract-text-by-selector"
-  },
-  "nyno-falcon-keygen": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-falcon-keygen"
-  },
-  "nyno-glob": {
-    "yaml": "- step: nyno-glob\n  args:\n    - extensions/**/template.yml\n    - extensions/**/command.*\n\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-glob"
-  },
-  "nyno-glob-v": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-glob-v"
-  },
-  "nyno-guardrails": {
-    "yaml": "- step: nyno-guardrails\n  args:\n    - [\"PROMPT\"] # keys to check/override\n",
-    "emoji": "🛡️",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-guardrails"
-  },
-  "nyno-json-sql": {
-    "yaml": "- step: nyno-json-sql\n  args:\n    - ${JSON_FILE}\n    - ${JSON_SQL}",
-    "emoji": "🛢️",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-json-sql"
-  },
-  "nyno-kyber": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-kyber"
-  },
-  "nyno-markdown-to-html-and-frontmatter": {
-    "yaml": "- step: nyno-markdown-to-html\n  args:\n    - ${prev}\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-markdown-to-html-and-frontmatter"
-  },
-  "nyno-notify": {
-    "yaml": "- step: nyno-notify\n  args:\n    - \"Title Notification\"\n    - \"Sub title\"",
-    "emoji": "📄",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-notify"
-  },
-  "nyno-push-update": {
-    "yaml": "- step: nyno-push-update\n  args:\n    - ${USERNAME}\n    - ${COMMIT_MSG}\n    - ${REPO_DIR}\n",
-    "emoji": "💻",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-push-update"
-  },
-  "nyno-rsync-ssh": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-rsync-ssh"
-  },
-  "nyno-search-files": {
-    "yaml": "- step: nyno-search-files\n  args:\n    - [\".path/dir1/*.command\", \".path/dir1/template.yml\"]\n    - 'object' # remove to output text\n",
-    "emoji": "🔎",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-search-files"
-  },
-  "nyno-search-grep": {
-    "yaml": "- step: nyno-search-grep\n  args:\n    - ${SEARCH}\n    - ${DIR}\n\n",
-    "emoji": "🔎",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-search-grep"
-  },
-  "nyno-string-to-camelcase": {
-    "yaml": "- step: nyno-string-to-camelcase\n  args:\n    - ${prev}\n  context:\n    STC_PREPEND:\"\"\n    STC_APPEND:\"\"\n",
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-string-to-camelcase"
-  },
-  "nyno-wait": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/nyno-wait"
-  },
-  "pentest-port-scan": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pentest-port-scan"
+    "sourceDir": "/home/user/nyno/extensions/tool-settings"
   },
   "placeholder": {
     "yaml": null,
     "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/placeholder"
-  },
-  "pseudo-dsl-to-flat-ast": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pseudo-dsl-to-flat-ast"
-  },
-  "pseudo-flat-ast-to-js": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pseudo-flat-ast-to-js"
-  },
-  "pseudo-flat-ast-to-php": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pseudo-flat-ast-to-php"
-  },
-  "pseudo-flat-ast-to-python": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pseudo-flat-ast-to-python"
-  },
-  "pseudo-flat-ast-to-ruby": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/pseudo-flat-ast-to-ruby"
-  },
-  "vultr-create-instance": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/vultr-create-instance"
-  },
-  "vultr-create-nginx-subdomain": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/vultr-create-nginx-subdomain"
-  },
-  "vultr-create-subdomain": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/vultr-create-subdomain"
-  },
-  "vultr-delete-stopped-instances": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/vultr-delete-stopped-instances"
-  },
-  "vultr-wait-for-ip": {
-    "yaml": null,
-    "emoji": "",
-    "sourceDir": "/home/user/github/nyno-private-extensions/vultr-wait-for-ip"
+    "sourceDir": "/home/user/nyno-private-extensions/placeholder"
   }
 }

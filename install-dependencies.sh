@@ -1,0 +1,2 @@
+bun install
+uv sync
