@@ -52,7 +52,7 @@ if [ -d ".venv" ]; then
     fi
 fi
 
-sudo bash extensions/nyno-log/setup.sh
+sudo bash ./install-postgres-db.sh
 
 
 # --- Start Best.js server in proper mode ---
