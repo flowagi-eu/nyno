@@ -8,7 +8,7 @@
 ---
 
 
-## Nyno 5.3: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
+## Nyno 6.0: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
 - Try the Online Playground: [https://nyno.dev/online-playground](https://nyno.dev/online-playground)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
 
@@ -26,7 +26,7 @@ Nyno is an **open-source multi-language workflow engine** and [language](https:/
 Each programming language runs in its own **high-performance worker engine**. Command-steps can be called in short human-readable **YAML Workflows** (.nyno files).
 
 ```yaml
-nyno: 5.3
+nyno: 6.0
 workflow:
   - step: ai-openai-text
     args: ['My idea: ${PROMPT}', minimal]
@@ -69,24 +69,6 @@ Example in Workflow (YAML):
   args: 
   - "${name}"
 ```
-
-Example in [TCP](https://github.com/empowerd-cms/tcpman) (**after saving your flow.json in workflows-enabled/ and restarting** Nyno):
-```bash
-tcpman localhost:9024/test_nyno 'c{"apiKey":"changeme"}' 'q{"name":"Alice"}'
-```
-
-Example output
-```
->>> Sending: c{"apiKey":"changeme"}
-{"status":"ok","type":"connect"}
->>> Sending: q{"name":"Alice","path":"/test_nyno"}
-{"route":"/test_nyno","system":"default","status":"ok","execution_time_seconds":0.019,"execution":[{"input":{"name":"Alice"},"output":"","details":{"error":true,"missing":["i"],"node_id":"1","node_title":"route_/test_nyno","new_context":{"name":"Alice"}}},{"input":{"name":"Alice","O_1":""},"output":"hi node 2!","details":{"command":["echo","hi node 2!"],"bash":true,"stderr":"","exitCode":0,"node_id":"2","node_title":"node_2","new_context":{"name":"Alice","O_1":"","O_2":"hi node 2!"}}},{"input":{"name":"Alice","O_1":"","O_2":"hi node 2!"},"output":"always hi from node 4!","details":{"command":["echo","always hi from node 4!"],"bash":true,"stderr":"","exitCode":0,"node_id":"4","node_title":"node_4","new_context":{"name":"Alice","O_1":"","O_2":"hi node 2!","O_4":"always hi from node 4!"}}}]}
-
-```
-
----
-
-
 
 <p align="center">
   <img src="/h/3f391b88ab87a304526f144770a4288fe36c0f98eae79e9979276783f77a4a4f/nyno-neon-logo.webp" alt="Nyno logo" width="200">
@@ -220,8 +202,31 @@ Example Workflow output:
 }
 ```
 
+
+## Frequently Asked Questions
+
+#### Benefits of Nyno over n8n:
+ - is n8n not already open source?
+- -  n8n is not open-source. See also **[[Why Nyno might save you $25.000 for both you and your clients]]**
+- n8n can be a pain to debug. How is Nyno easier?
+- - Nyno provides full input/output logs of each step. including previous + new context variables.
+- How about scaling? 
+- - The goal of Nyno is to be 10x better than n8n. For scaling, **[see Custom Python Code/Node benchmarks](https://nyno.dev/n8n-vs-nyno-for-python-code-execution-the-benchmarks-and-why-nyno-is-much-faster)**
+
+
+
+#### Common Nyno Questions:
+
+- I couldn't figure out **how to get the data from one node to be the argument to the next** 
+- - Use ${prev} as value in most cases. See also: [https://nyno.dev/workflow-context-variable-passing](https://nyno.dev/workflow-context-variable-passing ) 
+
+
+
+
+
 ---
 
-Nyno (“Nine-oh”) is  open-source & Proudly build with [Best.JS](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative.
+The Nyno GUI is Proudly build with [Best.JS](https://github.com/empowerd-cms/best.js) - a faster Next.JS alternative.
+
 
 

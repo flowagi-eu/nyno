@@ -342,7 +342,7 @@ console.log('before sortedNodes workflow',workflow);
 
 
 
-    const yamlObj = { nyno: "5.3", workflow };
+    const yamlObj = { nyno: "6.0", workflow };
     if (firstNodeRoute) yamlObj.route = firstNodeRoute;
 
     let yamlStr = YAML.dump(yamlObj, { noRefs: true, flowLevel: 3 });
