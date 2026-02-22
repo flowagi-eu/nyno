@@ -1,6 +1,5 @@
 #!/bin/bash
 # Usage: ./run.sh docker   OR   ./run.sh podman
-
 if [ -z "$1" ]; then
     echo "Error: You must specify 'docker' or 'podman'"
     exit 1
@@ -8,11 +7,6 @@ fi
 
 CONTAINER_TOOL=$1
 IMAGE_NAME="nyno:latest"
-
-mkdir -p envs
-mkdir -p output
-
-rm envs/.nyno_log_db.env -f
 
 source "$(pwd)/envs/ports.env"
 

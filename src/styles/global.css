@@ -86,7 +86,9 @@ background:#00050d !important;
   padding: 15px;
   border-radius: 9px;
   margin: 1rem 0;
-  background: #04080f;padding: 15px;border-radius: 9px;margin: 1rem 0;overflow: scroll;
+  background: #04080f;padding: 0;border-radius: 9px;margin: 1rem 0;overflow: scroll;
+  
+ border:1px solid rgb(55, 65, 81);
 }
 
 .chat-message{
@@ -151,6 +153,10 @@ button {
 .dialog_content{
   max-height:81dvh;
   overflow-y:scroll;
+  z-index: 9999;
+}
+.dialog_context_editor{
+  z-index: 99999;
 }
 label{
   display:block;
@@ -163,4 +169,19 @@ label{
   padding: 9px 12px;
   border: 1px solid #4f4f4f;
 
+}
+
+.explorerSearch {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 9px;
+  background: #111827;
+  border: none;
+  color: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  border-bottom: none;
+  outline:none;
+  box-shadow:none;
+  background:none;
 }

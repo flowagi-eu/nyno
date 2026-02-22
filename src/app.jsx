@@ -8,10 +8,11 @@ import { TemplateSelect } from "@/components/TemplateSelect";
 import FileButton from "@/components/FileButton";
 import DynamicKeyValueEditor from "@/components/DynamicKeyValueEditor";
 import NynoAgentBuilder from "@/components/NynoAgentBuilder";
+import JsonNode from '@/components/JsonNode.jsx';
 
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
-import nynoWhite from "./assets/nyno-coin.png";
+import nynoWhite from "./assets/nyno-brand-star.png";
 import React, { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   Background,
@@ -499,8 +500,8 @@ setNodeCounter(maxId + 1);
           
        
     
-    Nyno{isPro && <span style={{ color: "cyan" }}> Pro</span>}</span></div>
-      <GitHubStarBadge />
+    {!isPro && <span>Nyno</span>}</span></div>
+    {!isPro && <GitHubStarBadge />}
 	  <RunButton getText={getDynamicText} onExecution={handleExecution} />
       <div style={{ width: "100%", height: "100vh" }}>
         <div style={{ position: "absolute", bottom: 9, right: 300, zIndex: 20 }}>
@@ -545,6 +546,7 @@ setNodeCounter(maxId + 1);
       style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)" }}
     />
     <Dialog.Content
+    className='dialog_context_editor'
       style={{
         background: "#111",
         padding: "1rem",

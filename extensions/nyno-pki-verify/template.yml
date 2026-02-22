@@ -1,0 +1,8 @@
+- step: nyno-pki-verify
+  args:
+    - ${prev.message}
+    - ${prev.signatureBase64}
+    - ${prev.publicBase32} # sender
+  context:
+    set_context: sig_verified
+

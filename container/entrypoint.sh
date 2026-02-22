@@ -1,6 +1,28 @@
 #!/bin/bash
 set -e
 
+# Load base env
+if [[ -f /nyno/envs/ports.env ]]; then
+  source /nyno/envs/ports.env
+fi
+
+# Optional overrides
+if [[ -f /nyno/envs/ports.local.env ]]; then
+  source /nyno/envs/ports.local.env
+fi
+
+echo "WF:$WF"
+echo "GU:$GU"
+echo "RB:$RB"
+
+### 
+
+mkdir -p envs
+mkdir -p output
+
+
+
+
 PG_BIN=/usr/lib/postgresql/18/bin
 PG_DATA=/nyno/pgdata   # writable in rootless Podman
 PG_PORT=5432
@@ -52,6 +74,8 @@ if [ -d ".venv" ]; then
     fi
 fi
 
+# Create New DB
+rm envs/.nyno_log_db.env -f
 sudo bash ./install-postgres-db.sh
 
 

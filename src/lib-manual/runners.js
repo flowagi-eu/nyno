@@ -107,7 +107,7 @@ const RUNNERS = {
   py: {
     host,
     port: ports['PY'] ?? 9006,
-    cmd: "python3",
+    cmd: "uv",
     file: path.resolve(__dirname, "runners/runner.py"),
     checkFunction: makeCheckFunction(['command.py'])
   },
@@ -131,7 +131,14 @@ const pending = {};
 function startRunner(type) {
   const cfg = RUNNERS[type];
   console.log(`[RUNEXT] Starting ${type} runner: ${cfg.cmd} ${cfg.file}`);
-  const proc = spawn(cfg.cmd, [cfg.file], { stdio: ["ignore", "inherit", "inherit"] });
+  const args = [];
+  if(cfg.cmd == 'uv') {
+    args.push('run');
+  }
+  
+  args.push(cfg.file); 
+  console.log('starting runner with',cfg.cmd, args);
+  const proc = spawn(cfg.cmd, args, { cwd: process.cwd(), stdio: ["ignore", "inherit", "inherit"] });
 
   proc.on("exit", (code) => {
     console.log(`[RUNEXT] ${type} runner exited with code ${code}, restarting in 2s...`);
@@ -217,7 +224,7 @@ function connectAllRunners() {
 // ---------------------------
 // UUIDv7 generator
 // ---------------------------
-function generateUUIDv7() {
+export function generateUUIDv7() {
   const timestamp = BigInt(Date.now());
   const rand = crypto.randomBytes(10); // 80 bits
   const tsHex = timestamp.toString(16).padStart(12, "0"); // 48 bits

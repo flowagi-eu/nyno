@@ -28,6 +28,15 @@ function evaluateCondition(string $input, $left, $right): ?bool
     if (str_contains($input, 'contains')) {
         return str_contains((string)$left, (string)$right);
     }
+    
+    
+    if (str_contains($input, 'not starts with')) {
+        return !(str_starts_with((string)$left, (string)$right));
+    }
+    
+    if (str_contains($input, 'starts with')) {
+        return str_starts_with((string)$left, (string)$right);
+    }
 
     if (str_contains($input, 'lower than') || str_contains($input, 'less than')) {
         return $left < $right;
@@ -59,31 +68,20 @@ function nyno_if(array $args, array &$context)
         return -1;
     }
 
-    $raw   = trim($args[0]);
-    $input = strtolower($raw);
+    	$left = $args[0];
+    	$input = strtolower($args[1]);
+    
 
-    /**
-     * Operand detection
-     */
-    if (hasQuotedPair($raw)) {
-        $pair = parseQuotedPair($raw);
+    	$right = $args[2];
 
-        if (!$pair) {
-            $context[$setName . '.error'] =
-                "Could not extract quoted string operands";
-            return -1;
-        }
-    } else {
-        $pair = parseNumberPair($input);
-
-        if (!$pair) {
-            $context[$setName . '.error'] =
-                "Could not extract numeric operands";
-            return -1;
-        }
-    }
-
-    [$left, $right] = $pair;
+    	
+    	if (is_numeric($left)) {
+    		$left += 0; // convert to int/float
+    	}
+    	if (is_numeric($right)) {
+    		$right += 0; // convert to int/float
+    	}
+   
 
     $context[$setName . '.left']  = $left;
     $context[$setName . '.right'] = $right;

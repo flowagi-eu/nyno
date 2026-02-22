@@ -1,0 +1,5 @@
+- step: nyno-pki-sign
+  args:
+    - ${prev}
+    - ${keypair.for_signing}
+

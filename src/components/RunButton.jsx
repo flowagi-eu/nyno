@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SimpleOutputToggle } from "@/components/SimpleOutputToggle";
+import SimpleJsonExplorer from "@/components/JsonNode.jsx";
 
 export function RunButton({ getText, onExecution }) {
 
@@ -47,6 +48,8 @@ const [oneVarText, setOneVarText] = useState(`context:
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+
 
   const [token, setToken] = useState(() => {
     const defaultPw = 'change_me';
@@ -240,7 +243,8 @@ const renderSimpleChat = () => {
       <html>
         <head>
           <style>
-            body { background-color: #2a2d33; color: white; padding: 16px; font-family: sans-serif; }
+            body { background-color: #2a2d33;  background:none;color: white; padding: 16px; font-family: sans-serif; }
+            img,video { max-width:100%;}
           </style>
         </head>
         <body>Invalid response</body>
@@ -249,7 +253,7 @@ const renderSimpleChat = () => {
     return (
       <iframe
         sandbox="allow-scripts allow-same-origin"
-        style={{ width: "100%", border: "none", minHeight: "80dvh" }}
+        style={{ width: "100%", border: "none", minHeight: "60dvh",'border': '1px solid rgb(55, 65, 81)' }}
         srcDoc={srcDoc}
       />
     );
@@ -287,12 +291,14 @@ const renderSimpleChat = () => {
       <head>
         <style>
           body {
-            background-color: #2a2d33;
+            background-color: rgb(17, 24, 39);
+             background:none;
             color: white;
             padding: 16px;
             font-family: sans-serif;
             white-space: pre-wrap;
           }
+          img,video { max-width:100%;}
         </style>
       </head>
       <body>${content}</body>
@@ -302,7 +308,7 @@ const renderSimpleChat = () => {
   return (
     <iframe
       sandbox="allow-scripts allow-same-origin"
-      style={{ width: "100%", border: "none", minHeight: "80dvh" , borderRadius: '9px','marginTop': '1rem'}}
+      style={{ width: "100%", border: "none", minHeight: "60dvh" , borderRadius: '9px','marginTop': '1rem', 'border': '1px solid rgb(55, 65, 81)'}}
       srcDoc={srcDoc}
     />
   );
@@ -460,7 +466,14 @@ Custom Context
   </div>
 ) : (
   <pre className="rnh_result whitespace-pre-wrap text-sm">
-    {result}
+    <div style={{ maxHeight: 400, overflow: 'auto' }}>
+     		<input className='explorerSearch'
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <SimpleJsonExplorer data={JSON.parse(result)} query={searchQuery}  />
+              </div>
   </pre>
 )}
 

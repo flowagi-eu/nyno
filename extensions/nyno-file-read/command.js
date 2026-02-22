@@ -10,6 +10,12 @@ export function nyno_file_read(args, context) {
     }
 
     const filePath = args[0];
+    
+    // ✅ Return 1 immediately if file does not exist
+    if (!fs.existsSync(filePath)) {
+        context[setName + ".error"] = { message: "File does not exist." };
+        return 1;
+    }
 
     try {
         const content = fs.readFileSync(filePath, "utf8");

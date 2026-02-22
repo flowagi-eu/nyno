@@ -107,7 +107,7 @@ export function TemplateSelect({
         <input
           ref={inputRef}
           value={query}
-          placeholder="Search templates…"
+          placeholder="Change node to…"
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
