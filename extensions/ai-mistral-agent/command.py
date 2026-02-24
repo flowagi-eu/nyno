@@ -49,8 +49,15 @@ def yaml_type_to_json_schema(field):
         if "description" in field:
             schema["description"] = field["description"]
 
+            
         if "enum" in field:
-            schema["enum"] = field["enum"]
+            enum_values = field["enum"]
+            # Handle CSV string enum values
+            if isinstance(enum_values, str):
+                schema["enum"] = [v.strip() for v in enum_values.split(",")]
+            else:
+                schema["enum"] = enum_values
+
 
         if schema["type"] == "array":
             schema["items"] = {"type": field.get("items", "string")}
