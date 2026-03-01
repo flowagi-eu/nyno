@@ -221,7 +221,8 @@ Example Workflow output:
 - - Use ${prev} as value in most cases. See also: [https://nyno.dev/workflow-context-variable-passing](https://nyno.dev/workflow-context-variable-passing ) 
 
 
-
+### For More Optional Plugins
+- See [flowagi-eu/nyno-optional-plugins](https://github.com/flowagi-eu/nyno-optional-plugins/)
 
 
 ---

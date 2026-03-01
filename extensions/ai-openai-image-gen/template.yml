@@ -1,3 +1,0 @@
-- step: ai-openai-image-gen
-  args: 
-    - ${PROMPT}

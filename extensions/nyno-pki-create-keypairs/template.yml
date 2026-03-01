@@ -1,5 +1,3 @@
 - step: nyno-pki-create-keypairs
-  args:
-    - 'user' # or 'flow' (for automated actors)
   context:
     set_context: "keypair"

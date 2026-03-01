@@ -1,6 +1,0 @@
-- step: ai-openai-text
-  args:
-    - ${PROMPT}
-    - "minimal"
-  context:
-    SYSTEM_PROMPT: ""
