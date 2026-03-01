@@ -188,10 +188,18 @@ label{
 
 .explorer_blur {
   background: #080c13;
-  color: #080c13 !important;
+
 }
 .explorer_blur:hover {
   background: none;
-  color: inherit !important;
+
+}
+
+.explorer_blur_text{
+visibility:hidden;
+}
+
+.explorer_blur:hover .explorer_blur_text {
+visibility:visible;
 }
 

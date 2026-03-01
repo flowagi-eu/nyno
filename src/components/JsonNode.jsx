@@ -47,9 +47,11 @@ function JsonNode({ jkey, data, query, level = 0 }) {
     if(jkey && String(jkey).includes('API')) {
     return (
       <span className='explorer_blur' style={{ color }}>
+        <span class="explorer_blur_text">
         {typeof data === "string" ? '"' : ""}
         {highlight(String(data), query)}
         {typeof data === "string" ? '"' : ""}
+        </span>
       </span>
     );
     } else {
