@@ -14,7 +14,7 @@ function highlight(text, query) {
   );
 }
 
-function JsonNode({ data, query, level = 0 }) {
+function JsonNode({ jkey, data, query, level = 0 }) {
   const [open, setOpen] = useState(level < 1);
 
   const isObject = typeof data === "object" && data !== null;
@@ -44,6 +44,15 @@ function JsonNode({ data, query, level = 0 }) {
         ? "#f97316"
         : "#e5e7eb";
 
+    if(jkey && String(jkey).includes('API')) {
+    return (
+      <span className='explorer_blur' style={{ color }}>
+        {typeof data === "string" ? '"' : ""}
+        {highlight(String(data), query)}
+        {typeof data === "string" ? '"' : ""}
+      </span>
+    );
+    } else {
     return (
       <span style={{ color }}>
         {typeof data === "string" ? '"' : ""}
@@ -51,6 +60,7 @@ function JsonNode({ data, query, level = 0 }) {
         {typeof data === "string" ? '"' : ""}
       </span>
     );
+    }
   }
 
   return (
@@ -67,7 +77,7 @@ function JsonNode({ data, query, level = 0 }) {
           {entries.map(([key, value]) => (
             <div key={key} style={{ display: "flex", gap: 3 }}>
               <span style={{ color: "#3b82f6" }}>{highlight(String(key), query)}:</span>
-              <JsonNode data={value} query={query} level={level + 1} />
+              <JsonNode jkey={key} data={value} query={query} level={level + 1} />
             </div>
           ))}
           <div style={{ color: "#9ca3af" }}>{isArray ? "]" : "}"}</div>
@@ -90,7 +100,7 @@ export default function SimpleJsonExplorer({ data, query = "" }) {
         color: "#e5e7eb",
       }}
     >
-      {data ? <JsonNode data={data} query={query} /> : <div style={{ color: "#ef4444" }}>No JSON Data</div>}
+      {data ? <JsonNode jkey='' data={data} query={query} /> : <div style={{ color: "#ef4444" }}>No JSON Data</div>}
     </div>
   );
 }

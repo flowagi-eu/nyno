@@ -185,3 +185,13 @@ label{
   box-shadow:none;
   background:none;
 }
+
+.explorer_blur {
+  background: #080c13;
+  color: #080c13 !important;
+}
+.explorer_blur:hover {
+  background: none;
+  color: inherit !important;
+}
+
