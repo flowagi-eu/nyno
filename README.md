@@ -1,3 +1,34 @@
+![Describe Image Here](/h/f32a675319e6394dbae59b535e71424249ca5537afa089a20ad3d81e40eb2427/screenshot-from-2026-02-22-20-18-14.webp)
+
+# Nyno is not just another AI workflow tool. Nyno is:
+
+## 🟢 Human Editable Workflow Files (YAML + GUI).
+## 🟢 Commercial Friendly License (Apache 2).
+
+## 🟢 Multi-Language: Build on top of  the best ecosystems (Python, Ruby, PHP & JavaScript)
+
+Quick Comparison to n8n (the current most popular AI workflow builder with GUI):
+
+| Core Values    | With n8n | With Nyno                                                            |
+| ------------------ | --------------------------- | ------------------------------------------------------------------------ |
+| Financial Freedom    | No. Not OSI open-source. Embedded licenses (potentially costing $25.000+) required for commercial use.               | Yes. Build and possibly fully own and sell your own automation systems, extensions and commercial services.           
+          |
+| AI Features   | Agents & API Integrations             | AI, Precision & Data Sovereignty              |                           |
+| Technical Vendor Lock-in    | Yes. Complicated SDK.               | No. Custom nodes simply use an exportable (py,rb,php,js) function.                               |
+| Scalability & Execution Speed for Custom Code   | Slow (≈0.15s per node). Custom Python/NodeJS code nodes use a new process.               | Fast (≈0.002s per node). Custom code require custom nodes which are loaded when Nyno boots.                  |
+| Developer Experience   | Workflows are big messy JSON files.               | Workflows are clean human editable YAML scripts, like code.    
+| Privacy & GDPR   | n8n workflows often rely on US-based AI & APIs. Each workflow may introduce additional GDPR compliance risks.            | Nyno uses European Mistral AI by default and includes  built-in local Postgres database nodes to encourage sovereign data storage.     
+
+---
+
+#### The #1 USP Question from a real user:
+
+> "So, it goes as: 1. I import a language function. 2. Now I have a new component in my workflow. 3. Enjoy?"
+- A: Yes, exactly. From all the best ecosystems (py,js,php,ruby). And better yet it's yours. You own it. You can license/sell it however you want, since the core is permissive Apache2 licensed.
+
+---
+
+
 ![Nyno Workflow Example](/h/3fec8199e52b6983079d4800694475a7c660ab26c1f0a831e16050dc340f24ec/screenshot-from-2026-01-12-00-04-09.webp)
 
 
