@@ -39,7 +39,7 @@ Quick Comparison to n8n (the current most popular AI workflow builder with GUI):
 ---
 
 
-## Nyno 6.0: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
+## Nyno 6.1: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
 - Try the Online Playground: [https://nyno.dev/online-playground](https://nyno.dev/online-playground)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
 
