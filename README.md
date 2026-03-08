@@ -63,10 +63,10 @@ Each programming language runs in its own **high-performance worker engine**. Co
 ```yaml
 nyno: 6.0
 workflow:
-  - step: ai-openai-text
+  - step: ai-mistral-text
     args: ['My idea: ${PROMPT}', minimal]
     context: {SYSTEM_PROMPT: 'You''re a blog post writer. I will give you an idea, and you basically need to expand upon it, you can also correct me, but just give me the best possible article you can write about it to share my idea. Only output the new article, dont affirm.'}
-  - step: ai-openai-text
+  - step: ai-mistral-text
     args: ['my article: ${prev}', minimal]
     context: {SYSTEM_PROMPT: 'Make my article more heartfelt. Only output the new article, dont affirm.'}
 ```
