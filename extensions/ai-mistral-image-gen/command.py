@@ -3,6 +3,7 @@ import uuid
 from mistralai import Mistral
 from mistralai.models import ToolFileChunk
 import time
+import base64
 
 def ai_mistral_image_gen(args, context):
 
@@ -70,7 +71,12 @@ def ai_mistral_image_gen(args, context):
             file_bytes = client.files.download(file_id=chunk.file_id).read()
             if len(file_bytes) != 0:
                 file_name = output_dir + '/' + str(uid) + '.png' # f"image_generated_{i}.png"
-                context[set_name] = file_name
+                context[set_name + "_file"] = file_name
+
+                # Convert bytes -> base64 string
+                b64_data = base64.b64encode(file_bytes).decode("utf-8")
+                context[set_name] = b64_data;
+
                 with open(file_name, "wb") as f:
                     f.write(file_bytes)
                 print(f"Saved image: {file_name}")

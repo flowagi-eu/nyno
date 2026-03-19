@@ -15,15 +15,7 @@ export default function Base64ImagePopup() {
         if (typeof value === "string" && value.length > 100 && !value.startsWith("http")) {
           setSrc(`data:image/*;base64,${value}`);
         } else {
-          // 2. Otherwise assume it's a file/url → fetch → convert to base64
-          const res = await fetch(value);
-          const blob = await res.blob();
-
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setSrc(reader.result); // already data:image/...;base64,...
-          };
-          reader.readAsDataURL(blob);
+          alert("Invalid base64");
         }
 
         setVisible(true);
