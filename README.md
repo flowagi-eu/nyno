@@ -1,3 +1,10 @@
+### Quick Install
+```bash
+podman run -it -p 9057:9057 flowagi/nyno
+
+## Or Docker: docker run -it -p 9057:9057 flowagi/nyno
+```
+
 ![Nyno Workflow Example 1](/h/f32a675319e6394dbae59b535e71424249ca5537afa089a20ad3d81e40eb2427/screenshot-from-2026-02-22-20-18-14.webp)
 
 # Nyno is not just another AI workflow tool. Nyno is:
@@ -6,6 +13,9 @@
 ## 🟢 Commercial Friendly License (Apache 2).
 
 ## 🟢 Multi-Language: Build on top of  the best ecosystems (Python, Ruby, PHP & JavaScript)
+
+
+
 
 ---
 
