@@ -1,0 +1,1 @@
+🔵 Generate 1024-dimension vector from text for search

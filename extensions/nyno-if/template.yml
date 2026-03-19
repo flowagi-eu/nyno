@@ -1,11 +1,5 @@
 - step: nyno-if
   args:
-    - '"${prev}" contains "OK"'
-    
-    # for text: (not) contains/equals (use quotes)
-    # for numbers: lower/higher than (remove quotes)
-    
-    # Optionally also use 3 arguments: 
-    # - ${prev}
-    # - contains
-    # - "\"something with quotes\""
+    - ${prev}
+    - contains
+    - "\"something with quotes\""

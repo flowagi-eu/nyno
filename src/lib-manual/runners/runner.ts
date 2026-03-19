@@ -7,6 +7,9 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import { loadWasm, runWasm } from '../runWasm.js';
+
+
 
 // Load Nyno Main Ports/config
 
@@ -74,27 +77,37 @@ async function loadExtensions() {
       continue;
     }
 
-    const cmdFile = path.join(sourceDir, "command.js");
-    if (!fs.existsSync(cmdFile)) {
-      continue;
-    }
+    // derive function name from folder: lowercase, - → _
+    const folder = path.basename(sourceDir);
+    const funcName = folder.toLowerCase().replaceAll("-", "_");
 
-    try {
-      const module = await import(cmdFile);
+    const wasmFile = path.join(sourceDir, "command.wasm");
+      //console.log('trying wasmFile: ',wasmFile);
+    if (fs.existsSync(wasmFile)) {
+		  console.log("[WASM] Loading wasmFile:",wasmFile);
+		globalThis.state[folder] = {"wasm":true, instance: await loadWasm(wasmFile) };
+		extensionsLoaded.push(funcName);
+    } else {
+	    const cmdFile = path.join(sourceDir, "command.js");
+      //console.log('trying cmdFile: ',cmdFile);
+	    if (!fs.existsSync(cmdFile)) {
+	      continue;
+	    }
 
-      // derive function name from folder: lowercase, - → _
-      const folder = path.basename(sourceDir);
-      const funcName = folder.toLowerCase().replaceAll("-", "_");
+	    try {
+	      const module = await import(cmdFile);
 
-      if (module[funcName]) {
-        globalThis.state[folder] = module[funcName];
-        extensionsLoaded.push(funcName);
-      } else {
-        console.warn(`[JS Runner] ${folder} does not export function ${funcName}`);
-      }
-    } catch (err) {
-      console.error(`[JS Runner] Failed loading ${extName}`, err);
-    }
+
+	      if (module[funcName]) {
+		globalThis.state[folder] = module[funcName];
+		extensionsLoaded.push(funcName);
+	      } else {
+		console.warn(`[JS Runner] ${folder} does not export function ${funcName}`);
+	      }
+	    } catch (err) {
+	      console.error(`[JS Runner] Failed loading ${extName}`, err);
+	    }
+     }
   }
 
   console.log(`[JS Runner] Loaded ${extensionsLoaded.length} extensions: ${extensionsLoaded.join(", ")}`);
@@ -136,7 +149,23 @@ async function startWorker() {
           const fn = globalThis.state[payload.functionName];
           let context = payload.context ?? {};
           if (typeof fn !== 'function') {
-            socket.write(JSON.stringify({ fnError: "not exist", c:context }) + "\n");
+		console.log('state',globalThis.state);
+		console.log('fn',fn);
+            if("wasm" in fn) {
+
+		    try {
+	              const instance = fn.instance;
+			console.log('wasm instance',instance);
+		      const result = await runWasm(instance,payload.args,context); //...(payload.args || []));
+		      socket.write(JSON.stringify({ r:result[0], c:result[1]}) + "\n");
+		    } catch (err) {
+		      socket.write(JSON.stringify({ error: err.message,c:context }) + "\n");
+		    }
+
+
+            } else {
+            	socket.write(JSON.stringify({ fnError: "not exist", c:context }) + "\n");
+            }
           } else {
             try {
               const result = await fn(payload.args,context); //...(payload.args || []));

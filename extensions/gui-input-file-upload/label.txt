@@ -1,0 +1,1 @@
+🟢 Upload file (Base64) (this opens a popup before the workflow)

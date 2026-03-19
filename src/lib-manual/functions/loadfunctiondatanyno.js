@@ -28,6 +28,9 @@ export function loadStepCommandLangs(...baseDirs) {
       // Typescript support: treat TS as JS
       if (ext === 'ts') ext = 'js';
 
+      // wASM support: treat as JS
+      if (ext === 'wasm') ext = 'js';
+      
       commands[dir] = ext;
     }
   }

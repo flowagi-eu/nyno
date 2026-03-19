@@ -1,4 +1,6 @@
 .ascend
+build
+guest-uploads
 node_modules
 dist
 dist-ts

@@ -102,7 +102,7 @@ const RUNNERS = {
     port: ports["JS"] ?? 9072,
     cmd: "node",
     file: path.resolve(__dirname, "../../dist-ts/nyno/src/lib-manual/runners/runner.js"),
-    checkFunction: makeCheckFunction(['command.js','command.ts'])
+    checkFunction: makeCheckFunction(['command.js','command.ts','command.wasm'])
   },
   py: {
     host,
@@ -184,7 +184,14 @@ function connectRunner(type) {
       buffer = buffer.slice(idx + 1);
       if (!msg) continue;
 
-      const resolvedData = JSON.parse(msg); // .c & .r in object, needs c.__n_id for parralel
+	let resolvedData;
+      	try {
+	resolvedData = JSON.parse(msg); // .c & .r in object, needs c.__n_id for parralel
+	} catch(err) {
+console.log(`[RUNEXT] Bad JSON from ${type}:`, msg);
+      // Close the connection on bad data
+	return false;
+	}
 
       if(resolvedData && resolvedData.c) { 
       const __n_id = resolvedData['c']['__n_id'];

@@ -2,8 +2,8 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 
 export function TemplateSelect({
   templates,
-  emojis = {},
-  value,
+  visuals = {},
+    value,
   onSelect,
 }) {
   const [query, setQuery] = useState(value || "");
@@ -38,10 +38,14 @@ export function TemplateSelect({
       .split(/\s+/)
       .filter(Boolean);
 
-    return Object.keys(templates).filter((key) =>
-      words.every((w) => key.toLowerCase().includes(w))
-    );
-  }, [query, templates]);
+    return Object.keys(templates).filter((key) => {
+    const label = visuals[key]?.label || "";
+    const haystack = `${key} ${label}`.toLowerCase(); // 👈 combine
+
+    return words.every((w) => haystack.includes(w));
+  });
+  
+  }, [query, templates,visuals]);
 
   // Reset active index when list changes
   useEffect(() => {
@@ -175,7 +179,28 @@ export function TemplateSelect({
                   index === activeIndex ? "#222" : "transparent",
               }}
             >
-              {emojis[key] || ""} {key}
+              
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+  {visuals[key]?.icon ? (
+    <img
+      src={visuals[key].icon}
+      alt=""
+      style={{ width: 16, height: 16, objectFit: "contain" }}
+    />
+  ) : (
+    <span>{visuals[key]?.emoji || "⚙️"}</span>
+  )}
+
+  <div style={{ display: "flex", flexDirection: "column" }}>
+    <span style={{ fontSize: 13, opacity: 0.6 }}>
+      {key}
+    </span>
+    <span style={{ fontSize: 10 }}>
+      {visuals[key]?.label || key}
+    </span>
+  </div>
+</div>
+
             </div>
           ))}
         </div>

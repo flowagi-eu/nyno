@@ -9,6 +9,13 @@ import FileButton from "@/components/FileButton";
 import DynamicKeyValueEditor from "@/components/DynamicKeyValueEditor";
 import NynoAgentBuilder from "@/components/NynoAgentBuilder";
 import JsonNode from '@/components/JsonNode.jsx';
+import FileUploadPopup from '@/components/FileUploadPopup.jsx';
+import MarkdownPopup from '@/components/MarkdownPopup.jsx';
+import TextareaPopup from '@/components/TextareaPopup.jsx';
+import Base64ImagePopup from '@/components/Base64ImagePopup.jsx';
+
+
+
 
 // --- Template imports (as plain text)
 import YAML from 'js-yaml';
@@ -65,14 +72,63 @@ const [contextOpen, setContextOpen] = useState(false);
 
   // --- Templates for textarea
   const templates = {};
-  const emojis = {};
+
+  const getStepFromYaml = (yamlStr) => {
+  if (!yamlStr) return null;
+
+  try {
+    const parsed = YAML.load(yamlStr);
+
+    // your format: array with one object
+    if (Array.isArray(parsed)) {
+      return parsed[0]?.step || null;
+    }
+
+    return parsed?.step || null;
+  } catch {
+    return null;
+  }
+};
+  
 
   // --- Get existing extensions
-  for (const [folder, { yaml, emoji }] of Object.entries(extensions)) {
-    if (!yaml) continue;
-    templates[folder] = yaml;
-    if (emoji) emojis[folder] = emoji;
+ const DEFAULT_STEP_EMOJI = "⚙️";
+
+const visuals = {};
+
+for (const [folder, { yaml, emoji, icon,label }] of Object.entries(extensions)) {
+  if (!yaml) continue;
+
+  templates[folder] = yaml;
+
+  visuals[folder] = {
+    icon: icon ? `${icon}` : null,
+    emoji: emoji || DEFAULT_STEP_EMOJI, // 👈 default here
+  };
+  
+if(label){
+	visuals[folder]['label'] = label;
+}
+
+}
+
+const renderNodeVisual = (node) => {
+  const step = getStepFromYaml(node?.data?.info);
+  const visual = visuals[step];
+
+  if (visual?.icon) {
+    return (
+      <img
+        src={visual.icon}
+        alt=""
+        style={{ width: 20, height: 20, objectFit: "contain" }}
+        onError={(e) => (e.currentTarget.style.display = "none")}
+      />
+    );
   }
+
+  return visual?.emoji || DEFAULT_STEP_EMOJI;
+};
 
   // --- Undo history
   const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
@@ -259,6 +315,7 @@ const [nodeCounter, setNodeCounter] = useState(1);
   const addNode = () => {
   const id = nodeCounter.toString();
 
+	
     const newNode = {
       id,
       position: { x: 50 * nodes.length, y: 50 * nodes.length },
@@ -418,7 +475,7 @@ console.log('before sortedNodes workflow',workflow);
     ...(step.context && Object.keys(step.context).length > 0 ? { context: step.context } : {}),
 }
 ],{ flowLevel: 3 }),
-          emoji: emojis[step.step] || "🌐",
+          
         },
         type: step.type || undefined,
       }));
@@ -469,10 +526,16 @@ setNodeCounter(maxId + 1);
 };
 
   const renderLabel = (rawLabel, node) => (
-  <div style={{ textAlign: "center" }}>
-    {node?.data?.emoji && <span className="node-emoji">{node.data.emoji}</span>}
+  <div style={{ paddingBottom: "6px",position:'relative' }}>
+  
+  <div class="wjei_block">
+  
+  
+      <div class="wjei_emoji">{renderNodeVisual(node)}</div>
+      
+  <div class="wjei_text">
+  <div>
     <div>{rawLabel}</div>
-
     {node?.data?.missing?.length > 0 && (
       <div style={{
         marginTop: 4,
@@ -482,6 +545,15 @@ setNodeCounter(maxId + 1);
         Missing: {node.data.missing.map(k => `\${${k}}`).join(", ")}
       </div>
     )}
+    </div>
+  </div>
+</div>
+
+
+
+    
+
+    
   </div>
 );
 
@@ -495,6 +567,11 @@ setNodeCounter(maxId + 1);
 
   return (
     <ReactFlowProvider>
+      <TextareaPopup />
+    <FileUploadPopup />
+    <MarkdownPopup />
+    <Base64ImagePopup />
+    
     <div style={{ position: "absolute", top: 15, left:15 }} ><img style={{ height: 24,margin:'0px 0px -6px 1px' }} src={nynoWhite} /> <span style={{color:'white','opacity':isPro ? 1 : 0.81}}>
     
           
@@ -628,32 +705,19 @@ setNodeCounter(maxId + 1);
   <div>
 		      <TemplateSelect
   templates={templates}
-  emojis={emojis}
+  visuals={visuals}
   value={selectedTemplate}
   onSelect={(templateKey) => {
     setSelectedTemplate(templateKey);
 
     const templateYaml = templates[templateKey] || "";
-    const templateEmoji = emojis[templateKey] || "";
-
-    handleFieldChange({"info": templateYaml, "emoji": templateEmoji});
-
-/*
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id !== selectedNode.id
-          ? n
-          : {
-              ...n,
-              data: {
-                ...n.data,
-                emoji: templateEmoji,
-              },
-            }
-      )
-    );*/
-
-
+    const visual = visuals[templateKey] || {};
+    
+     handleFieldChange({
+      info: templateYaml,
+      emoji: visual.emoji, // always defined (⚙️ fallback already)
+        label: (visual.label || templateKey).replace(/[🟢🔵🟣]/g, ''), 
+    });
 
 
 // If this template includes an agent step, insert an tool-settings node above it
@@ -694,7 +758,7 @@ setNodeCounter(maxId + 1);
       //pushHistory(newNodes, newEdges);
 
 
-    handleFieldChange({"info": templateYaml,"emoji": templateEmoji});
+    handleFieldChange({"info": templateYaml,"emoji":  visual.emoji,   label: (visual.label || templateKey).replace(/[🟢🔵🟣]/g, '') });
 
       setNodes((nds) => {
         const updated = [...nds, configNode];

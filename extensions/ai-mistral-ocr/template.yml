@@ -1,0 +1,5 @@
+- step: ai-mistral-ocr
+  args:
+    - ${prev} # base64 or path if not in OCR_BASE64_MODE
+  context:
+    OCR_BASE64_MODE: true

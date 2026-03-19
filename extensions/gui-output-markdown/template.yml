@@ -1,0 +1,2 @@
+- step: gui-output-markdown
+  # only supports ${prev} for input

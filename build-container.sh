@@ -9,6 +9,7 @@ fi
 CONTAINER_TOOL=$1
 
 # Build the image
-$CONTAINER_TOOL build -t nyno:latest -f Dockerfile .
+$CONTAINER_TOOL build --no-cache -t nyno:latest -f Dockerfile .
+#$CONTAINER_TOOL build -t nyno:latest -f Dockerfile .
 
 

@@ -96,24 +96,37 @@ async function loadExtensions() {
 
       const extDir = path.join(baseDir, folder);
       const emojiFile = path.join(extDir, 'emoji.txt');
+      const iconFile = path.join(extDir, 'icon.webp');
       const yamlFile = path.join(extDir, 'template.yml');
+            const labelFile = path.join(extDir, 'label.txt');
 
       let yaml = null;
-      let emoji = '';
-
       if (fs.existsSync(yamlFile)) {
         yaml = fs.readFileSync(yamlFile, 'utf8');
       }
 
-      if (fs.existsSync(emojiFile)) {
-        emoji = fs.readFileSync(emojiFile, 'utf8').trim();
-      }
-
       extensions[folder] = {
         yaml,
-        emoji,
         sourceDir: extDir, // useful for runners / debugging
       };
+
+    if (fs.existsSync(labelFile)) {
+        const label = fs.readFileSync(labelFile, 'utf8').trim();
+        extensions[folder]['label'] = label;
+      }
+      
+      if (fs.existsSync(emojiFile)) {
+        const emoji = fs.readFileSync(emojiFile, 'utf8').trim();
+        extensions[folder]['emoji'] = emoji;
+      }
+      
+      if (fs.existsSync(iconFile)) {
+  const buffer = fs.readFileSync(iconFile); // no 'utf8', read raw bytes
+  const ext = path.extname(iconFile).slice(1); // "webp" or "png"
+  const base64 = `data:image/${ext};base64,${buffer.toString('base64')}`;
+  extensions[folder]['icon'] = base64;
+}
+
 
       console.log('[EXT LOAD]', folder, 'from', baseDir);
     }

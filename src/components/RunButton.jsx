@@ -1,8 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { SimpleOutputToggle } from "@/components/SimpleOutputToggle";
 import SimpleJsonExplorer from "@/components/JsonNode.jsx";
+import YAML from "js-yaml";
 
 export function RunButton({ getText, onExecution }) {
+
+
+  const updateYamlContext = (yamlText, updater) => {
+  let doc = {};
+
+  try {
+    doc = YAML.load(yamlText) || {};
+  } catch (e) {
+    console.error("Invalid YAML:", e);
+    doc = {};
+  }
+
+  if (!doc.context) doc.context = {};
+
+  // allow custom mutation logic
+  updater(doc.context, doc);
+
+  return YAML.dump(doc);
+};
+
+const getLastExecutionVar = (execution, varName) => {
+  const context = execution?.at(-1)?.output?.c || {};
+  return context[varName] ?? null;
+};
 
   const [needsMistralKey, setNeedsMistralKey] = useState(false);
 const [mistralKey, setMistralKey] = useState(() => {
@@ -21,22 +46,8 @@ useEffect(() => {
   }
 }, [mistralKey]);
 
-  const [needsOpenAIKey, setNeedsOpenAIKey] = useState(false);
-const [OpenAIKey, setOpenAIKey] = useState(() => {
-  try {
-    return localStorage.getItem("OPEN_AI_API_KEY") || "";
-  } catch {
-    return "";
-  }
-});
 
-useEffect(() => {
-  if (OpenAIKey) {
-    try {
-      localStorage.setItem("OPEN_AI_API_KEY", OpenAIKey);
-    } catch {}
-  }
-}, [OpenAIKey]);
+
 
 
   const [oneVarMode, setOneVarMode] = useState(false);
@@ -50,6 +61,39 @@ const [oneVarText, setOneVarText] = useState(`context:
   const [result, setResult] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const waitForTextInput = async (timeoutMs = 30000, intervalMs = 500) => {
+  const start = Date.now();
+
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      if (window.LAST_TEXT) {
+        resolve(window.LAST_TEXT);
+      } else if (Date.now() - start >= timeoutMs) {
+        reject(new Error("Text input timed out after 30 seconds."));
+      } else {
+        setTimeout(check, intervalMs);
+      }
+    };
+    check();
+  });
+};
+
+const waitForFileUpload = async (timeoutMs = 30000, intervalMs = 500) => {
+  const start = Date.now();
+  
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      if (window.LAST_FILE) {
+        resolve(window.LAST_FILE); // File is ready
+      } else if (Date.now() - start >= timeoutMs) {
+        reject(new Error("File upload timed out after 30 seconds."));
+      } else {
+        setTimeout(check, intervalMs); // check again
+      }
+    };
+    check();
+  });
+};
 
   const [token, setToken] = useState(() => {
     const defaultPw = 'change_me';
@@ -94,9 +138,51 @@ let textToSend = [oneVarPrefix, baseText]
   .join("\n\n")
   .trim();
 
+  // check GUI input blocks (refactor later)
+  
+  if (textToSend.includes('gui-input-textarea')) {
+  window.SHOW_TEXTAREA_POPUP = true;
 
+  try {
+    const userText = await waitForTextInput();
+
+    console.log("Text input received:", userText);
+
+    // attach to YAML context
+    textToSend = updateYamlContext(textToSend, (ctx) => {
+      ctx.PROMPT = userText;
+    });
+
+    delete window.LAST_TEXT;
+  } catch (err) {
+    alert(err.message);
+    setLoading(false);
+    return;
+  }
+}
+
+  if(textToSend.includes('gui-input-file-upload')){
+  	window.SHOW_FILE_UPLOAD_POPUP = true;
+  	try {
+    const uploadedFile = await waitForFileUpload();
+
+    console.log("File uploaded:", uploadedFile);
+    
+     // append file to context as key ${prev} is set via the GUI
+     textToSend = updateYamlContext(textToSend, (ctx) => {
+      ctx.prev = window.LAST_FILE;
+     });
+	delete window.LAST_FILE;
+  } catch (err) {
+    alert(err.message); // Show timeout alert
+    setLoading(false);
+    return;
+  }
+  
+  }
+
+     
 const usesMistral = textToSend.includes("mistral") && textToSend.includes("ai");
-const usesOpenAI = textToSend.includes("openai") && textToSend.includes("ai");
 
 if (usesMistral && !mistralKey) {
   setNeedsMistralKey(true);
@@ -105,27 +191,10 @@ if (usesMistral && !mistralKey) {
 
 }
 if (usesMistral && mistralKey) {
-  const mistralContext = `context:\n  MISTRAL_API_KEY: "${mistralKey}"\n`;
-  if(textToSend.startsWith('context:')) {
-    textToSend = textToSend.replace('context:',mistralContext);
-  } else {
-    textToSend = [mistralContext, textToSend].join("\n\n");
-  }
-}
-if (usesOpenAI && !OpenAIKey) {
-  setNeedsOpenAIKey(true);
-  setLoading(false);
-  return;
-
-}
-if (usesOpenAI && OpenAIKey) {
-  const OpenAIContext = `context:\n  OPEN_AI_API_KEY: "${OpenAIKey}"\n`;
-  if(textToSend.startsWith('context:')) {
-    textToSend = textToSend.replace('context:',OpenAIContext);
-  } else {
-    textToSend = [OpenAIContext, textToSend].join("\n\n");
-  }
-}
+  textToSend = updateYamlContext(textToSend, (ctx) => {
+      ctx.MISTRAL_API_KEY = mistralKey;
+  });
+}  
 
       if(textToSend.includes('workflow: []')) {
         alert("Please use \"Add Node\" to add at least one node.")
@@ -148,6 +217,42 @@ if (usesOpenAI && OpenAIKey) {
       } catch (e) {
         data = null;
       }
+
+
+// hardcoded test for markdown popup
+
+// OUTPUT LAYER GUI (refactor later)
+if("execution" in data) {
+  console.log('data.execution',data.execution);
+
+const lastStep = data.execution[data.execution.length-1].output.c.LAST_STEP;
+console.log('lastStep',lastStep);
+
+
+
+if (lastStep === "gui-output-markdown") {
+const markdown = getLastExecutionVar(data.execution, "prev");
+window.dispatchEvent(
+    new CustomEvent("showMarkdownPopup", {
+      detail: markdown,
+    })
+  );
+}
+
+if (lastStep === "gui-output-image") {
+  const value = getLastExecutionVar(data.execution, "prev");
+
+  window.dispatchEvent(
+    new CustomEvent("showImagePopup", {
+      detail: value,
+    })
+  );
+}
+
+
+
+}
+
 
       // Detect unauthorized by HTTP status or by JSON body containing an "Unauthorized" error
       const isUnauthorized = res.status === 401 || (data && (data.error === "Unauthorized" || data.message === "Unauthorized"));
@@ -343,7 +448,7 @@ const blob = new Blob([(result)], { type: "application/json" });
           textAlign: "right",
           position: "fixed",
           right: 0,
-          zIndex: 999999,
+          zIndex: 9989,
         }}
       >
         <button
@@ -379,27 +484,7 @@ const blob = new Blob([(result)], { type: "application/json" });
     </button>
   </div>
 )}
-{needsOpenAIKey && (
-  <div className="mb-4">
-    <label className="block text-sm font-medium mb-1">
-      OpenAI API Key required
-    </label>
-    <input
-      type="password"
-      value={OpenAIKey}
-      onChange={(e) => setOpenAIKey(e.target.value)}
-      placeholder="sk-..."
-      className="w-full px-3 py-2 border rounded mb-2"
-    />
-    <button
-      onClick={() => setNeedsOpenAIKey(false)}
-      disabled={!OpenAIKey}
-      className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
-    >
-      Save & Continue
-    </button>
-  </div>
-)}
+
 
 
             {/* If unauthorized, show an input to change the token */}

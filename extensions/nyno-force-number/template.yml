@@ -1,0 +1,3 @@
+- step: nyno-force-number
+  args:
+    - ${prev}
