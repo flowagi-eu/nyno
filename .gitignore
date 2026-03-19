@@ -1,4 +1,5 @@
 .ascend
+plugin_sdk/target
 build
 guest-uploads
 node_modules
