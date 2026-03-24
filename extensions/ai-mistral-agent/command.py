@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import yaml
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 import re
 

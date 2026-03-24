@@ -1,5 +1,6 @@
 # extensions/ai_mistral_embeddings/command.py
-from mistralai import Mistral
+from mistralai.client import Mistral
+#from mistralai import Mistral
 
 def ai_mistral_embeddings(args, context):
     """

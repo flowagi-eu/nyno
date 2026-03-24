@@ -150,7 +150,7 @@ let textToSend = [oneVarPrefix, baseText]
 
     // attach to YAML context
     textToSend = updateYamlContext(textToSend, (ctx) => {
-      ctx.PROMPT = userText;
+      ctx.prev = userText;
     });
 
     delete window.LAST_TEXT;

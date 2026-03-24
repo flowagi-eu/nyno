@@ -98,7 +98,7 @@ if [[ -f "envs/.nyno_log_db.env" ]]; then
     echo -e "${GREEN}[OK]${RESET} envs/.nyno_log_db.env exists"
 else
     echo -e "${RED}[ERR]${RESET} Missing envs/.nyno_log_db.env"
-    echo -e "      ${YELLOW}Run: bash setup-postgres-db.sh${RESET}"
+    echo -e "      ${YELLOW}Run: bash install-postgres-db.sh${RESET}"
     db_env_missing=true
     error_count=$((error_count + 1))
 fi
@@ -115,7 +115,7 @@ if [[ $error_count -eq 0 ]]; then
     echo -e "  1. bun install"
     echo -e "  2. uv sync"
     echo -e "  3. npm link @best.js"
-    [[ "$db_env_missing" == false ]] || echo -e "  4. bash setup-postgres-db.sh"
+    [[ "$db_env_missing" == false ]] || echo -e "  4. bash install-postgres-db.sh"
     echo ""
     exit 0
 else

@@ -1,7 +1,7 @@
 import os
 import uuid
-from mistralai import Mistral
-from mistralai.models import ToolFileChunk
+from mistralai.client import Mistral
+from mistralai.client.models import ToolFileChunk
 import time
 import base64
 

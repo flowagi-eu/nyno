@@ -3,7 +3,9 @@ name = "nyno"
 version = "2.1.0"
 dependencies = [
     "html-to-markdown>=2.9.1",
+    "markdownify>=1.2.2",
     "mistralai>=1.10.0",
     "openai>=2.9.0",
+    "pyyaml>=6.0.3",
 ]
 
