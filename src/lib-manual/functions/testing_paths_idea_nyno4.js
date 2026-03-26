@@ -161,11 +161,15 @@ export async function traverseFullGraph(path, dynamicFunctions,debugLog=[],INSEC
       if(error) {
           // 1.4.1 Handle missing variables case (from replaceNynoVariables functions)
           console.log("EARLY EXIT: MISSING");
+          if(INSECURE_CORE_DEV_MODE) debugLog.push('EARLY EXIT: MISSING');
+
       		return { result, one_var, error, errorMsg:'missing', exitReason: "missing_vars" };
       }
 
       // 1.5 Handle returnCode -1 to prepare for forceStop later in next visit
       if (fullResult.r === -1) {
+        if(INSECURE_CORE_DEV_MODE) debugLog.push('EARLY EXIT forceStop r.===-1 (171)');
+
         forceStop = true;
       }
 
@@ -218,21 +222,37 @@ export async function traverseFullGraph(path, dynamicFunctions,debugLog=[],INSEC
             const [ errorAgent, argsRepAgent, contextRepAgent ] = replaceNynoVariables({ step:stepType, args: [toolObjRaw] }, fullResult.c);
 
 
+            if(INSECURE_CORE_DEV_MODE) {
+              debugLog.push('agent full debug next:');
+              debugLog.push({errorAgent, argsRepAgent, contextRepAgent} );
+            }
+
+
             const tools = argsRepAgent[0];
             console.log('tools',tools);
 
             for(let i=0;i<tools.length;i++){
               const valueToMatch = tools[i].name;
-              console.log({valueToMatch,i,toolName});
-              if(valueToMatch == toolName) {
+
+
+              // lowercase value to match
+              const lvalueToMatch = valueToMatch.replaceAll(' ','_').toLowerCase();
+              console.log({lvalueToMatch,i,toolName});
+              if(INSECURE_CORE_DEV_MODE) debugLog.push('agent seeking match',{lvalueToMatch,i,toolName})
+
+              if(lvalueToMatch == toolName) {
                 matchingIndex = i;
                 console.log('found match');
+                if(INSECURE_CORE_DEV_MODE) debugLog.push('found match')
+
                 console.log('children ', children);
                 console.log('children matching', children[matchingIndex]);
               }
             }
 
             if(matchingIndex !== null && children[matchingIndex]){
+               if(INSECURE_CORE_DEV_MODE) debugLog.push('agent nextChild loop 1/2')
+
               const nextChild = children[matchingIndex];
               if (nextChild !== undefined) {
                 const nextContext = JSON.parse(JSON.stringify(fullResult.c));
@@ -241,7 +261,10 @@ export async function traverseFullGraph(path, dynamicFunctions,debugLog=[],INSEC
 	          }  
 	        } else {
             // (normal) 2.1.2.1.2 Handle all node children
+            if(INSECURE_CORE_DEV_MODE) debugLog.push('agent nextChild loop 2/2')
             const nextChild = children[fullResult.r];
+            if(INSECURE_CORE_DEV_MODE) debugLog.push('nextChild value:',nextChild);
+
             if (nextChild !== undefined) {
               const nextContext = JSON.parse(JSON.stringify(fullResult.c));
               await visit(nextChild, nextContext, branchId);

@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
 fi
 
 CONTAINER_TOOL=$1
-IMAGE_NAME="nyno:latest"
+IMAGE_NAME="flowagi/nyno"
 
 source "$(pwd)/envs/ports.env"
 
