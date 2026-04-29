@@ -2,3 +2,4 @@
   args:
     - ${URL}
     - ${POST_DATA}
+    - ${HEADER_KEY_VALUE} # optional

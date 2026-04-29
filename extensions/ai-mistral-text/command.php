@@ -39,7 +39,7 @@ function ai_mistral_text($args, &$context) {
 
     // Mistral API endpoint and model
     $endpoint = "https://api.mistral.ai/v1/chat/completions";
-    $model = "mistral-large-latest"; // or "mistral-small-latest", "mistral-large-latest", etc.
+    $model = "mistral-medium-latest"; // or "mistral-small-latest", "mistral-large-latest", etc.
 
     $messages = [];
     if (!empty($systemPrompt)) {

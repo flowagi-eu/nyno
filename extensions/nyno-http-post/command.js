@@ -29,10 +29,24 @@ export async function nyno_http_post(args, context) {
 
     const text = await response.text();
 
-    context[setName] = { HTTP_RESPONSE:text, HTTP_STATUS: response.status, HTTP_ERROR: response.ok ? null : `HTTP error ${response.status}`};
-    return 0
+    context[setName] = text;
+    context[setName + "_meta"] = { HTTP_STATUS: response.status, HTTP_ERROR: response.ok ? null : `HTTP error ${response.status}`};
+
+    // _meta: try to parse response as json, , default true
+    let json = {};
+    if((context.POST_PARSE_JSON ?? true) === true) {
+      try {
+        json = JSON.parse(text);
+         context[setName + "_meta"]['json'] = json;
+      } catch(err){
+        // 
+      }
+    }
+
+    return 0;
   } catch (err) {
     context[setName] = { HTTP_RESPONSE:"", HTTP_STATUS: "", HTTP_ERROR: err.message};
+    context[setName + "_error"] = { HTTP_ERROR: err.message};
     return -1;
   }
 
