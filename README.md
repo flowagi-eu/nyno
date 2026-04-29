@@ -1,21 +1,24 @@
-### Quick Install
+> Founder Note: "Unlike with n8n, you and your clients never have to request a commercial license to run Nyno workflows. This was the main reason I started building Nyno." – MJ
+
+### Nyno 7.0: Quick Install (Linux or Windows)
+For Linux install see the bash command below. For Windows install, see [https://nyno.dev/how-to-run-nyno-on-windows-using-docker-desktop](https://nyno.dev/how-to-run-nyno-on-windows-using-docker-desktop)
 ```bash
 podman run -it -p 9057:9057 flowagi/nyno
 
 ## Or Docker: docker run -it -p 9057:9057 flowagi/nyno
+
+# Browse to http://localhost:9057
 ```
 
 ![Nyno Workflow Example 1](/h/f32a675319e6394dbae59b535e71424249ca5537afa089a20ad3d81e40eb2427/screenshot-from-2026-02-22-20-18-14.webp)
 
-# Nyno is not just another AI workflow tool. Nyno is:
+# From Slow, Restrictive AI workflows to Fast, Simple & Sovereign Automation.
+Nyno is not just another AI workflow tool. Nyno is:
+- **🟢 Human Editable Workflow Files (YAML + GUI).**
+- **🟢 Commercial Friendly License (Apache 2).**
+- **🟢 Multi-Language: Build on top of  the best ecosystems (Python, Ruby, PHP & JavaScript)**
 
-## 🟢 Human Editable Workflow Files (YAML + GUI).
-## 🟢 Commercial Friendly License (Apache 2).
-
-## 🟢 Multi-Language: Build on top of  the best ecosystems (Python, Ruby, PHP & JavaScript)
-
-
-
+[spacing value='4rem']
 
 ---
 
@@ -26,14 +29,15 @@ podman run -it -p 9057:9057 flowagi/nyno
 
 - A: Yes, exactly. From all the best ecosystems (py,js,php,ruby). And better yet, it's yours. You own it. You can license/sell it however you want, since the core is permissive Apache2 licensed.
 
+[spacing value='6rem']
+
 
 Quick comparison with n8n (currently most popular AI Workflow GUI builder):
 
 | Core Values    | With n8n | With Nyno |
 | ------------------ | --------------------------- | ------------------------------------------------------------------------ |
-| AI Features | ✅ Agents & API Integrations | ✅ AI, Precision & Data Sovereignty |  
-| Financial Freedom    | ❌ No. Not OSI open-source. Embedded licenses (potentially costing $25.000+) required for commercial use. | ✅ Yes. Build and possibly fully own and sell your own automation systems, extensions and commercial services. | 
-| No Technical Vendor Lock-in | ❌ Complicated specific SDK for extensions.               | ✅ Custom nodes simply use an exportable (py,rb,php,js) function. |
+| Financial Freedom    | ❌ No. n8n is not OSI open-source. Embedded licenses (potentially costing $25.000+) required for commercial use. | ✅ Yes. Build and possibly fully own and sell your own automation systems, extensions and commercial services. | 
+| No Technical Vendor Lock-in | ❌ Complicated specific SDK for extensions. | ✅ Custom nodes simply use an exportable (py,rb,php,js) function. See also [generate-your-own-nyno-workflow-extensions](https://nyno.dev/generate-your-own-nyno-workflow-extensions) |
 | Scalability & Execution Speed for Custom Code   | 🐌 Slow (≈0.15s per node). Custom Python/NodeJS code nodes use a new process. | ⚡ Fast (≈0.002s per node). Custom code require custom nodes which are loaded when Nyno boots. |
 | Developer Experience | 🤯 Workflows are big messy JSON files.               | 😌 Workflows are clean human editable YAML scripts, like code.    
 | Privacy & GDPR | 🇺🇸 n8n workflows often rely on US-based AI & APIs. Each workflow may introduce additional GDPR compliance risks. | 🇪🇺 Nyno uses European Mistral AI by default and includes  built-in local Postgres database nodes to encourage sovereign data storage.     
@@ -46,16 +50,17 @@ Quick comparison with n8n (currently most popular AI Workflow GUI builder):
 ![Nyno Workflow Example](/h/3fec8199e52b6983079d4800694475a7c660ab26c1f0a831e16050dc340f24ec/screenshot-from-2026-01-12-00-04-09.webp)
 
 
-> Founder Note: "Unlike with n8n, you and your clients never have to request a commercial license to run Nyno workflows. This was the main reason I started building Nyno." – MJ
+
 
 ![Nyno examples connecting multiple AI nodes](/h/c0f8c2c19f52c63ba139a25e5fa5fbc80a36a865c1368534bac204c3fc3d683f/screenshot-from-2026-01-12-13-26-24.webp)
 
 ---
 
 
-## Nyno 6.1: Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
+## Your Open-Source Workflow Engines for AI, Advanced Intelligence & Beyond. Extend with Python, PHP, JS and Ruby.  Runs in the Browser.
 - Try the Online Playground: [https://nyno.dev/online-playground](https://nyno.dev/online-playground)
 - Stay Up-to-Date: Join our Reddit community at [/r/Nyno](https://www.reddit.com/r/Nyno)
+- Fill in the first form to join the platform next week: [https://nyno.dev/](https://nyno.dev/)
 
 
 ---
@@ -74,10 +79,10 @@ Each programming language runs in its own **high-performance worker engine**. Co
 nyno: 6.0
 workflow:
   - step: ai-mistral-text
-    args: ['My idea: ${PROMPT}', minimal]
+    args: ['My idea: ${PROMPT}']
     context: {SYSTEM_PROMPT: 'You''re a blog post writer. I will give you an idea, and you basically need to expand upon it, you can also correct me, but just give me the best possible article you can write about it to share my idea. Only output the new article, dont affirm.'}
   - step: ai-mistral-text
-    args: ['my article: ${prev}', minimal]
+    args: ['my article: ${prev}']
     context: {SYSTEM_PROMPT: 'Make my article more heartfelt. Only output the new article, dont affirm.'}
 ```
 
@@ -116,12 +121,22 @@ Example in Workflow (YAML):
 ```
 
 <p align="center">
-  <img src="/h/3f391b88ab87a304526f144770a4288fe36c0f98eae79e9979276783f77a4a4f/nyno-neon-logo.webp" alt="Nyno logo" width="200">
+  <img src="/h/8bce199fb887e27200cb6b95ded7d0893b4c265e0e0de457291ea481b048013d/nyno-9-dot.webp" alt="Nyno logo" width="200">
 </p>
 
 
 
 ### Install Nyno using Docker/Podman
+
+
+## Quick Install (option 1, recommended)
+```bash
+podman run -it -p 9057:9057 flowagi/nyno
+
+## Or Docker: docker run -it -p 9057:9057 flowagi/nyno
+```
+
+## Developer Mode (option 2, for custom builds)
 
 #### 1. Clone the Repo
 ```bash
@@ -149,7 +164,11 @@ Make sure you to build the container first.
 
 ### Install Nyno on Linux Host
 
+#### For first time users: Docker/Podman install is recommended.
 Note: Nyno is dependent on Best.js which needs to be installed to run Nyno. **You will need to install quite a lot of  dependencies. Docker/Podman install is  recommended.** However, for the experts, a `bash scripts/check_host.sh` script is included to check dependencies quickly.
+
+
+
 
 ```bash
 # install Best.js
