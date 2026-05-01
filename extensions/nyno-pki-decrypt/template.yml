@@ -1,7 +1,0 @@
-- step: nyno-pki-decrypt
-  args:
-    - ${prev.ciphertextBase64}
-    - ${prev.nonceBase64}
-    - ${keypair.for_e2e.publicBase32} # sender
-    - ${keypair.for_e2e.secretBase32} # receiver
-

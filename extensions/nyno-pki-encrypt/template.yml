@@ -1,6 +1,0 @@
-- step: nyno-pki-encrypt
-  args:
-    - very secret message
-    - ${keypair.for_e2e.publicBase32} # receiver
-    - ${keypair.for_e2e.secretBase32} # sender
-
