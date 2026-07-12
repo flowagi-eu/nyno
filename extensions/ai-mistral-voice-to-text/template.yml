@@ -1,0 +1,5 @@
+- step: ai-mistral-voice-to-text
+  args:
+    - '${prev}' # base64 gui input node
+  context:
+    MISTRAL_API_KEY: "your Mistral api key"

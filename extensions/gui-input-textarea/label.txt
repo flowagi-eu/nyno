@@ -1,1 +1,1 @@
-🟢 Send Text/Chat Message (this opens a popup before the workflow)
+🟢 Send Message

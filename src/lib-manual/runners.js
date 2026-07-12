@@ -101,8 +101,8 @@ const RUNNERS = {
     host,
     port: ports["JS"] ?? 9072,
     cmd: "node",
-    file: path.resolve(__dirname, "../../dist-ts/nyno/src/lib-manual/runners/runner.js"),
-    checkFunction: makeCheckFunction(['command.js','command.ts','command.wasm'])
+    file: path.resolve(__dirname, "runners/runner.js"),
+    checkFunction: makeCheckFunction(['command.js','command.wasm'])
   },
   py: {
     host,
@@ -259,7 +259,9 @@ context['__n_id'] = __n_id;
       resolve(msg);
     };
 
-    client.write('r'+JSON.stringify({functionName,args,context}) + '\n');
+    const dataToSend = 'r'+JSON.stringify({functionName,args,context}) + '\n';
+    //console.log("writing data: ",dataToSend);
+    client.write(dataToSend);
   });
 }
 

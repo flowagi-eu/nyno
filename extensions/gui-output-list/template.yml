@@ -1,0 +1,2 @@
+- step: gui-output-list
+  # only supports ${prev} as list of objects for input

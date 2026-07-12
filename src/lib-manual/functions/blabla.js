@@ -60,38 +60,56 @@ function resolvePath(ctx, path) {
 }
 
 export function renderArgs(args, ctx, missing) {
-  //console.log('renderArgs args',args);
-  return args.map(arg => {
-    if (typeof arg !== 'string') return arg;
+  function renderValue(value) {
+    // strings
+    if (typeof value === 'string') {
+      // FULL replacement
+      const fullMatch = value.match(/^\$\{([\w.]+)\}$/);
 
-    // FULL replacement
-    const fullMatch = arg.match(/^\$\{([\w.]+)\}$/);
-    if (fullMatch) {
-      const path = fullMatch[1];
-      const value = resolvePath(ctx, path);
+      if (fullMatch) {
+        const path = fullMatch[1];
+        const resolved = resolvePath(ctx, path);
 
-      if (value === undefined) {
-        missing.add(path);
-        return arg;
+        if (resolved === undefined) {
+          missing.add(path);
+          return value;
+        }
+
+        return resolved;
       }
-      return value;
+
+      // PARTIAL replacement
+      return value.replace(/\$\{([\w.]+)\}/g, (_, path) => {
+        const resolved = resolvePath(ctx, path);
+
+        if (resolved === undefined) {
+          missing.add(path);
+          return `\${${path}}`;
+        }
+
+        return typeof resolved === 'string'
+          ? resolved
+          : JSON.stringify(resolved);
+      });
     }
 
-    // PARTIAL replacement
-    return arg.replace(/\$\{([\w.]+)\}/g, (_, path) => {
-      const value = resolvePath(ctx, path);
+    // arrays
+    if (Array.isArray(value)) {
+      return value.map(renderValue);
+    }
 
-      if (value === undefined) {
-        missing.add(path);
-        return `\${${path}}`;
-      }
+    // objects
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([k, v]) => [k, renderValue(v)])
+      );
+    }
 
-      return typeof value === 'string'
-  ? value
-  : JSON.stringify(value);
-  
-    });
-  });
+    // numbers, booleans, null, undefined
+    return value;
+  }
+
+  return renderValue(args);
 }
 
 export function replaceNynoVariables(node, context = {}) {

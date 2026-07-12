@@ -79,6 +79,7 @@ $server->set([
 
 $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, $VALID_API_KEY) {
 
+var_dump('php: RECEIVE EVENT');
     // Worker-level TCP state
     static $buffers = [];
     static $auth = [];
@@ -107,6 +108,8 @@ $server->on("Receive", function ($server, $fd, $reactorId, $data) use (&$STATE, 
                 $server->send($fd, "{\"error\":\"invalid_json\"}\n");
                 return;
             }
+
+            var_dump('received payload: '.json_encode($payload));
 
             /* ---------- AUTH ---------- */
 

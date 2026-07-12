@@ -2,4 +2,5 @@
   args:
     - ${prev} # base64 or path if not in OCR_BASE64_MODE
   context:
+    MISTRAL_API_KEY: "your Mistral api key"
     OCR_BASE64_MODE: true

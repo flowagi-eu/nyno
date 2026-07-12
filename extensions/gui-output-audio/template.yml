@@ -1,0 +1,2 @@
+- step: gui-output-audio
+  # only supports ${prev} with base64 input

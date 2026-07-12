@@ -1,1 +1,1 @@
-🟢 Show Markdown as HTML (this opens a popup after workflow)
+🟢 Show Result (this opens a popup after workflow)

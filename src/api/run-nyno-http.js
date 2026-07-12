@@ -1,52 +1,92 @@
-import { runYamlString,emitEvent} from './../lib-manual/runYamlString.js';
+import { runYamlString } from './../lib-manual/runYamlString.js';
 import fs from 'fs';
 const envs = load_nyno_ports();
 
+import YAML from 'js-yaml';
+
+import { createTaskManager } from "./tasks-util/index.js";
+
+import { flows } from './handlers/flows.js';
+import { flowsSync } from './handlers/flowsSync.js';
+import { polling } from './handlers/polling.js';
+
+const taskManager = createTaskManager({
+  runTaskFn: async (taskId, input, ctx) => {
+
+    console.log({ t: 'runTaskFn inputs', d: { taskId, input, ctx }, ts: Date.now() });
+
+    let yamlString;
+    if (input.json ?? false) {
+      yamlString = YAML.dump(input.json);
+    } else if (input.text ?? false) {
+      yamlString = input.text;
+    }
+
+    const result = await runYamlString(yamlString);
+    return result;
+  }
+});
+
 export default function register(app) {
 
-  // TEST TODO for receiving events from other processes
-  app.post('/event/:name' , async(req,res) => {
-      if(!envs.SECRET) {
-        return res.status(401).json({ error: 'Security secret must be set in envs/ports.env' });
-      }
-
-      if (req.query.secret !== envs.SECRET) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      const data = req.body ?? {};
-      emitEvent(req.params.name ?? '?',data);
-      res.json({"status":"OK"});
+// for "Run Workflow" via HTTP(s) GUI 
+  app.get('/api/v1/health', async (req, res) => {
+    res.json({status:"OK"});
   });
 
-  app.get('/event/:name' , async(req,res) => {
-      if(!envs.SECRET) {
-        return res.status(401).json({ error: 'Security secret must be set in envs/ports.env' });
-      }
-
-      if (req.query.secret !== envs.SECRET) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      const data = {};
-      emitEvent(req.params.name ?? '?',data);
-      res.json({"status":"OK"});
-  });
-
-  // for "Run Workflow" via HTTP(s) GUI 
-  app.post('/run-nyno-http', async(req, res) => {
-    if(!envs.SECRET) {
+  // Returns {taskId} for "Run Workflow" via HTTP(s) GUI 
+  app.post('/api/v1/flows/async', async (req, res) => {
+    if (!envs.SECRET) {
       return res.status(401).json({ error: 'Security secret must be set in envs/ports.env' });
     }
     if (req.headers.authorization !== envs.SECRET) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const text = req.body.text;
-    const result = await runYamlString(text);
-    res.json(result);
+    const ctx = createCtx(req);
+    const result = await flows(ctx, req);
+    res.json(result[1]);
   });
+
+  // Waits and returns full workflow result
+  app.post('/api/v1/flows', async (req, res) => {
+    if (!envs.SECRET) {
+      return res.status(401).json({ error: 'Security secret must be set in envs/ports.env' });
+    }
+    if (req.headers.authorization !== envs.SECRET) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const ctx = createCtx(req);
+    const result = await flowsSync(ctx, req);
+    res.json(result[1]);
+  });
+
+  // for "Run Workflow" via HTTP(s) GUI 
+  app.get('/api/v1/polling/:taskId', async (req, res) => {
+    if (!envs.SECRET) {
+      return res.status(401).json({ error: 'Security secret must be set in envs/ports.env' });
+    }
+    if (req.headers.authorization !== envs.SECRET) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const ctx = createCtx(req);
+    const result = await polling(ctx, req);
+    res.json(result[1]);
+  });
+
 }
+
+
+
+function createCtx(req) {
+  return {
+    getTask: (id) => taskManager.getTask(id),
+    createTask: (input, ctx) => taskManager.createTask(input, ctx),
+  };
+}
+
 
 function load_nyno_ports(path = "envs/ports.env") {
   const env = {};

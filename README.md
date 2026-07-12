@@ -1,6 +1,6 @@
 > Founder Note: "Unlike with n8n, you and your clients never have to request a commercial license to run Nyno workflows. This was the main reason I started building Nyno." – MJ
 
-### Nyno 7.0: Quick Install (Linux or Windows)
+### Nyno 8.0: Quick Install (Linux or Windows)
 For Linux install see the bash command below. For Windows install, see [https://nyno.dev/how-to-run-nyno-on-windows-using-docker-desktop](https://nyno.dev/how-to-run-nyno-on-windows-using-docker-desktop)
 ```bash
 podman run -it -p 9057:9057 flowagi/nyno

@@ -154,7 +154,7 @@ def handle_client(conn, addr):
                 elif type_char == "r":
                     fn_name = payload.get("functionName")
                     args = payload.get("args", [])
-                    context = payload.get("context", [])
+                    context = payload.get("context", {})
                     fn = STATE.get(fn_name)
                     if callable(fn):
                         try:

@@ -1,0 +1,22 @@
+- step: ai-mistral-text
+  args:
+    - ${JSON_ONLY_PROMPT} ${prev}
+  context:
+    MISTRAL_API_KEY: "your Mistral api key"
+    # example json format
+    JSON_ONLY_PROMPT: |
+      Return ONLY a JavaScript list of objects, don't include any comments and never ever surround the output in markdown like ```json or ```javascript:
+
+      [{
+        "title": "category of the quote",
+        "details": "random inspiring quote",
+      }]
+
+      Rules:
+      - keys = need to match the above example
+      - values = need to fit their descriptions
+      - no explanations
+
+      Task:
+    MISTRAL_JSON_MODE: true
+

@@ -1,0 +1,7 @@
+- step: ai-mistral-text
+  args:
+    - '${prev}' # prompt
+  context:
+    set_value: "MESSAGES"
+    SYSTEM_PROMPT: ""
+    MISTRAL_API_KEY: "your Mistral api key"

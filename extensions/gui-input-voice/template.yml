@@ -1,0 +1,3 @@
+- step: gui-input-voice
+  # writes base64 to ${prev}
+

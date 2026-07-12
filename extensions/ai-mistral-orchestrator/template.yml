@@ -1,0 +1,10 @@
+- step: ai-mistral-orchestrator
+  context:
+    MISTRAL_API_KEY: "your Mistral api key"
+  args:
+    - '${prev}'
+
+    # List agents below (name: 'description')
+    - Marketing Specialist Agent: 'Specialized in marketing strategies, advertising campaign management, market trend analysis, and marketing content creation.'
+      Product Manager Agent: 'Responsible for managing the product lifecycle, roadmap planning, cross-team coordination, and making strategic decisions about products.'
+      Product Feature Specialist Agent: 'Expert in developing and enhancing product features, managing technical specifications, and collaborating with development teams to ensure feature quality and performance.'

@@ -35,8 +35,14 @@ check_port "$JS"
 check_port "$PE"
 check_port "$RB"
 
+node scripts/loadExtensions.js
+
 # Typescript support
 npm run build:node
+
+cp src/extension-data.json dist/client/extension-data.json
+
+export VITE_HTTP_EXECUTOR_URL="http://localhost:9057/api/v1"
 
 bestjsserver --prod --tcp "$WF" --port "$GU" --host "$HOST"
 
