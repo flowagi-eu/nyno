@@ -1,6 +1,0 @@
-- step: ai-mistral-agent
-  args:
-    - '${prev}' # prompt
-    - ${TOOL_SETTINGS}
-  context:
-    set_context: "agent"

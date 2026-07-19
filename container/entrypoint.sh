@@ -80,12 +80,12 @@ sudo bash ./install-postgres-db.sh
 
 
 # --- Start Best.js server in proper mode ---
-if [ "$APP_ENV" = "prod" ]; then
-    echo "[DEBUG] Starting Best.js in production mode..."
-    exec ./run-prod.sh
-else
+if [ "$APP_ENV" = "dev" ]; then
     echo "[DEBUG] Starting Best.js in development mode..."
     exec ./run-dev.sh
+else
+    echo "[DEBUG] Starting Best.js in production mode..."
+    exec ./run-prod.sh
 fi
 
 

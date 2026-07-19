@@ -280,7 +280,6 @@ if(!basedir)  throw new Error("Missing VITE_BASE environment variable");
 {
 
 
-const HTTP_EXECUTOR_URL = import.meta.env.VITE_HTTP_EXECUTOR_URL;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -293,7 +292,7 @@ const pollTask = async (taskId, { timeoutMs = 5 * 60 * 1000, intervalMs = 300 } 
       throw new Error("Polling timed out after 5 minutes");
     }
 
-    res = await fetch(`${HTTP_EXECUTOR_URL}/polling/${taskId}`, {
+    res = await fetch(`/api/v1/polling/${taskId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -324,7 +323,7 @@ const pollTask = async (taskId, { timeoutMs = 5 * 60 * 1000, intervalMs = 300 } 
 };
 
 const run = async (textToSend) => {
-  const res = await fetch(import.meta.env.VITE_HTTP_EXECUTOR_URL + '/flows/async', {
+  const res = await fetch('/api/v1/flows/async', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
