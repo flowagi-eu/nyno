@@ -242,11 +242,11 @@ export function generateUUIDv7() {
 // --- Run function on a single runner ---
 export function runFunctionSingle(language, functionName, args = [],context={}) {
 
-console.log('runFunctionSingle',language, functionName, args,context);
+//console.log('runFunctionSingle',language, functionName, args,context);
 
 let __n_id = generateUUIDv7(); // nyno task id for parallel support
 context['__n_id'] = __n_id;
-	console.log('language',language);
+	//console.log('language',language);
   const client = connections[language];
   if (!client || client.destroyed) throw new Error(`${language} runner not connected`);
 

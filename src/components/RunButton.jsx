@@ -5,7 +5,28 @@ import YAML from "js-yaml";
 export default function RunButton({ getText, onExecution }) {
 
 
+async function ensureMistralApiKey() {
+  let key = localStorage.getItem("MISTRAL_API_KEY");
+
+  if (!key) {
+    key = prompt("Enter your MISTRAL_API_KEY:");
+
+    if (!key) {
+      throw new Error("MISTRAL_API_KEY is required.");
+    }
+
+    key = key.trim();
+    localStorage.setItem("MISTRAL_API_KEY", key);
+  }
+
+  return key;
+}
+
 console.log("RunButton render",getText());
+
+useEffect(() => {
+window.latestWorkflow = getText();
+});
 
   const getYamlSteps = (yamlText) => {
   let doc = {};
@@ -174,11 +195,12 @@ let textToSend = [oneVarPrefix, baseText]
   .join("\n\n")
   .trim();
 
-  // IF rnh_token exists, we automatically add it to the context
-  let rnh_token = localStorage.getItem("rnh_token") ?? null;
-  if(rnh_token) {
+  // IF MISTRAL_API_KEY exists, we automatically add it to the context
+  const MISTRAL_API_KEY = await ensureMistralApiKey();
+
+  if(MISTRAL_API_KEY) {
     textToSend = updateYamlContext(textToSend, (ctx) => {
-      ctx.rnh_token = rnh_token;
+      ctx.MISTRAL_API_KEY = MISTRAL_API_KEY;
     });
   }
 
@@ -329,7 +351,7 @@ const run = async (textToSend) => {
       "Content-Type": "application/json",
       Authorization: localStorage.getItem("rnh_token") ?? "change_me",
     },
-    body: JSON.stringify({ json: YAML.load(textToSend) }),
+    body: JSON.stringify({json: YAML.load(textToSend)}),
   });
 
   let data;

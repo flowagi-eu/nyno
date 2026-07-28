@@ -1,10 +1,12 @@
 .ascend
+pgdata
 plugin_sdk/target
 build
 guest-uploads
 node_modules
 dist
 dist-ts
+bun.lock
 src/tcp/routes
 output
 input
@@ -12,6 +14,7 @@ src/extension-data.json
 workflows-available
 extensions-available
 private-extensions
+uv.lock
 extensions-untested
 
 envs/*
@@ -31,3 +34,4 @@ workflows-enabled/*
 pgdata
 
 
+package-lock.json

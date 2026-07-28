@@ -1,27 +1,15 @@
-import fs from "fs";
-import path from "path";
 import { load, dump } from 'js-yaml';
-import { file } from "zod";
 
-function ensureObject(value) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value
-    : {};
-}
+import { ensureObject } from '../utils/ensureObject.js';
 
 export async function flowsSync(ctx, req) {
 
-  let { text,json,  filepath, context } = req.body;
+  const { text, json } = req.body;
+  const context = ensureObject(json.context ?? {});
 
-  console.log(JSON.stringify({t:'req.body',ts: Date.now(), d: {text,filepath,context}}));
+  console.log(JSON.stringify({t:'req.body',ts: Date.now(), d: {text,context}}));
 
-let obj = Object.assign({}, load(text));
-
-  // handle both context methods, if POST .context is use it, otherwise use YAML context
-  if(context) obj.context = ensureObject(context);
-  else if(!obj.context) obj.context = {};
-
-  obj.context['NYNO_API_KEY'] = ctx.NYNO_API_KEY;
+  let obj = Object.assign({}, load(text));
 
   text = dump(obj);
 
@@ -30,7 +18,6 @@ let obj = Object.assign({}, load(text));
     d: {
       tenant_id: ctx.tenant_id,
       text,
-      filepath,
       context: context,
       obj_context: obj.context,
     },
@@ -41,7 +28,6 @@ let obj = Object.assign({}, load(text));
   const taskId = ctx.createTask({
     text,
     json, 
-    filepath,
     context,
     status: "pending",
     result: null,

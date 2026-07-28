@@ -1,17 +1,15 @@
-import fs from "fs";
-import path from "path";
-
+import { ensureObject } from '../utils/ensureObject.js';
 
 
 export async function flows(ctx, req) {
-      const { text, json, filepath, context } = req.body;
+      const { text, json } = req.body;
+      const context = ensureObject(json.context ?? {});
 
       console.log({
             t: 'called  "/v1/flows/async"', 
             d: {
                 tenant_id : ctx.tenant_id,
                 text,
-                filepath,
                 json,
                 context
             }, 
@@ -28,15 +26,9 @@ export async function flows(ctx, req) {
           obj.json = json;
       } else if(text) {
           obj.text = text;
-      } else if(filepath) {
-          obj.filepath = filepath;
       } 
 
-      if(context) {
-        obj.context = context;
-      }
-
-
+      obj.context = context;
       const taskId = ctx.createTask(obj, ctx);
 
       return [200, { taskId }];

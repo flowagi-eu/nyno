@@ -21,10 +21,13 @@ echo "GU:$GU"
 echo "RB:$RB"
 
 
+mkdir -p pgdata
+
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
 -e APP_ENV=prod \
 -v $(pwd)/workflows-enabled:/nyno/workflows-enabled \
+-v $(pwd)/pgdata:/nyno/pgdata \
 -v $(pwd)/envs:/nyno/envs \
 -v $(pwd)/output:/nyno/output \
 -v $(pwd)/extensions:/nyno/extensions \

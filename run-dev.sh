@@ -40,7 +40,6 @@ export VITE_NYNO_IS_PRO_VERSION
 
 node scripts/loadExtensions.js
 
-export VITE_HTTP_EXECUTOR_URL="http://localhost:9057/api/v1"
 export VITE_OVERRIDE_EXTENSION_DATA_URL="/src/extension-data.json"
 
 bestjsserver --tcp "$WF" --port "$GU" --host "$HOST"

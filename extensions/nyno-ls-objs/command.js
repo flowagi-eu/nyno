@@ -18,7 +18,7 @@ export async function nyno_ls_objs(args, context) {
           const stat = await import("fs/promises").then((fs) => fs.stat(path));
 
           return {
-            filename: entry.name,
+            name: entry.name,
             dir: entry.isDirectory(),
             mtime: stat.mtimeMs,
           };
@@ -33,7 +33,7 @@ export async function nyno_ls_objs(args, context) {
       });
 
       files = matches.map((match) => ({
-        filename: match.fullpath() ?? match.toString(),
+        name: match.fullpath() ?? match.toString(),
         dir: match.stat?.isDirectory() ?? false,
         mtime: match.stat?.mtimeMs ?? 0,
       }));
@@ -43,8 +43,8 @@ export async function nyno_ls_objs(args, context) {
     files.sort((a, b) => b.mtime - a.mtime);
 
     // remove mtime if you don't want it
-    context[setName] = files.map(({ filename, dir }) => ({
-      filename,
+    context[setName] = files.map(({ name, dir }) => ({
+      name,
       dir,
     }));
 

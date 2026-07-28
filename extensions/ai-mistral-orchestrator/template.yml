@@ -1,6 +1,4 @@
 - step: ai-mistral-orchestrator
-  context:
-    MISTRAL_API_KEY: "your Mistral api key"
   args:
     - '${prev}'
 

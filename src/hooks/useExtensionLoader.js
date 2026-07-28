@@ -3,7 +3,7 @@ import { saveWorkflowToFilepath } from '@/endpoints/saveWorkflowToFilepath.js';
 import { loadWorkflowByFilepath } from '@/endpoints/loadWorkflowByFilepath.js';
 import { loadExtensions } from '@/endpoints/loadExtensions.js';
 
-export function useWorkflowLoader({
+export function useExtensionLoader({
   exportWorkflowStr,
   setExtensions,
 }) {
@@ -26,20 +26,5 @@ export function useWorkflowLoader({
 
     localStorage.setItem("NYNO_API_KEY", key);
     console.log({ key, filepath });
-
-    loadWorkflowByFilepath({
-      filepath,
-      NYNO_API_KEY: key
-    });
-
-    const interval = setInterval(async () => {
-      saveWorkflowToFilepath({
-        text: await exportWorkflowStr(),
-        filepath,
-        NYNO_API_KEY: key,
-      });
-    }, 200);
-
-    return () => clearInterval(interval);
   }, []);
 }

@@ -2,7 +2,6 @@
   args:
     - ${FILES_ONLY_PROMPT} ${prev}
   context:
-    MISTRAL_API_KEY: "your Mistral api key"
     FILES_ONLY_PROMPT: |
       Return ONLY a JavaScript object, don't include any comments and never ever surround the output in markdown like ```json or ```javascript:
 

@@ -37,12 +37,14 @@ check_port "$RB"
 
 node scripts/loadExtensions.js
 
-# Typescript support
-npm run build:node
+# hotfix for cp after build
 
-cp src/extension-data.json dist/client/extension-data.json
+bestjsserver --prod --tcp "$WF" --port "$GU" --host "$HOST" &
+SERVER_PID=$!
 
-export VITE_HTTP_EXECUTOR_URL="http://localhost:9057/api/v1"
+(sleep 9 && cp src/extension-data.json dist/client/) &
 
-bestjsserver --prod --tcp "$WF" --port "$GU" --host "$HOST"
+trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
+
+wait $SERVER_PID
 

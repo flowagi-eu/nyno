@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const pendingEvents = new Map();
 
 function debugLog(...args) {
-  if (process.env.NODE_ENV !== 'production') console.log('[DEBUG]', ...args);
+  // if (process.env.NODE_ENV !== 'production') console.log('[DEBUG]', ...args);
 }
 
  
@@ -116,14 +116,14 @@ export async function runYamlString(text,customContext=null) {
       } else {
           // Normal TCP runner step
           const language = languageKeyValue[step];
-          console.log('[DEBUG] dynamicFunctions',JSON.stringify({step,args,context}));
+          //console.log('[DEBUG] dynamicFunctions',JSON.stringify({step,args,context}));
           const resultCode = await runFunctionSingle(language, step, args,context);
           return resultCode;
       }
     }
   }     
   
-  console.log('flattenedObj',flattenedObj);
+  //console.log('flattenedObj',flattenedObj);
 
   // 4. actually run the graph
   let workflowResult;
@@ -156,8 +156,48 @@ export async function runYamlString(text,customContext=null) {
   
   const retObj = { status:"ok", execution: workflowResult,execution_time_seconds: (endTime - startTime) / 1000 };
   if(debugStepLog) {
-    retObj['debugStepLog'] = debugStepLog;
+    //retObj['debugStepLog'] = debugStepLog;
   }
 
-  return retObj;
+  return maskSecretsAndDeleteInternal(retObj);
+}
+
+function maskSecretsAndDeleteInternal(data, patterns = ["API_", "SECRET_"]) {
+  if (!Array.isArray(data?.execution)) return data;
+
+  // Mask input.context
+  for (const execution of data.execution) {
+    const context = execution?.input?.context;
+    if (!context) continue;
+
+    for (const key of Object.keys(context)) {
+      // also delete internal only use keys
+      if(key == '__renderedKeys'  || key == 'workflowId' || key == '__n_id') {
+        delete context[key];
+      }
+
+      if (patterns.some((pattern) => key.includes(pattern))) {
+        context[key] = "**********";
+      }
+    }
+  }
+
+  // Mask output.c
+  for (const execution of data.execution) {
+    const context = execution?.output?.c;
+    if (!context) continue;
+
+    for (const key of Object.keys(context)) {
+      // also delete internal only use keys
+      if(key == '__renderedKeys' || key == 'workflowId' || key == '__n_id') {
+        delete context[key];
+      }
+
+      if (patterns.some((pattern) => key.includes(pattern))) {
+        context[key] = "**********";
+      }
+    }
+  }
+
+  return data;
 }

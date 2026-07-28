@@ -1,5 +1,3 @@
 - step: ai-mistral-image-gen
   args: 
     - '${prev}' # prompt
-  context:
-    MISTRAL_API_KEY: "your Mistral api key"

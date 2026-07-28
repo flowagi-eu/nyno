@@ -9,6 +9,7 @@ import "reactflow/dist/style.css";
 import CustomNode from "./CustomNode";
 
 import { importYaml } from "../functions/importYaml.js";
+//  onChange={(event) => importYaml(event, setNodes, setEdges,setFirstNode,setLastNode)}
 
 //yamlToReactFlow
 
@@ -31,7 +32,9 @@ visuals,
   onEdgesChange,
 
   selectedNode,
+  selectedNodeId,
   setSelectedNode,
+  setSelectedNodeId,
 
   exportWorkflow
 
@@ -86,9 +89,12 @@ const onNodeClick = useCallback((event, node) => {
 
   console.log("Clicked node:", node);
 
-  setSelectedNode(node);
+  window.selectedNodeId = node.id;
 
-}, [setSelectedNode]);
+  setSelectedNode(node);
+  setSelectedNodeId(node.id);
+
+}, [setSelectedNode,setSelectedNodeId]);
 
 
 
@@ -158,6 +164,7 @@ const clearWorkflow = () => {
   setEdges([]);
 
   setSelectedNode(null);
+  setSelectedNodeId(null);
 
 };
 
@@ -165,7 +172,10 @@ const clearWorkflow = () => {
 
 
 
-
+const renderedNodes = nodes.map((n) => ({
+  ...n,
+  className: n.data.active ? "node-active" : "", // Replace `active` with your condition
+}));
 
 
 return (
@@ -248,7 +258,7 @@ onInit={setRf}
 nodeTypes={nodeTypes}
 
 
-nodes={nodes}
+nodes={renderedNodes}
 
 
 edges={edges}

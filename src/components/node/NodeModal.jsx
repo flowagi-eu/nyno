@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 
 // Style rules: components are always default exportable
 import TemplateSelect from "@/components/node/TemplateSelect.jsx";
 
 export default function NodeModal({
-  node,
+  node_id,
+      getNodeData,
   onClose,
   updateNodeData,
   templates,
@@ -12,6 +13,9 @@ export default function NodeModal({
   removeNode
 }) {
 
+const node = getNodeData().find((node)=> node_id == node.id);
+
+console.log("NodeModal render", node?.data?.info ?? '');
   if (!node) return null;
 
    
@@ -43,12 +47,15 @@ export default function NodeModal({
 
   const [selectedTemplate, setSelectedTemplate] = useState("");
 
-  const handleFieldChange = (updates) => {
-    console.log(JSON.stringify({
-      t: "handleFieldChange",
-      d: {updates, node}
-    }));
+  // hotfix for reloading based on node.id
+  useEffect(() => {
+    setSelectedTemplate("");
+}, [node.id]);
 
+
+
+  const handleFieldChange = (updates) => {
+    console.log('node.id before updateNodeData',node.id);
     updateNodeData(node.id, {
       ...updates
       })
@@ -113,6 +120,7 @@ value={node.data?.label || ""}
         </div>
 
         <TemplateSelect
+          node={node}
           templates={filteredTemplates}
           visuals={visuals}
           value={selectedTemplate}
@@ -122,6 +130,7 @@ value={node.data?.label || ""}
             const templateYaml = templates[templateKey] || "";
             const visual = visuals[templateKey] || {};
 
+            console.log("before::handleFieldChange", node.data.info);
             handleFieldChange({
               info: templateYaml,
               emoji: visual.emoji ?? "⚙️",
@@ -131,6 +140,9 @@ value={node.data?.label || ""}
                 ""
               ),
             });
+
+            console.log("after::handleFieldChange", node.data.info);
+
           }}
         />
 

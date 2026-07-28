@@ -2,6 +2,7 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 
 export default function TemplateSelect({
   templates,
+  node,
   visuals = {},
     value,
   onSelect,
@@ -66,12 +67,14 @@ export default function TemplateSelect({
   
   }, [query, templates,visuals]);
 
+
   // Reset active index when list changes
   useEffect(() => {
     setActiveIndex(filteredKeys.length > 0 ? 0 : -1);
   }, [filteredKeys]);
 
   const handleSelect = (key) => {
+    console.log('event::handleSelect',{d:{key}});
     setQuery(key);
     setOpen(false);
     setActiveIndex(-1);

@@ -31,9 +31,13 @@ import DynamicListForm from '@/components/gui/OutputGuiDynamicListForm.jsx';
 import OutputChat from '@/components/gui/OutputChat.jsx';
 
 // Style rule: Hooks are in hooks folder and use named exports
-import { useWorkflowLoader } from '@/hooks/useWorkflowLoader.js';
+import { useExtensionLoader } from '@/hooks/useExtensionLoader.js';
 
 export default function App() {
+
+const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+const [theme, setTheme] = useState("default");
 
     const [extensions, setExtensions] = useState({});
 
@@ -45,12 +49,8 @@ export default function App() {
       position: { x: 100, y: 100 },
       data: {
         label: "Generate Text",
-        info: `- step: ai-mistral-text
-  args:
-    - '\${prev}' # prompt
-  context:
-    SYSTEM_PROMPT: ""
-    MISTRAL_API_KEY: "your Mistral api key"`
+        info: `- step: ai-mistral-text 
+  args: ["\${prev}"]`
       }
     },
   ]);
@@ -90,10 +90,20 @@ const removeNode = () => {
     setNodes(newNodes);
     setEdges(newEdges);
     setSelectedNode(null);
+    setSelectedNodeId(null);
+
+    window.selectedNodeId = null;
+
     setIsOpen(false);
     pushHistory(newNodes, newEdges);
   };
 
+
+const getNodeData = () => [
+    inputNode,
+    ...nodes,
+    outputNode,
+];
 
   const updateNodeData = (id, changes) => {
 
@@ -144,6 +154,8 @@ const removeNode = () => {
 
 
 
+/*
+  // this may have caused issue bug selected node id
     setSelectedNode(prev =>
       prev && prev.id === id
       ? {
@@ -154,7 +166,7 @@ const removeNode = () => {
           }
         }
       : prev
-    );
+    );*/
 
   };
 
@@ -165,8 +177,6 @@ const removeNode = () => {
   const exportWorkflowStr = () => {
 
 
- console.log("nodes", nodes);
-  console.log("edges", edges);
   
     const {
       nodes: finalNodes,
@@ -196,7 +206,7 @@ const removeNode = () => {
 
 
   // Hooks and one time calls go here
-  useWorkflowLoader({exportWorkflowStr,setExtensions});
+  useExtensionLoader({ exportWorkflowStr,setExtensions  });
 
   if("VITE_NYNO_DEV_UNSAFE_AUTO_SET_API_KEY" in import.meta.env) {
 	const API_KEY = import.meta.env.VITE_NYNO_DEV_UNSAFE_AUTO_SET_API_KEY;
@@ -204,6 +214,8 @@ const removeNode = () => {
 	  localStorage.setItem('NYNO_API_KEY',API_KEY);
 	},[]);
   }
+
+
 
 
  // memos
@@ -229,13 +241,6 @@ const { templates, visuals } = React.useMemo(() => {
 
   return { templates, visuals };
 }, [extensions]);
-
-
-
-const renderedNodes = nodes.map((n) => ({
-  ...n,
-  className: n.data.active ? "node-active" : "", // Replace `active` with your condition
-}));
 
 
   return (
@@ -281,7 +286,12 @@ const renderedNodes = nodes.map((n) => ({
           <h3 className='inputH3'>INPUT</h3>
 
           <div
-            onClick={() => setSelectedNode(inputNode)}
+            onClick={() => {
+              console.log('selecting inputNode id',inputNode.id);
+              window.selectedNodeId = inputNode.id;
+              setSelectedNode(inputNode);
+              setSelectedNodeId(inputNode.id);
+            }}
           >
             <CustomNode visuals={visuals} data={inputNode.data}/>
           </div>
@@ -302,7 +312,8 @@ const renderedNodes = nodes.map((n) => ({
 
           <WorkflowCanvas
 
-            nodes={renderedNodes}
+
+            nodes={nodes}
             edges={edges}
 
             visuals={visuals} 
@@ -315,7 +326,9 @@ const renderedNodes = nodes.map((n) => ({
             onEdgesChange={onEdgesChange}
 
             selectedNode={selectedNode}
+            selectedNodeId={selectedNodeId}
             setSelectedNode={setSelectedNode}
+            setSelectedNodeId={setSelectedNodeId}
 
             updateNodeData={updateNodeData}
 
@@ -345,7 +358,12 @@ const renderedNodes = nodes.map((n) => ({
 
 
           <div
-            onClick={() => setSelectedNode(outputNode)}
+            onClick={() => { 
+              console.log('selecting outputNode id',outputNode.id);
+              window.selectedNodeId = outputNode.id;
+              setSelectedNode(outputNode);
+              setSelectedNodeId(outputNode.id);
+            }}
           >
 
             <CustomNode visuals={visuals} data={outputNode.data}/>
@@ -364,14 +382,19 @@ const renderedNodes = nodes.map((n) => ({
 
 
       <NodeModal
+      node_id={selectedNodeId}
+      getNodeData={getNodeData}
 removeNode={removeNode}
 templates={templates}
  visuals={visuals}
-        node={selectedNode}
 
         updateNodeData={updateNodeData}
 
-        onClose={() => setSelectedNode(null)}
+        onClose={() => {
+          window.selectedNodeId = null;
+          setSelectedNode(null);
+          setSelectedNodeId(null);
+        }}
 
       />
 

@@ -81,7 +81,24 @@ ON embeddings
 USING ivfflat (embedding vector_ip_ops)
 WITH (lists = 1024);  -- 1024 clusters → tiny RAM (~4 MB for centroids)
 
+CREATE TABLE IF NOT EXISTS users (
+  "ID" BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_login VARCHAR(60) NOT NULL DEFAULT '',
+  user_pass VARCHAR(255) NOT NULL DEFAULT '',
+  user_nicename VARCHAR(50) NOT NULL DEFAULT '',
+  user_email VARCHAR(100) NOT NULL DEFAULT '',
+  user_url VARCHAR(100) NOT NULL DEFAULT '',
+  user_registered TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_activation_key VARCHAR(255) NOT NULL DEFAULT '',
+  user_status INT NOT NULL DEFAULT 0,
+  display_name VARCHAR(250) NOT NULL DEFAULT '',
+  fields JSONB DEFAULT '{}'::jsonb
+  );
 
+-- Indexes for users
+CREATE INDEX idx_user_login ON users(user_login);
+CREATE INDEX idx_user_nicename ON users(user_nicename);
+CREATE UNIQUE INDEX idx_user_email ON users(user_email);
 
 -- Flush function
 CREATE OR REPLACE FUNCTION flush_queue()

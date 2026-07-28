@@ -3,6 +3,5 @@
     - '${prev}' # text for voice
   context:
     MISRTRAL_VOICE_ID: "fr_marie_curious" 
-    MISTRAL_API_KEY: "your Mistral api key"
     # other common: gb_jane_confident"    
     # other common: gb_oliver_neutral"
