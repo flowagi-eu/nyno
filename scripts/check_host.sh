@@ -94,7 +94,7 @@ fi
 ### --- Check for Postgres ENV file --- ###
 echo -e "${BLUE}Checking database environment file...${RESET}"
 
-if [[ -f "envs/.nyno_log_db.env" ]]; then
+if [[ -f "${PWD}/envs/.nyno_log_db.env" ]]; then
     echo -e "${GREEN}[OK]${RESET} envs/.nyno_log_db.env exists"
 else
     echo -e "${RED}[ERR]${RESET} Missing envs/.nyno_log_db.env"

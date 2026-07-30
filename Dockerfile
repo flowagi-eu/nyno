@@ -21,7 +21,7 @@ RUN yes "" | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- Node.js + npm ---
-ENV NODE_VERSION=22.17.1
+ENV NODE_VERSION=26.5.1
 RUN curl -fsSL https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz \
     -o /tmp/node.tar.xz && \
     tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \

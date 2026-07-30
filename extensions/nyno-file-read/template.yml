@@ -1,3 +1,5 @@
 - step: nyno-file-read
   args:
     - ${FILE_PATH}
+  context:
+    set_context: "prev"

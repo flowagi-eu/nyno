@@ -188,7 +188,7 @@ if (cluster.isPrimary) {
 const isProd = process.env.NODE_ENV === 'production';
   let numCPUs = 2;
   if(isProd) {
-     numCPUs = os.cpus().length * 3;
+     numCPUs = os.cpus().length; // save memory /3 or *3 for max 1.5x more req/sec
   }
   console.log(`[JS Runner Master] Forking ${numCPUs} workers...`);
   for (let i = 0; i < numCPUs; i++) cluster.fork();
