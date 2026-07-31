@@ -1,6 +1,9 @@
 workflows-enabled
+.git
+plugin_sdk
 .ascend
 build
+h
 input
 output
 workflows-available

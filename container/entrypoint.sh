@@ -25,13 +25,19 @@ mkdir -p output
 
 ### POSTGRES PART BEGIN
 
-PG_BIN=/usr/lib/postgresql/18/bin
+PG_BIN=/usr/libexec/postgresql18
 PG_DATA=${PG_DATA:-/nyno/pgdata}
 PG_PORT=${PG_PORT:-5432}
 
 mkdir -p "$PG_DATA"
 chown -R postgres:postgres "$PG_DATA"
 chmod 700 "$PG_DATA"
+
+
+# PostgreSQL Unix socket directory
+mkdir -p /run/postgresql
+chown postgres:postgres /run/postgresql
+chmod 775 /run/postgresql
 
 NEW_CLUSTER=0
 
@@ -84,8 +90,6 @@ echo "=== Nyno Dev Container EntryPoint (mode: $APP_ENV) ==="
 
 
 
-# -- Create Postgres Databaes for nyno-logs extension
-mkdir envs -p
 
 # Check if .venv directory exists
 if [ -d ".venv" ]; then
@@ -102,12 +106,6 @@ fi
 
 
 # --- Start Best.js server in proper mode ---
-if [ "$APP_ENV" = "prod" ]; then
-    echo "[DEBUG] Starting Best.js in production mode..."
-    exec ./run-prod.sh
-else
-    echo "[DEBUG] Starting Best.js in development mode..."
-    exec ./run-dev.sh
-fi
-
-
+APP_ENV="prod"
+echo "[DEBUG] Starting Best.js in production mode..."
+exec ./run-prod.sh

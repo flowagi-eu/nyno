@@ -47,7 +47,6 @@ check_php_ext() {
 ### --- RUNTIMES --- ###
 
 check_cmd node "Node.js (>= 22)" "https://nodejs.org/en/download"
-check_cmd bun "Bun" "curl -fsSL https://bun.sh/install | bash"
 check_cmd php "PHP (>= 8.4)" "Install from your distro or https://www.php.net"
 check_cmd python3 "Python 3 (>= 3.10)" "Install via distro or https://www.python.org"
 check_cmd uv "uv (Astral)" "curl -fsSL https://astral.sh/uv/install.sh | bash"
@@ -112,9 +111,8 @@ if [[ $error_count -eq 0 ]]; then
     echo -e "${GREEN}Your system is ready for Nyno!${RESET}"
     echo ""
     echo -e "Next steps:"
-    echo -e "  1. bun install"
-    echo -e "  2. uv sync"
-    echo -e "  3. npm link @best.js"
+    echo -e "  1. uv sync"
+    echo -e "  2. npm link @best.js"
     [[ "$db_env_missing" == false ]] || echo -e "  4. bash install-postgres-db.sh"
     echo ""
     exit 0

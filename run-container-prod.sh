@@ -18,6 +18,10 @@ fi
 
 echo "WF:$WF"
 echo "GU:$GU"
+echo "-----"
+echo "JS:$JS"
+echo "PY:$PY"
+echo "PHP:$PE"
 echo "RB:$RB"
 
 

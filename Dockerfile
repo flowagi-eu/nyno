@@ -1,88 +1,123 @@
-FROM debian:13-slim
+FROM alpine:3.24.1
 
 WORKDIR /nyno
 
 # --- Base system setup ---
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates xz-utils curl unzip git bash lsb-release gnupg \
-        php8.4-cli php8.4-dev php8.4-common php8.4-xml php8.4-mbstring php8.4-curl php8.4-zip \
-        python3 python3-pip python3-venv postgresql-common sudo \
-         build-essential \
- autoconf bison \
-    libssl-dev libyaml-dev libreadline-dev zlib1g-dev libffi-dev \
-    libgdbm-dev libncurses5-dev libgmp-dev \
-        && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+        ca-certificates \
+        xz \
+        curl \
+        unzip \
+        git \
+        bash \
+        lsb-release \
+        gnupg \
+        sudo \
+        php84 \
+        php84-cli \
+        php84-dev \
+        php84-common \
+        php84-xml \
+        php84-mbstring \
+        php84-curl \
+        php84-zip \
+        php84-pdo \
+        php84-pdo_pgsql \
+        php84-pgsql \
+        php84-openssl \
+        php84-phar \
+        php84-tokenizer \
+        php84-session \
+        python3 \
+        py3-pip \
+        py3-virtualenv \
+	ruby \
+	ruby-bundler \
+        build-base \
+	openssl \
+        openssl-dev \
+        yaml-dev \
+        readline-dev \
+        zlib-dev \
+        libffi-dev \
+        gdbm-dev \
+        ncurses-dev \
+        gmp-dev \
+	postgresql18 \
+	postgresql18-client \
+	postgresql-pgvector
 
-# --- PostgreSQL repo and 18 install ---
-RUN yes "" | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh && \
-    apt-get update && \
-    apt-get install -y postgresql-18 postgresql-client-18 postgresql-server-dev-18 postgresql-18-pgvector && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Keep common command names available
+RUN ln -sf /usr/bin/php84 /usr/local/bin/php && \
+    ln -sf /usr/bin/php-config84 /usr/local/bin/php-config && \
+    ln -sf /usr/bin/phpize84 /usr/local/bin/phpize
+
+# --- PostgreSQL 18 ---
+# Alpine provides PostgreSQL 18 directly; no PGDG apt repository is needed.
+
 
 # --- Node.js + npm ---
-ENV NODE_VERSION=26.5.1
-RUN curl -fsSL https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz \
+ENV NODE_VERSION=24.18.1
+
+RUN curl -fL \
+    "https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.xz" \
     -o /tmp/node.tar.xz && \
-    tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \
-    rm /tmp/node.tar.xz
+    tar -xJf /tmp/node.tar.xz \
+        -C /usr/local \
+        --strip-components=1 && \
+    rm -f /tmp/node.tar.xz
 
 # --- Verify Node and npm ---
-RUN node -v && npm -v
+RUN node --version && npm --version
 
 # --- Copy Swoole ---
-COPY container/bin/swoole.so /usr/lib/php/20230831/swoole.so
+# IMPORTANT: this .so must be compiled for Alpine/musl + PHP 8.4.
+COPY container/bin/swoole.so /tmp/swoole.so
 
-# Enable Swoole extension in PHP
-RUN echo "extension=/usr/lib/php/20230831/swoole.so" > /etc/php/8.4/cli/conf.d/20-swoole.ini
+# Install Swoole into the actual PHP 8.4 extension directory
+RUN cp /tmp/swoole.so "$(php-config84 --extension-dir)/swoole.so" && \
+    rm -f /tmp/swoole.so && \
+    echo "extension=$(php-config84 --extension-dir)/swoole.so" \
+        > /etc/php84/conf.d/20-swoole.ini
 
-# Install Ruby via APT
-RUN apt update && apt-get install -y --no-install-recommends \
-      ruby-full \
-      build-essential \
-      git \
-      ca-certificates && \
-    gem install bundler && \
-    rm -rf /var/lib/apt/lists/*
+# --- Ruby ---
+RUN gem install --no-document bundler
 
-
-
-
-# --- Install Bun ---
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
 
 # --- Clone Best.js ---
 RUN git clone https://github.com/empowerd-cms/best.js /opt/best.js && \
-    cd /opt/best.js && bun install && npm link
+    cd /opt/best.js && \
+    npm install && \
+    npm link
 
 # --- Copy Nyno source ---
 COPY . /nyno
 
 # --- Install Nyno dependencies ---
-RUN cd /nyno && bun install
+RUN cd /nyno && npm install
 
+# --- Install Astral UV ---
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# --- Install Astral UV via curl/sh ---
-RUN curl -fsSL https://astral.sh/uv/install.sh | bash
 ENV PATH="/root/.local/bin:$PATH"
 
-
-# Create Python venv
+# --- Create Python venv ---
 RUN python3 -m venv /nyno/.venv
 
-# Add both uv and venv binaries to PATH
-ENV PATH="/nyno/.venv/bin:$PATH"
+# Add venv + uv to PATH
+ENV PATH="/nyno/.venv/bin:/root/.local/bin:$PATH"
 
-# --- Install dependencies using uv ---
-RUN uv sync --project /nyno || echo "[WARN] uv sync may fail if requirements missing"
-
+# --- Install Python dependencies ---
+RUN uv sync --project /nyno || \
+    echo "[WARN] uv sync may fail if requirements are missing"
 
 # --- Expose ports ---
 EXPOSE 9024 9057 9003 9006 9072
 
 # --- Entrypoint ---
 COPY container/entrypoint.sh /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 
