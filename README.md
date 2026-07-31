@@ -109,12 +109,12 @@ workflow:
 Install and Start Nyno:
 
 ```bash
-mkdir -p ~/nyno/{pgdata,workflows-enabled}
+mkdir -p {pgdata,workflows-enabled}
 
 docker run -d \
   -p 9057:9057 \
-  -v ~/nyno/pgdata:/nyno/pgdata \
-  -v ~/nyno/workflows-enabled:/nyno/workflows-enabled \
+  -v ./pgdata:/nyno/pgdata \
+  -v ./workflows-enabled:/nyno/workflows-enabled \
   flowagi/nyno
 ```
 
