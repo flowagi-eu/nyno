@@ -24,6 +24,7 @@ import FileUploadPopup from '@/components/gui/FileUploadPopup.jsx';
 import MarkdownPopup from '@/components/gui/MarkdownPopup.jsx';
 import HtmlPopup from '@/components/gui/HtmlPopup.jsx';
 import TextareaPopup from '@/components/gui/TextareaPopup.jsx';
+import KeyValuePopup from '@/components/gui/KeyValuePopup.jsx';
 import Base64ImagePopup from '@/components/gui/Base64ImagePopup.jsx';
 import VoiceRecorderPopup from '@/components/gui/VoiceRecorderPopup.jsx';
 import AudioPlayerPopup from '@/components/gui/AudioPlayerPopup.jsx';
@@ -247,6 +248,7 @@ const { templates, visuals } = React.useMemo(() => {
 
     <ReactFlowProvider>
      <TextareaPopup />
+     <KeyValuePopup />
     <FileUploadPopup />
     <MarkdownPopup />
     <HtmlPopup />

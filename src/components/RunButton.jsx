@@ -100,6 +100,22 @@ const [oneVarText, setOneVarText] = useState(`context:
   const [result, setResult] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const waitForKvsInput = async (timeoutMs = 30000, intervalMs = 500) => {
+  const start = Date.now();
+
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      if (window.LAST_KVS) {
+        resolve(window.LAST_KVS);
+      } else if (Date.now() - start >= timeoutMs) {
+        reject(new Error("Key-value input timed out after 30 seconds."));
+      } else {
+        setTimeout(check, intervalMs);
+      }
+    };
+    check();
+  });
+};
     const waitForTextInput = async (timeoutMs = 30000, intervalMs = 500) => {
   const start = Date.now();
 
@@ -195,6 +211,7 @@ let textToSend = [oneVarPrefix, baseText]
   .join("\n\n")
   .trim();
 
+console.log('debug::textToSend',textToSend);
   // IF MISTRAL_API_KEY exists, we automatically add it to the context
   const MISTRAL_API_KEY = await ensureMistralApiKey();
 
@@ -236,7 +253,8 @@ if(window.CONTEXT_outputChatSubmit ?? false) {
       ctx.MISTRAL_MESSAGES = MISTRAL_MESSAGES;
     });
     delete window.CONTEXT_outputChatSubmit;
-} else if (textToSend.includes('gui-input-textarea') && !("CONTEXT_outputChatSubmit" in window)) {
+} 
+else if (textToSend.includes('gui-input-textarea') && !("CONTEXT_outputChatSubmit" in window)) {
   window.SHOW_TEXTAREA_POPUP = true;
 
   try {
@@ -250,6 +268,28 @@ if(window.CONTEXT_outputChatSubmit ?? false) {
     });
 
     delete window.LAST_TEXT;
+  } catch (err) {
+    alert(err.message);
+    setLoading(false);
+    return;
+  }
+}
+else if (textToSend.includes('gui-input-key-value') && !("CONTEXT_outputChatSubmit" in window)) {
+  window.SHOW_KVS_POPUP = true;
+
+  try {
+    const kvs = await waitForKvsInput();
+
+    console.log("Kvs input received:", kvs);
+
+    // attach to YAML context
+    textToSend = updateYamlContext(textToSend, (ctx) => {
+      for(const key of Object.keys(kvs)) {
+      ctx[key] = kvs[key];
+      }
+    });
+
+    delete window.LAST_KVS;
   } catch (err) {
     alert(err.message);
     setLoading(false);

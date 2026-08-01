@@ -3,6 +3,7 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 export default function TemplateSelect({
   templates,
   node,
+node_id,
   visuals = {},
     value,
   onSelect,
@@ -78,7 +79,7 @@ export default function TemplateSelect({
     setQuery(key);
     setOpen(false);
     setActiveIndex(-1);
-    onSelect(key);
+    onSelect(key,node_id);
   };
 
   const handleKeyDown = (e) => {

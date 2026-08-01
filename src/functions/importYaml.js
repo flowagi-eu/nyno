@@ -37,13 +37,14 @@ export function importYaml(
       setFirstNode(null);
     }
 
-    const lastNode = nodes.at(-1);
+    const lastNode = JSON.parse(JSON.stringify(nodes.at(-1))); // copy
     if (
       lastNode &&
       lastNode.id !== firstNode?.id
     ) {
-      nodesToRemove.add(lastNode.id);
+      nodesToRemove.add(lastNode.id); // pass by value
 
+      lastNode.id = "output"; // ! used to filter for specific output node options later
       lastNode.type = "outputNode"; // ! used to filter for specific output node options later
       setLastNode(lastNode);
     } else {

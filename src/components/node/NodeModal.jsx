@@ -54,9 +54,9 @@ console.log("NodeModal render", node?.data?.info ?? '');
 
 
 
-  const handleFieldChange = (updates) => {
-    console.log('node.id before updateNodeData',node.id);
-    updateNodeData(node.id, {
+  const handleFieldChange = (node_id,updates) => {
+    console.log('node.id before updateNodeData',node_id);
+    updateNodeData(node_id, {
       ...updates
       })
   };
@@ -120,18 +120,23 @@ value={node.data?.label || ""}
         </div>
 
         <TemplateSelect
+          node_id={node_id}
           node={node}
           templates={filteredTemplates}
           visuals={visuals}
           value={selectedTemplate}
-          onSelect={(templateKey) => {
+          onSelect={(templateKey,node_id) => {
+
+		const node = getNodeData().find((node)=> node_id == node.id);
             setSelectedTemplate(templateKey);
 
             const templateYaml = templates[templateKey] || "";
             const visual = visuals[templateKey] || {};
 
+	    console.log('before::handleFieldChange newData',JSON.stringify({templateYaml,templateKey}));
             console.log("before::handleFieldChange", node.data.info);
-            handleFieldChange({
+            console.log("before::handleFieldChange JSON",JSON.stringify(node));
+            handleFieldChange(node_id,{
               info: templateYaml,
               emoji: visual.emoji ?? "⚙️",
               icon: visual.icon ?? null,
@@ -142,6 +147,7 @@ value={node.data?.label || ""}
             });
 
             console.log("after::handleFieldChange", node.data.info);
+            console.log("after::handleFieldChange JSON",JSON.stringify(node));
 
           }}
         />
