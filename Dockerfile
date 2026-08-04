@@ -57,7 +57,7 @@ RUN ln -sf /usr/bin/php84 /usr/local/bin/php && \
 
 
 # --- Node.js + npm ---
-ENV NODE_VERSION=24.18.1
+ENV NODE_VERSION=24.19.0
 
 RUN curl -fL \
     "https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.xz" \
