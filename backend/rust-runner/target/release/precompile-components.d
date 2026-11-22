@@ -1,1 +1,1 @@
-/home/user/nyno-v10/backend/rust-runner/target/release/precompile-components: /home/user/nyno-v10/backend/rust-runner/src/bin/precompile-components.rs
+/home/user/Downloads/nyno/backend/rust-runner/target/release/precompile-components: /home/user/Downloads/nyno/backend/rust-runner/src/bin/precompile-components.rs
