@@ -1,0 +1,4 @@
+- step: nyno-date
+  args:
+    - Y-m-d # Y=year m=month d=day H=hour i=min s=sec | time/timestamp=unix ms
+

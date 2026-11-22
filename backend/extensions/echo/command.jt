@@ -1,0 +1,16 @@
+export function echo(args,context){
+    let setName = context['set_context'] ?? 'prev';
+    return main(setName, args);
+}
+
+@CheckAtRuntime
+export function main(setName:string, args) {
+    const newContext = {};
+    if(args.length == 1) {
+	    newContext[setName] = args[0];
+	} else {
+	    newContext[setName] = args;
+	}
+	
+    return [0, newContext];
+}

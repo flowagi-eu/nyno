@@ -1,0 +1,5 @@
+- step: nyno-time
+  context:
+    set_context: "time"
+    FORMAT: "timestamp"
+    # also supports Y-m-d H:i:s

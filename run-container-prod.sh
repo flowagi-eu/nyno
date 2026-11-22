@@ -1,41 +1,23 @@
 #!/bin/bash
-# Usage: ./run.sh docker   OR   ./run.sh podman
 if [ -z "$1" ]; then
     echo "Error: You must specify 'docker' or 'podman'"
     exit 1
 fi
 
 CONTAINER_TOOL=$1
-#IMAGE_NAME="flowagi/nyno"
-IMAGE_NAME="localhost/nyno:latest"
+IMAGE_NAME="localhost/nyno-v10:latest"
 
-source "$(pwd)/envs/ports.env"
-
-# Possibly override with custom .local.env
-if [ -f envs/ports.local.env ]; then
-  source envs/ports.local.env
+# --- Ensure docker.env exists (create empty if missing) ---
+if [ ! -f docker.env ]; then
+    echo "docker.env not found — creating empty file."
+    touch docker.env
 fi
-
-echo "WF:$WF"
-echo "GU:$GU"
-echo "-----"
-echo "JS:$JS"
-echo "PY:$PY"
-echo "PHP:$PE"
-echo "RB:$RB"
-
-
-mkdir -p pgdata
 
 # --- Run the container ---
 $CONTAINER_TOOL run -it \
+-v "$(pwd)/docker.env:/nyno/.env:ro" \
 -e APP_ENV=prod \
--v $(pwd)/workflows-enabled:/nyno/workflows-enabled \
--v $(pwd)/pgdata:/nyno/pgdata \
--v $(pwd)/envs:/nyno/envs \
--v $(pwd)/output:/nyno/output \
--v $(pwd)/extensions:/nyno/extensions \
--p "$PY:$PY" -p "$JS:$JS" -p "$PE:$PE" \
--p "$RB:$RB" \
--p "$WF:$WF" -p "$GU:$GU" $IMAGE_NAME bash
+-v $(pwd)/backend/extensions:/nyno/backend/extensions \
+-v $(pwd)/my-extensions:/nyno/my-extensions \
+-p "9099:9099" $IMAGE_NAME bash
 

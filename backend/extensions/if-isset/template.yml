@@ -1,0 +1,3 @@
+- step: nyno-if-isset
+  args:
+    - MESSAGES # key to check

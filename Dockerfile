@@ -1,11 +1,12 @@
-FROM alpine:3.24.1
+
+FROM debian:trixie-slim
 
 WORKDIR /nyno
 
 # --- Base system setup ---
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        xz \
+        xz-utils \
         curl \
         unzip \
         git \
@@ -13,54 +14,39 @@ RUN apk add --no-cache \
         lsb-release \
         gnupg \
         sudo \
-        php84 \
-        php84-cli \
-        php84-dev \
-        php84-common \
-        php84-xml \
-        php84-mbstring \
-        php84-curl \
-        php84-zip \
-        php84-pdo \
-        php84-pdo_pgsql \
-        php84-pgsql \
-        php84-openssl \
-        php84-phar \
-        php84-tokenizer \
-        php84-session \
         python3 \
-        py3-pip \
-        py3-virtualenv \
-	ruby \
-	ruby-bundler \
-        build-base \
-	openssl \
-        openssl-dev \
-        yaml-dev \
-        readline-dev \
-        zlib-dev \
+        python3-pip \
+        python3-venv \
+        python3-full \
+        build-essential \
+        openssl \
+        libssl-dev \
+        libyaml-dev \
+        libreadline-dev \
+        zlib1g-dev \
         libffi-dev \
-        gdbm-dev \
-        ncurses-dev \
-        gmp-dev \
-	postgresql18 \
-	postgresql18-client \
-	postgresql-pgvector
+        libgdbm-dev \
+        libncurses-dev \
+        inotify-tools \
+        libgmp-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Keep common command names available
-RUN ln -sf /usr/bin/php84 /usr/local/bin/php && \
-    ln -sf /usr/bin/php-config84 /usr/local/bin/php-config && \
-    ln -sf /usr/bin/phpize84 /usr/local/bin/phpize
+# Rust
+# --- Rust toolchain ---
+ENV RUSTUP_HOME=/root/.rustup
+ENV CARGO_HOME=/root/.cargo
+ENV PATH="/root/.cargo/bin:$PATH"
 
-# --- PostgreSQL 18 ---
-# Alpine provides PostgreSQL 18 directly; no PGDG apt repository is needed.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --default-toolchain 1.100.0
 
+RUN rustc --version && cargo --version
 
 # --- Node.js + npm ---
-ENV NODE_VERSION=24.19.0
+ENV NODE_VERSION=26.13.1
 
 RUN curl -fL \
-    "https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.xz" \
+    "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
     -o /tmp/node.tar.xz && \
     tar -xJf /tmp/node.tar.xz \
         -C /usr/local \
@@ -70,31 +56,26 @@ RUN curl -fL \
 # --- Verify Node and npm ---
 RUN node --version && npm --version
 
-# --- Copy Swoole ---
-# IMPORTANT: this .so must be compiled for Alpine/musl + PHP 8.4.
-COPY container/bin/swoole.so /tmp/swoole.so
-
-# Install Swoole into the actual PHP 8.4 extension directory
-RUN cp /tmp/swoole.so "$(php-config84 --extension-dir)/swoole.so" && \
-    rm -f /tmp/swoole.so && \
-    echo "extension=$(php-config84 --extension-dir)/swoole.so" \
-        > /etc/php84/conf.d/20-swoole.ini
-
-# --- Ruby ---
-RUN gem install --no-document bundler
-
-
 # --- Clone Best.js ---
-RUN git clone https://github.com/empowerd-cms/best.js /opt/best.js && \
-    cd /opt/best.js && \
+RUN git clone https://github.com/flowagi-eu/nyno-jt /opt/jt && \
+    cd /opt/jt && \
     npm install && \
     npm link
 
-# --- Copy Nyno source ---
-COPY . /nyno
+# --- Copy Relevant Nyno source files ---
+COPY backend /nyno/backend
+COPY scripts /nyno/scripts
+COPY start-devserver.sh /nyno/
+COPY LICENSE /nyno/
+COPY dev-server.js /nyno/
+
+# --- Build Rust runner ---
+RUN cd /nyno/backend/rust-runner && \
+    chmod +x build.sh && \
+    ./build.sh
 
 # --- Install Nyno dependencies ---
-RUN cd /nyno && npm install
+RUN cd /nyno/backend && npm install
 
 # --- Install Astral UV ---
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -104,7 +85,7 @@ ENV PATH="/root/.local/bin:$PATH"
 # --- Create Python venv ---
 RUN python3 -m venv /nyno/.venv
 
-# Add venv + uv to PATH
+# --- Add venv + uv to PATH ---
 ENV PATH="/nyno/.venv/bin:/root/.local/bin:$PATH"
 
 # --- Install Python dependencies ---
@@ -112,7 +93,7 @@ RUN uv sync --project /nyno || \
     echo "[WARN] uv sync may fail if requirements are missing"
 
 # --- Expose ports ---
-EXPOSE 9024 9057 9003 9006 9072
+EXPOSE 9099
 
 # --- Entrypoint ---
 COPY container/entrypoint.sh /entrypoint.sh

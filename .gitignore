@@ -1,37 +1,8 @@
+docker.env
 .ascend
-pgdata
-plugin_sdk/target
 build
-guest-uploads
-node_modules
-dist
-dist-ts
-bun.lock
-src/tcp/routes
-output
+h
 input
-src/extension-data.json
-workflows-available
-extensions-available
-private-extensions
-uv.lock
-extensions-untested
-
-envs/*
-workflows-enabled/*
-
-
-
-# Except these workflows
-!workflows-enabled/test.nyno
-!workflows-enabled/test_nyno.nyno 
-!workflows-enabled/test_nyno_runners.nyno
-
-# Envs exceptions
-!envs/ports.env
-
-# ignore container created db
-pgdata
-
-
-package-lock.json
+output
+dist-ts
+.env

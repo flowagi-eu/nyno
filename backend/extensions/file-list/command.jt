@@ -1,0 +1,32 @@
+import { readdir, stat } from "fs/promises";
+import fs from 'fs';
+
+//console.log(await file_list(['/home/user/Downloads']));
+
+export async function file_list(args, context) {
+  const setName = context?.set ?? "prev";
+  const input = args?.[0] ?? ".";
+  const readFs = context.SYSTEM.fs_read;
+  const writeFs = context.SYSTEM.fs_write;
+  return main(setName, input, readFs, writeFs);
+}
+
+@CheckAtRuntime
+export async function main(setName: string, input: string, readFs: object, writeFs: object) {
+  const newContext = {};
+
+  try {
+    // hotfix: create dir if not exist to make browsing cms easy
+    await writeFs.mkdir(input);
+    const [retCode, ctx] = await readFs.ls(input);
+    newContext[setName] = ctx;
+    return [retCode, newContext];
+  } catch (err) {
+    const newContext = {};
+    newContext[setName + "_error"] = {
+      errorMessage: err?.message || "file_list failed",
+    };
+
+    return [-1,newContext];
+  }
+}

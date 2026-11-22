@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "example",
+    "example2-yaml",
+    "example3-bool",
+]
+resolver = "2"
+
+[package]
+name = "plugin-sdk"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde_json = "1"

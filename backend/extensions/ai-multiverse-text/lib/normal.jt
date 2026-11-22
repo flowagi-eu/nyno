@@ -1,0 +1,206 @@
+#!/usr/bin/env node
+
+export async function multiverse_normal(args, context) {
+    // main args
+    const prompt = args[0];
+
+    // context (required)
+    const MULTIVERSE_API_KEY = context.MULTIVERSE_API_KEY;
+    if (!MULTIVERSE_API_KEY) {
+        return [-1, { error: 'Missing context.MULTIVERSE_API_KEY' }];
+    }
+
+    // context + defaults
+    const set_name = context?.set_context || "prev";
+    const system_prompt = context?.SYSTEM_PROMPT ?? "";
+    const model = context?.MULTIVERSE_MODEL || "quasar-1-2-358b";
+
+    const MULTIVERSE_JSON_MODE =
+        context?.MULTIVERSE_JSON_MODE === true ||
+        context?.MULTIVERSE_JSON_MODE === "true";
+
+    const MULTIVERSE_TEMPERATURE =
+        context?.MULTIVERSE_TEMPERATURE ?? null;
+
+    const set_value = context?.set_value ?? '';
+
+    let messages = context?.MULTIVERSE_MESSAGES;
+
+    if (typeof messages === "string") {
+        try {
+            messages = JSON.parse(messages);
+        } catch (err) {
+            return [-1, {
+                error: `Failed to parse MULTIVERSE_MESSAGES: ${err.message}`
+            }];
+        }
+    }
+
+    if (!Array.isArray(messages)) {
+        messages = [];
+    }
+
+    return main(
+        set_name,
+        set_value,
+        MULTIVERSE_API_KEY,
+        prompt,
+        system_prompt,
+        model,
+        messages,
+        MULTIVERSE_JSON_MODE,
+        MULTIVERSE_TEMPERATURE
+    );
+}
+
+
+@CheckAtRuntime
+export async function main(
+    set_name: string,
+    set_value: string,
+    MULTIVERSE_API_KEY: string,
+    prompt: string,
+    system_prompt: string,
+    model: string,
+    messages: any[],
+    MULTIVERSE_JSON_MODE: boolean,
+    MULTIVERSE_TEMPERATURE = null,
+) {
+
+    if (MULTIVERSE_TEMPERATURE !== null) {
+        validateNumberBetween(
+            { MULTIVERSE_TEMPERATURE },
+            0,
+            2
+        );
+    }
+
+    const newContext = {};
+
+    // Explicitly preserve the model name
+    newContext.MULTIVERSE_MODEL = model;
+
+    const error_key = `${set_name}_error`;
+    const error_meta_key = `error_meta`;
+
+    newContext[error_meta_key] = {};
+
+    const endpoint =
+        "https://api-eu.compactif.ai/v1/chat/completions";
+
+    // Add system message only when starting a new conversation
+    if (messages.length === 0 && system_prompt.length !== 0) {
+        messages.push({
+            role: "system",
+            content: system_prompt
+        });
+    }
+
+    // Add current user prompt
+    messages.push({
+        role: "user",
+        content: prompt
+    });
+
+    const payload = {
+        model,
+        messages
+    };
+
+    // Optional temperature
+    if (MULTIVERSE_TEMPERATURE !== null) {
+        payload.temperature = MULTIVERSE_TEMPERATURE;
+    }
+
+    // Optional JSON response mode
+    if (MULTIVERSE_JSON_MODE) {
+        payload.response_format = {
+            type: "json_object"
+        };
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${MULTIVERSE_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+
+            newContext[error_key] =
+                `API returned HTTP ${response.status}: ${text}`;
+
+            return [1, newContext];
+        }
+
+        const decoded = await response.json();
+
+        const lastMessage =
+            decoded?.choices?.[0]?.message?.content || "";
+
+        // Store assistant response in conversation history
+        messages.push({
+            role: "assistant",
+            content: lastMessage
+        });
+
+        // Return either full messages or just the response
+        if (set_value === "MESSAGES") {
+            newContext[set_name] = messages;
+        } else {
+            if (MULTIVERSE_JSON_MODE) {
+                try {
+                    newContext[set_name] = JSON.parse(lastMessage);
+                } catch (err) {
+                    newContext[error_key] =
+                        `Failed to parse JSON response: ${err.message}`;
+
+                    return [1, newContext];
+                }
+            } else {
+                newContext[set_name] = lastMessage;
+            }
+        }
+
+        // Store complete API response
+        newContext[`${set_name}_meta`] = decoded;
+
+        // Also store conversation history in metadata
+        newContext[`${set_name}_meta`].messages = messages;
+
+        return [0, newContext];
+
+    } catch (e) {
+        newContext[error_key] =
+            `Request error: ${String(e)}`;
+
+        return [1, newContext];
+    }
+}
+
+
+// helpers / validators
+
+function validateNumberBetween(
+    obj: Record<string, unknown>,
+    min: number,
+    max: number,
+): void {
+    const [name, value] = Object.entries(obj)[0];
+
+    if (
+        typeof value !== "number" ||
+        !Number.isFinite(value) ||
+        value < min ||
+        value > max
+    ) {
+        throw new TypeError(
+            `${name} must be a number between ${min} and ${max}`
+        );
+    }
+}

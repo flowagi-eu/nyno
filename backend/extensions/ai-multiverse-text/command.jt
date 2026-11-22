@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+import { multiverse_normal } from './lib/normal.jt';
+
+export async function ai_multiverse_text(args, context) {
+	return multiverse_normal(args,context);
+}

@@ -1,0 +1,8 @@
+- step: nyno-if
+  args:
+    - ${prev}
+    - equals
+    - 1 # expected
+
+# is, contains, starts with, higher than
+# equals, lower than, is not

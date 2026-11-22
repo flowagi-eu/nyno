@@ -1,0 +1,60 @@
+
+// glue function
+export async function file_write(args, context) {
+
+  const writeFs = context.SYSTEM.fs_write;
+
+  // Determine dynamic output key
+  const setName = context.set_context ?? "prev";
+
+    // Validate arguments
+    if (!args || args.length < 2) {
+        context[`${setName}.error`] = {
+            error: "Insufficient arguments. Expected: file_path, content"
+        };
+        return 1;
+    }
+
+    const [filePath, contentRaw] = args;
+
+    // --- Support object input as content, but convert to string ---
+    let content = contentRaw;
+    if (typeof contentRaw === "object") {
+        try {
+            content = JSON.stringify(contentRaw, null, 2);
+        } catch (err) {
+            const newContext = {};
+            newContext[`${setName}.error`] = {
+                error: "Failed to serialize object content: " + err.message,
+            };
+            return [-1, newContext];
+        }
+    } else if (contentRaw === undefined || contentRaw === null) {
+        content = ""; // treat nullish as empty content
+    } else {
+        content = String(contentRaw); // ensure it's a string
+    }
+
+    return main(setName, filePath, content, writeFs);
+}
+
+// main is a convention 
+// to focus on actual input/compute/output
+// and to use our custom @CheckAtRuntime decorator for checking types at runtime
+// 0 is success (or first node) 1 is second node (e.g. in case of error
+@CheckAtRuntime
+async function main(setName: string, filePath: string, content: string, writeFs: object) {
+    const newContext = {};
+    try {
+        // Write to file
+	const [retCode, obj] = await writeFs.write(filePath, content);
+        // Store success result
+        newContext[setName] = obj;
+        return [retCode, newContext];
+    } catch (err) {
+	// critical errors return -1
+        newContext[`${setName}.error`] = { error: err.message };
+        return [-1, newContext];
+    }
+}
+

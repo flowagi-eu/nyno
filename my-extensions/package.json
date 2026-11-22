@@ -1,0 +1,8 @@
+{
+  "name": "nyno-private-extensions",
+  "type": "module",
+  "dependencies": {
+    "@babel/parser": "^8.1.2",
+    "markdown-it": "^15.0.3"
+  }
+}

@@ -1,0 +1,11 @@
+export function nyno_set_context(args,context){
+  const [key,value] = args;
+  return main(key,value);
+}
+
+@CheckAtRuntime
+function main(key: string, value) {
+  const newContext = {};
+  newContext[key] = value;
+  return [0,newContext];
+}

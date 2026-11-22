@@ -1,0 +1,97 @@
+export async function system1_uprelic(args: any, context: any) {
+    // Extract inputs from args (preferred) and options from context
+    const state: string = args[0]?.state;
+    const questions: any = args[0]?.questions;
+    const apiKey: string = context['uprelic_api_key'] ?? '';
+    const model: string = context['model'] ?? 'strom-1.0.7';
+    const setName: string = context['set'] ?? 'prev';
+    const zdr = context['uprelic_zdr'] ?? false;
+
+    // Pass only clean, simple-typed parameters — never raw args/context
+    return main(setName, state, questions, apiKey, model,zdr);
+}
+
+@CheckAtRuntime
+export async function main(
+    setName: string,
+    state: string,
+    questions: any,
+    apiKey: string,
+    model: string,
+    zdr: boolean,
+): Promise<[number, any]> {
+    let newContext: any = {};
+
+    let endpoint;
+    if(zdr) {
+        endpoint = 'https://api.uprelic.com/v1/systemone/private';
+
+    } else {
+        endpoint = 'https://api.uprelic.com/v1/systemone';
+    }
+
+    newContext['endpoint'] =  endpoint;
+
+    // critical error: No data
+    if (!questions || Object.keys(questions).length == 0) {
+        newContext['error'] = 'No questions specified';
+        newContext[setName] = null;
+        return [-1, newContext];
+    }
+
+    // ── Critical error: missing required dependency ──
+    // No API key means we cannot authenticate at all
+    if (!apiKey) {
+        newContext['error'] = 'No api key specified';
+        newContext[setName] = null;
+        return [-1, newContext];
+    }
+
+    // ── Soft failure: missing optional core input ──
+    // Without a state message the API call is meaningless;
+    // we return a soft failure rather than erroring out
+    if (!state) {
+        newContext['error'] = 'No state specified';
+        newContext[setName] = null;
+        return [1, newContext];
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: model,
+                state: state,
+                questions: questions,
+            }),
+        });
+
+
+        const dataRaw: any = await response.text();
+        newContext['dataRaw'] = dataRaw;
+        
+        // ── Critical error: HTTP-level failure (4xx / 5xx) ──
+        if (!response.ok) {
+            newContext['error'] = 'response not ok';
+            newContext[setName] = null;
+            return [-1, newContext];
+        }
+
+
+        const data = JSON.parse(dataRaw);
+
+        // ── Success ──
+        newContext[setName] = data.answers;
+        newContext[setName+'_meta'] = data;
+        return [0, newContext];
+
+    } catch (error) {
+        // ── Critical error: network failure or JSON parse exception ──
+        newContext[setName] = null;
+        return [-1, newContext];
+    }
+}

@@ -1,3 +1,0 @@
-- step: nyno-trigger
-  args:
-    - ${EVENT_NAME}

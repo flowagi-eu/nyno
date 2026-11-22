@@ -1,0 +1,15 @@
+- step: system1-uprelic
+  args:
+    - "Our whole team is blocked. The app has been down since this morning."
+    - team:
+        type: choice
+        instructions: "Which team should handle this?"
+        criteria:
+          engineering: "Outages and bugs"
+          billing: "Payments and invoices"
+          account: "Login and access"
+      urgent:
+        type: noul
+        instructions: "This message needs urgent attention."
+  context:
+    UPRELIC_API_KEY: "upr_your_api_key"

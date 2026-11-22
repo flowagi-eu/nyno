@@ -1,0 +1,174 @@
+#!/usr/bin/env node
+
+export async function mistral_normal(args, context) {
+    // main args
+    const prompt = args[0];
+    const reasoning_effort = args.length > 1 ? args[1] : '';
+
+    // context (required)
+    const MISTRAL_API_KEY = context.mistral_api_key;
+    if(!MISTRAL_API_KEY){
+        return [-1, { error: 'Missing context.mistral_api_key'}];
+    }
+
+    // context + defaults (from simple to complex)
+    const set_name = context?.set || "prev";
+    const system_prompt = context?.system_prompt ?? "";
+    const model = context?.mistral_model || "mistral-large-4";
+    const MISTRAL_JSON_MODE = context?.mistral_json_mode === true || context?.mistral_json_mode === "true";
+    const MISTRAL_TEMPERATURE = context?.mistral_temperature ?? null;
+    const MISTRAL_K = context?.mistral_k ?? null;
+    const set_value = context.set_value ?? '';
+    let messages = context?.messages;
+    if (typeof messages === "string") {
+    try {
+        messages = JSON.parse(messages);
+    } catch (err) {
+        return [-1, { error: `Failed to parse context.messages: ${err.message}` }];
+    }
+    }
+
+    if (!Array.isArray(messages)) messages = [];
+
+    return main(set_name, set_value, MISTRAL_API_KEY, prompt, reasoning_effort, system_prompt, model, messages,MISTRAL_JSON_MODE,MISTRAL_TEMPERATURE,MISTRAL_K);
+}
+
+@CheckAtRuntime
+export async function main(
+	set_name: string, 
+    set_value: string, 
+    MISTRAL_API_KEY: string,
+	prompt: string,
+	reasoning_effort: string,
+	system_prompt: string,
+	model: string,
+    messages: any[],
+    MISTRAL_JSON_MODE: boolean,
+    MISTRAL_TEMPERATURE=null,
+    MISTRAL_K=null,
+) {
+
+  if(MISTRAL_TEMPERATURE !== null) {
+    validateNumberBetween({ MISTRAL_TEMPERATURE }, 0,1);
+  }
+
+  if(MISTRAL_K !== null) {
+    validateNumberBetween({ MISTRAL_K }, 0,1);
+  }
+
+
+    const newContext = {};
+    // we also set model name explicitly
+    newContext.MISTRAL_MODEL = model;
+
+
+    const error_key = `${set_name}_error`;
+    const error_meta_key = `error_meta`; 
+    newContext[error_meta_key] = {};
+
+    const endpoint = "https://api.eu.mistral.ai/v1/chat/completions";
+
+    newContext.LAST_URL = endpoint;
+
+
+    if (messages.length === 0 && system_prompt.length !== 0) {
+        messages.push({
+            role: "system",
+            content: system_prompt
+        });
+    }
+
+    messages.push({ role: "user", content: prompt });
+
+    const payload = {
+        model,
+        messages,
+    };
+
+    if(reasoning_effort.length !== 0) payload.reasoning_effort = reasoning_effort;
+    if (MISTRAL_TEMPERATURE) payload.temperature;
+    if (MISTRAL_K) payload.k = MISTRAL_K;
+    if (MISTRAL_JSON_MODE) {
+        payload.response_format = {
+            type: "json_object"
+        };
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${MISTRAL_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            newContext[error_key] = `API returned HTTP ${response.status}: ${text}`;
+            return [1,newContext];
+        }
+
+        const decoded = await response.json();
+        const lastMessage = decoded?.choices?.[0]?.message?.content || "";
+
+	    messages.push({role:'assistant', content: lastMessage});
+
+        if(set_value == 'MESSAGES') {
+                newContext[set_name] = messages;
+        } else {
+            if(MISTRAL_JSON_MODE ?? false) {
+                    if(Array.isArray(lastMessage)) {
+                        let text;
+                        for(const item of lastMessage) {
+                            if(item.type=='text') text = item.text;
+                        }
+
+                        newContext[set_name] = JSON.parse(text);
+                    } else {
+                        newContext[set_name] = JSON.parse(lastMessage);
+                    }
+            } else {
+                if(Array.isArray(lastMessage)) {
+                        let text;
+                        for(const item of lastMessage) {
+                            if(item.type=='text') text = item.text;
+                        }
+
+                        newContext[set_name] = (text);
+                    } 
+
+                else {
+                        newContext[set_name] = lastMessage;
+                    }
+            }
+        }
+
+        newContext[`${set_name}_meta`] = decoded;
+        newContext[`${set_name}_meta`]['messages'] = messages;
+        return [0,newContext];
+
+    } catch (e) {
+        newContext[error_key] = `Request error: ${String(e)}`;
+        return [1,newContext];
+    }
+}
+
+// helpers/validators
+function validateNumberBetween(
+  obj: Record<string, unknown>,
+  min: number,
+  max: number,
+): void {
+  const [name, value] = Object.entries(obj)[0];
+
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value) ||
+    value < min ||
+    value > max
+  ) {
+    throw new TypeError(`${name} must be a number between ${min} and ${max}`);
+  }
+}

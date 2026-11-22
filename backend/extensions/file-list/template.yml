@@ -1,0 +1,2 @@
+- step: nyno-ls-objs
+  args: [dir]

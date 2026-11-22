@@ -1,4 +1,0 @@
-- step: nyno-copy-dir
-  args:
-    - src
-    - dsr

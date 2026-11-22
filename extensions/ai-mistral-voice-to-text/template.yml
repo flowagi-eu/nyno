@@ -1,3 +1,0 @@
-- step: ai-mistral-voice-to-text
-  args:
-    - '${prev}' # base64 gui input node

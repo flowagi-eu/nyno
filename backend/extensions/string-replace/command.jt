@@ -1,0 +1,32 @@
+export function string_replace(args: any, context: any) {
+    // Arguments come from args; context only carries optional configuration
+    const original: string = args[0] ?? '';
+    const search: string   = args[1] ?? '';
+    const replace: string  = args[2] ?? '';
+    const setName: string  = context['set'] ?? 'prev';
+
+    return main(setName, original, search, replace);
+}
+
+@CheckAtRuntime
+export function main(setName: string, original: string, search: string, replace: string): [number, any] {
+    const newContext: any = {};
+
+    try {
+        // Soft failure: empty search string — nothing to replace, return original unchanged
+        if (!search) {
+            newContext[setName] = original;
+            return [1, newContext];
+        }
+
+        // split/join replaces ALL occurrences without regex-escaping issues
+        const result: string = original.split(search).join(replace);
+
+        newContext[setName] = result;
+        return [0, newContext]; // Success
+    } catch (error) {
+        // Critical error: fatal exception
+        newContext[setName] = null;
+        return [-1, newContext];
+    }
+}

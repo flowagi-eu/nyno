@@ -1,3 +1,0 @@
-- step: nyno-http-get
-  args:
-    - ${URL}

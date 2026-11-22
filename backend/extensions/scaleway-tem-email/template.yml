@@ -1,0 +1,12 @@
+- step: scaleway-tem-email
+  args:
+    - to
+    - subject
+    - textContent
+    - htmlContent # optional HTML
+  context:
+    SCW_API_KEY: "your-api-key"
+    SCW_PROJECT_ID: "your-project-id"
+    SCW_FROM_EMAIL: "your@email.com"
+    SCW_FROM_NAME: "Your Name"
+    SCW_REGION: "fr-par" # default

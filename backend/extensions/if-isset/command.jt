@@ -1,0 +1,23 @@
+// returns [0,object] on success, default
+// returns [-1,{error}] on critical error
+// returns [n,{object}] for custom next node (0=most left node, 1=one next, 2=second next)
+export function nyno_if_isset(args = [], context = {}) {
+    const setName = context.set_context ?? 'prev';
+
+    if (!args || args.length < 1) {
+        context[`${setName}.usage`] = 'Usage: if_isset "key" or if_isset "key1" "key2" ...';
+        return [-1, context];
+    }
+
+    return main(setName, args, context);
+}
+
+@CheckAtRuntime
+function main(setName: string, keys: any[], context: any) {
+    const newContext = {};
+
+    // Check if all keys exist in context
+    const allExist = keys.every(key => key in context);
+
+    return [allExist ? 0 : 1, {}];
+}

@@ -1,0 +1,6 @@
+- step: nyno-file-write
+  args:
+    - /output/file.md
+    - '${prev}' # previous data
+  context:
+    set_context: "last_write"

@@ -1,0 +1,70 @@
+nyno: '5.3'
+workflow:
+  - id: '0'
+    step: gui-input-textarea
+    label: gui-input-textarea
+    position:
+      x: 0
+      'y': 0
+    next:
+      - 3
+  - id: '3'
+    step: nyno-file-read
+    args:
+      - >-
+        /home/user/Downloads//flo-nyno-v1/backend/extensions/nyno-time/chat-history/chat(0).nyno.json
+    context:
+      set_context: prev_file
+    label: nyno-file-read
+    position:
+      x: -514.9663374023437
+      'y': -187.8333312988281
+    next:
+      - 2
+      - 4
+  - id: '4'
+    step: ai-multiverse-text
+    args:
+      - ${prev}
+    context:
+      set_value: MESSAGES
+    label: ai-multiverse-text
+    position:
+      x: -377.6160244140625
+      'y': -18.149650390625
+    next:
+      - 5
+  - id: '2'
+    step: ai-multiverse-text
+    args:
+      - ${prev}
+    context:
+      set_value: MESSAGES
+      MULTIVERSE_MESSAGES: ${prev_file}
+    label: ai-multiverse-text
+    position:
+      x: -627.7499084472656
+      'y': -18.050073242187494
+    next:
+      - 5
+  - id: '5'
+    step: nyno-file-write
+    args:
+      - >-
+        /home/user/Downloads//flo-nyno-v1/backend/extensions/nyno-time/chat-history/chat(0).nyno.json
+      - ${prev}
+    context:
+      set_context: last_write
+    label: nyno-file-write
+    position:
+      x: -503.799349609375
+      'y': 121.3836251953125
+    next:
+      - 6
+  - id: '6'
+    step: gui-output-chat-history-form
+    label: gui-output-chat-history-form
+    position:
+      x: 0
+      'y': 0
+    next: []

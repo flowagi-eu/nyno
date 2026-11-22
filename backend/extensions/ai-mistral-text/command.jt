@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+import { mistral_normal } from './lib/normal.jt';
+
+export async function ai_mistral_text(args, context) {
+	return mistral_normal(args,context);
+}

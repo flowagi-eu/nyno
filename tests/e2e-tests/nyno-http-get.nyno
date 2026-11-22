@@ -1,6 +1,0 @@
-context:
-  URL: "https://nyno.dev" # example
-workflow:
-  - step: nyno-http-get
-    args:
-      - ${URL}

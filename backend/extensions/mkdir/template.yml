@@ -1,0 +1,4 @@
+- step: nyno-mkdir
+  args:
+    - output/your-new-dir
+

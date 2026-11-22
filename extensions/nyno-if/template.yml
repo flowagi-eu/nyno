@@ -1,5 +1,0 @@
-- step: nyno-if
-  args:
-    - ${prev}
-    - contains
-    - "\"something with quotes\""

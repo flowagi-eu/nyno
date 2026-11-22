@@ -1,3 +1,0 @@
-- step: ai-mistral-image-gen
-  args: 
-    - '${prev}' # prompt

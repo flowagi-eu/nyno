@@ -1,0 +1,38 @@
+
+
+
+
+export async function file_read(args, context) {
+        const setName = context.set ?? "prev";
+        const filePath = args[0];
+        const readFs = context.SYSTEM.fs_read;
+	return main(setName, filePath, readFs);
+}
+
+@CheckAtRuntime
+export async function main(setName: string, filePath: string, readFs: object) {
+    const newContext = {};
+    try {
+        const [retCode, content] = await readFs.cat(filePath);
+        if(retCode != 0) {
+            return [retCode,content];
+        }
+
+        newContext[setName] = content;
+        if(filePath.endsWith('json')) {
+        	newContext[setName + "_meta"] = {json: JSON.parse(content)};
+        }
+
+        console.log('nyno_file_read::main',JSON.stringify([retCode, {filePath,...newContext}]));
+
+        return [retCode, newContext];
+
+    } catch (err) {
+
+	    const newContext = {};
+        newContext[setName + "_error"] = String(err);
+                console.log('nyno_file_read::main_err',JSON.stringify([-1, newContext]));
+        return [-1, newContext ];
+    }
+}
+

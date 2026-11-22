@@ -1,1 +1,0 @@
-🟢 Helper function for quick SQL read

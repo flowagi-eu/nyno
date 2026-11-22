@@ -1,0 +1,68 @@
+function formatDate(date: Date, format: string): string {
+    const pad = (n: number, len: number = 2) => String(n).padStart(len, '0');
+
+    const monthsFull = ['January','February','March','April','May','June',
+        'July','August','September','October','November','December'];
+    const monthsShort = ['Jan','Feb','Mar','Apr','May','Jun',
+        'Jul','Aug','Sep','Oct','Nov','Dec'];
+    const daysShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const daysFull = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    const tokens: Record<string, () => string | number> = {
+        'Y': () => date.getFullYear(),
+        'y': () => String(date.getFullYear()).slice(-2),
+        'm': () => pad(date.getMonth() + 1),
+        'n': () => date.getMonth() + 1,
+        'd': () => pad(date.getDate()),
+        'j': () => date.getDate(),
+        'H': () => pad(date.getHours()),
+        'G': () => date.getHours(),
+        'i': () => pad(date.getMinutes()),
+        's': () => pad(date.getSeconds()),
+        'F': () => monthsFull[date.getMonth()],
+        'M': () => monthsShort[date.getMonth()],
+        'a': () => date.getHours() < 12 ? 'am' : 'pm',
+        'A': () => date.getHours() < 12 ? 'AM' : 'PM',
+        'D': () => daysShort[date.getDay()],
+        'l': () => daysFull[date.getDay()],
+    };
+
+    let result = '';
+    for (let i = 0; i < format.length; i++) {
+        const ch = format[i];
+        if (ch === '\\' && i + 1 < format.length) {
+            result += format[i + 1];
+            i++;
+        } else if (tokens[ch]) {
+            result += tokens[ch]();
+        } else {
+            result += ch;
+        }
+    }
+    return result;
+}
+
+export function nyno_time(args: any, context: any) {
+    let setName = context['set_context'] ?? 'prev';
+    // If FORMAT is not defined, the value is 'timestamp'
+    let format = context['FORMAT'] ?? 'timestamp';
+    
+    return main(setName, format);
+}
+
+@CheckAtRuntime
+export function main(setName: string, format: string) {
+    const now = new Date();
+    let value: string | number;
+
+    if (format === 'timestamp') {
+        value = Math.floor(now.getTime() / 1000);
+    } else {
+        value = formatDate(now, format);
+    }
+
+    const newContext = {};
+    newContext[setName] = value;
+
+    return [0, newContext];
+}

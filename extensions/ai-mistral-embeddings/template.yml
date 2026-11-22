@@ -1,3 +1,0 @@
-- step: ai-mistral-embeddings
-  args:
-    - '${prev}'

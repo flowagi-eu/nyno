@@ -1,2 +1,0 @@
-- step: gui-output-chat-history-form
-  # needs ${prev} as MESSAGES (history) for input

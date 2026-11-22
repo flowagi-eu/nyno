@@ -1,0 +1,2 @@
+- step: ai-multiverse-text
+  args: ['${prev}']

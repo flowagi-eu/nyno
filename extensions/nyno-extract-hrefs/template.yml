@@ -1,3 +1,0 @@
-- step: nyno-extract-hrefs
-  args:
-    - "<div><a href=\"/test-link\">test 1<a>"

@@ -1,0 +1,11 @@
+[project]
+name = "python-runner"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beartype>=0.23.1",
+    "msgpack>=1.2.4",
+    "python-dotenv>=1.2.4",
+]

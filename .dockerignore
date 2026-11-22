@@ -1,11 +1,9 @@
-workflows-enabled
+docker.env
 .git
-plugin_sdk
 .ascend
 build
 h
 input
 output
-workflows-available
-envs/.nyno_log_db.env
 dist-ts
+.env

@@ -1,0 +1,151 @@
+import yaml from 'js-yaml';
+import { createCtx } from "../../ctxfactory.config.js"; // for auth/checking
+import { flows } from '../../http-server/handlers/flows.js'
+import { polling } from '../../http-server/handlers/polling.js'
+
+
+export async function runSubworkflow(workflow,context){
+    const taskId = await startTask(workflow,context);
+    const result = await pollTask(taskId);
+    return result;
+}
+export async function startTask(workflow,context){
+  console.log('startTask', JSON.stringify({workflow,context}));
+    const req = { body: { workflow,context} }; 
+    const ctx = await createCtx({headers: {authorization: process.env.SECRET_NYNO_API_KEY}});
+    const taskInfo = await flows (ctx,req); // [200, {taskId}]
+    return taskInfo[1].taskId;
+}
+
+export async function pollTask(taskId, maxAttempts = 1000) {
+    const req = { params: { taskId } };
+    const ctx = await createCtx({headers: {authorization: process.env.SECRET_NYNO_API_KEY}});
+    const POLL_INTERVAL_MS = 100;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const taskInfo = await polling(ctx, req); // [200, {status: "pending"}]
+        const status = taskInfo[1]?.status;
+
+        if (status !== "pending") {
+            return taskInfo[1];
+        }
+
+        // wait 100ms before next poll (skip on last attempt)
+        if (attempt < maxAttempts - 1) {
+            await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+        }
+    }
+
+    throw new Error(`Task ${taskId} still pending after ${maxAttempts} attempts (${maxAttempts * POLL_INTERVAL_MS}ms)`);
+}
+
+
+export async function subworkflow(args = [], context = {}) {
+
+  const subworkflowObj = args[0];
+  const concurrency = context.concurrency ?? 4;
+    const subworkflowContext = context.sub_context ?? {};
+    const items = context.for_each ?? [];
+    const setName = context.set ?? 'prev'; // setName with default 'prev' is also required
+
+  const res = await main(setName,subworkflowContext,items, concurrency, subworkflowObj);
+    return res;
+
+}
+
+@CheckAtRuntime
+async function main(
+  setName: string,
+  subworkflowContext: object,
+  items: any[],
+  concurrency: number,
+  subworkflowObj: object,
+) {
+  const workerCount = Math.min(
+    Math.max(concurrency, 1),
+    10
+  );
+
+  const results = new Array(items.length);
+  let nextIndex = 0;
+ 
+  async function worker() {
+    while (true) {
+      const index = nextIndex++;
+
+      if (index >= items.length) {
+        return;
+      }
+
+      const [code, result] = await subworkflowItem(
+        items[index],
+        subworkflowObj,
+        subworkflowContext
+      );
+
+      results[index] = {
+        index,
+        code,
+        result: result.result
+      };
+    }
+  }
+
+  const workers = Array.from(
+    {
+      length: Math.min(workerCount, items.length)
+    },
+    () => worker()
+  );
+
+  await Promise.all(workers);
+
+  const newContext = {};
+  newContext[setName] = results;
+
+  return [0, newContext];
+}
+
+@CheckAtRuntime
+async function subworkflowItem(
+  item: any,
+  subworkflowObj:object,
+  subworkflowContext:object
+) {
+  try {
+
+    if(!("context" in subworkflowObj)){
+      subworkflowObj.context = {};
+    }
+    
+     // add context from sub
+    for(const key of Object.keys(subworkflowContext)){
+      subworkflowObj.context[key] = subworkflowContext[key];
+    }
+
+    subworkflowObj.context['prev'] = item;
+
+    const result = await executeSubworkflow(
+      subworkflowObj,
+    );
+
+    return [0, { result: result }];
+  } catch (error) {
+    return [
+      -1,
+      {
+        error: error instanceof Error
+          ? error.message
+          : String(error)
+      }
+    ];
+  }
+}
+
+async function executeSubworkflow(
+      subworkflowObj: object,
+    ) {
+        const res = await runSubworkflow(subworkflowObj.workflow,subworkflowObj.context);
+        return res;
+
+}

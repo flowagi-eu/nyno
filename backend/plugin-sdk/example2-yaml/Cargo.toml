@@ -1,0 +1,9 @@
+[package]
+name = "example-extension2"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+plugin-sdk = { path = ".." }
+serde_json = "1"
+noyalib = "0.0.51"

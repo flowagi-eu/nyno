@@ -1,5 +1,0 @@
-- step: nyno-sftp-command
-  args:
-    - "root@yourdomain.com"
-    - "./localfile.txt"
-    - "/root/remote_uploaded.txt"
