@@ -1,6 +1,6 @@
 # Nyno 10
 
-## `Derisk AI innovation` by seperating code from configuration.
+## `Derisk AI innovation` by separating code from configuration.
 Nyno is a global open protocol to derisk AI innovation.
 
 
