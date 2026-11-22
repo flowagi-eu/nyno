@@ -98,7 +98,7 @@ workflow:
 ### Run the Server
 ```
 git clone https://github.com/flowagi-eu/nyno
-bash run-container-prod.sh podman # or docker
+cd nyno && bash run-container-prod.sh podman # or docker
 ```
 
 ### Run Your First Workflow
