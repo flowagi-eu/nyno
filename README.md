@@ -130,6 +130,15 @@ nyno10 workflow.yml
 
 ---
 
+## Extensions
+Nyno can be extended with Python, JavaScript and Rust/WASM (WASI P2) extensions, so you can add your own steps. 
+
+You can place custom extensions in the `./my-extensions` folder.
+
+See also `./my-extensions/README.md`
+
+---
+
 ## Need more help?
 
 ### 🌐 Community
