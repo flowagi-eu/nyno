@@ -5,7 +5,8 @@ if [ -z "$1" ]; then
 fi
 
 CONTAINER_TOOL=$1
-IMAGE_NAME="localhost/nyno-v10:latest"
+IMAGE_NAME="flowagi/nyno:latest"
+#IMAGE_NAME="localhost/nyno-v10:latest"
 
 # --- Ensure docker.env exists (create empty if missing) ---
 if [ ! -f docker.env ]; then
