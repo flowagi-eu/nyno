@@ -62,10 +62,10 @@ Conventional keys like "prev" and "meta" are used to set the previous text value
 
 ```json
 {
-    prev: "Hello, how can I help?",
-    prev_meta: {
-      usage: {}
-    }
+  "prev": "Hello, how can I help?",
+  "prev_meta": {
+    "usage": {}
+  }
 }
 ```
 
