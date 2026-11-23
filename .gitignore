@@ -1,5 +1,4 @@
 docker.env
-**/node_modules/
 backend/node_modules
 backend/shared-libs/nyno-engine/node_modules
 .ascend
