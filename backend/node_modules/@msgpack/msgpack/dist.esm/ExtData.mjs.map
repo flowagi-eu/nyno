@@ -1,0 +1,1 @@
+{"version":3,"file":"ExtDatamjs","sourceRoot":"","sources":["../src/ExtData.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,MAAM,OAAO,OAAO;IACT,IAAI,CAAS;IACb,IAAI,CAA6C;IAE1D,YAAY,IAAY,EAAE,IAAgD,EAAE;QAC1E,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;IAAA,CAClB;CACF"}

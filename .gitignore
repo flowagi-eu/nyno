@@ -1,4 +1,5 @@
 docker.env
+backend/shared-libs/nyno-engine/node_modules
 .ascend
 build
 h
