@@ -1,1 +1,1 @@
-/home/user/nyno-v10/backend/plugin-sdk/target/wasm32-wasip2/release/example-extension2.wasm: /home/user/nyno-v10/backend/plugin-sdk/example2-yaml/src/main.rs /home/user/nyno-v10/backend/plugin-sdk/src/lib.rs
+/home/user/Downloads/nyno/backend/plugin-sdk/target/wasm32-wasip2/release/example-extension2.wasm: /home/user/Downloads/nyno/backend/plugin-sdk/example2-yaml/src/main.rs /home/user/Downloads/nyno/backend/plugin-sdk/src/lib.rs

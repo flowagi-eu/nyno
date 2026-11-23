@@ -3,12 +3,22 @@
 ENV_FILE="$(dirname "${BASH_SOURCE[0]}")/.env"
 [ -f "$ENV_FILE" ] && source "$ENV_FILE"
 
+
+
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Comma-separated list of directories to watch (spaces after commas are OK)
 WATCH_DIRS="${NYNO_WATCH_DIRS:-$ROOT/backend/extensions,$ROOT/my-extensions}"
 DEBOUNCE=2
+
+
+if [ ! -L "$ROOT/backend/shared-libs/nyno-engine/node_modules" ]; then
+    ln -s "$ROOT/backend/node_modules" \
+        "$ROOT/backend/shared-libs/nyno-engine/node_modules"
+fi
+
+
 
 command -v inotifywait >/dev/null || {
     echo "Install: sudo apt install inotify-tools"
